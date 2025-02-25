@@ -1,0 +1,755 @@
+---
+alwaysApply: false
+---
+# 项目架构规范与设计原则
+
+## 一、架构概述
+
+本项目基于阿里巴巴 **COLA（Clean Object-Oriented and Layered Architecture）** 框架开发，支持 **DDD（领域驱动设计）** 和 **MVC（模型-视图-控制器）** 两种开发模式。
+
+### 架构分层原则
+
+```
+┌─────────────────────────────────────────┐
+│         Adapter Layer (适配层)          │  ← 对外接口，处理HTTP请求
+├─────────────────────────────────────────┤
+│       Application Layer (应用层)        │  ← 业务编排与流程控制
+├─────────────────────────────────────────┤
+│         Domain Layer (领域层)           │  ← 【仅DDD模式】核心业务逻辑
+├─────────────────────────────────────────┤
+│     Infrastructure Layer (基础设施层)   │  ← 技术实现，数据持久化
+└─────────────────────────────────────────┘
+```
+
+**注意：当前项目暂不需要 Client 层（API 定义层）**
+
+---
+
+## 二、模式选择指南
+
+### 2.1 何时使用 DDD 模式？
+
+适用于**复杂的写场景**，具有以下特征：
+
+- ✅ **复杂的业务逻辑**：包含多个业务规则、状态转换
+- ✅ **需要领域模型**：业务实体包含行为和状态
+- ✅ **多层次的业务编排**：需要协调多个领域对象
+- ✅ **重要的业务流程**：核心业务功能，需要严格的业务规则
+
+**DDD 模式示例场景：**
+- 帖子发布（审核、权限、状态管理）
+- 评论管理（审核、嵌套回复、通知）
+- 用户注册（验证、角色分配、欢迎流程）
+- 订单处理（状态流转、库存扣减、支付）
+
+**DDD 模式分层结构：**
+```
+Adapter (Controller)
+    ↓ 调用
+Application (编排层)
+    ↓ 调用
+Domain (领域层)
+    - Entity (E 后缀)：领域实体
+    - ValueObject (V 后缀)：值对象
+    - DomainService：领域服务
+    - Gateway：领域网关接口
+    ↓ 依赖接口
+Infrastructure (实现层)
+    - GatewayImpl：实现 Gateway 接口
+    - Mapper：MyBatis-Plus 数据访问
+```
+
+### 2.2 何时使用 MVC 模式？
+
+适用于**简单的业务逻辑或查询场景**，具有以下特征：
+
+- ✅ **简单的 CRUD 操作**：直接的增删改查
+- ✅ **查询场景**：数据展示、报表、列表查询
+- ✅ **配置管理**：系统配置的读写
+- ✅ **工具类服务**：辅助功能、数据转换
+
+**MVC 模式示例场景：**
+- 系统配置查询
+- 简单的数据字典管理
+- 用户信息查询
+- 日志查询
+- 统计数据获取
+
+**MVC 模式分层结构：**
+```
+Adapter (Controller)
+    ↓ 调用
+Application (当做 Service)
+    ↓ 直接调用
+Infrastructure (Mapper)
+    - Mapper：MyBatis-Plus 数据访问
+    - PO：持久化对象
+```
+
+**注意：MVC 模式下，Application 层直接调用 Infrastructure 的 Mapper，无需 Domain 层**
+
+---
+
+## 三、项目结构
+
+### 3.1 模块划分
+
+#### 业务模块（nx-biz-*）
+```
+nx-biz-forum/                    # 论坛业务模块
+├── nx-forum-adapter/            # 适配层（Controller）
+├── nx-forum-app/                # 应用层（Application）
+├── nx-forum-domain/             # 领域层（Domain Entity、Gateway）【仅DDD】
+└── nx-forum-infrastructure/     # 基础设施层（Mapper、GatewayImpl）
+```
+
+#### 平台模块（nx-platform）
+```
+nx-platform/                     # 平台通用能力
+├── nx-common/                   # 公共组件和工具类
+└── nx-module-*/                 # 按业务域划分子模块
+    ├── *-adapter/               # 适配层
+    ├── *-app/                   # 应用层
+    ├── *-domain/                # 领域层【可选】
+    └── *-infrastructure/        # 基础设施层
+```
+
+### 3.2 包结构规范
+
+```
+com.leyuz.{module}.{domain}/
+├── {domain}Application.java           # 应用服务
+├── {domain}Controller.java            # 【adapter包】控制器
+├── domain/                             # 【仅DDD】领域包
+│   ├── {Domain}E.java                 # 领域实体
+│   ├── {Domain}V.java                 # 值对象
+│   ├── service/{Domain}DomainService  # 领域服务
+│   └── gateway/{Domain}Gateway        # 领域网关接口
+├── dto/                                # 数据传输对象
+│   ├── {Domain}Cmd.java               # 命令对象
+│   ├── {Domain}Query.java             # 查询对象
+│   └── {Domain}VO.java                # 视图对象
+└── mybatis/                            # 【infrastructure包】数据访问
+    ├── I{Domain}Service.java          # Mapper 接口
+    └── {Domain}PO.java                # 持久化对象
+```
+
+---
+
+## 四、分层设计规范
+
+### 4.1 Adapter 层（适配层）
+
+**职责：** 处理 HTTP 请求，参数校验，响应封装
+
+**规范：**
+- 使用 `@RestController` 注解
+- 类名以 `Controller` 结尾
+- 方法命名规范：
+  - 查询：`query*` / `list*` / `get*`
+  - 创建：`create*` / `add*`
+  - 更新：`update*` / `modify*`
+  - 删除：`delete*` / `remove*`
+- 统一使用 `SingleResponse` / `MultiResponse` 包装响应
+- 入参使用 `*Cmd` / `*Query` 命名
+- 使用 `@Operation` 注解文档化 API
+- 使用 `@Schema` 注解提供参数说明
+
+**示例：**
+```java
+@RestController
+@RequiredArgsConstructor
+@Tag(name = "Thread", description = "帖子管理")
+public class ThreadController {
+    private final ThreadApplication threadApplication;
+    
+    @PostMapping("/thread")
+    @Operation(summary = "创建帖子")
+    public SingleResponse<Void> createThread(
+        @RequestParam Integer forumId,
+        @RequestBody @Valid ThreadCmd threadCmd) {
+        threadApplication.createThread(forumId, threadCmd);
+        return SingleResponse.buildSuccess();
+    }
+    
+    @GetMapping("/thread/{threadId}")
+    @Operation(summary = "查询帖子详情")
+    public SingleResponse<ThreadDetailVO> getThread(@PathVariable Long threadId) {
+        return SingleResponse.of(threadApplication.getThreadForView(threadId));
+    }
+}
+```
+
+### 4.2 Application 层（应用层）
+
+#### 4.2.1 DDD 模式下的 Application
+
+**职责：** 业务编排、流程控制、权限校验、事务管理
+
+**规范：**
+- 使用 `@Service` 注解
+- 类名以 `Application` 结尾
+- 使用构造器注入（`@RequiredArgsConstructor`）
+- 负责组织和调度领域对象
+- 处理事务（`@Transactional`）
+- DTO 与领域对象的转换
+- 权限校验
+- 不包含核心业务逻辑（应在 Domain 层）
+
+**示例：**
+```java
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ThreadApplication {
+    private final ThreadDomainService threadDomainService;
+    private final ThreadGateway threadGateway;
+    private final ForumPermissionResolver forumPermissionResolver;
+    
+    public void createThread(Integer forumId, ThreadCmd threadCmd) {
+        // 1. 权限校验
+        forumPermissionResolver.checkPermission(forumId, "thread:new");
+        
+        // 2. 构建领域对象
+        ThreadE threadE = ThreadE.builder()
+            .forumId(forumId)
+            .subject(threadCmd.getSubject())
+            .content(threadCmd.getContent())
+            .build();
+        
+        // 3. 调用领域服务
+        threadDomainService.save(threadE);
+    }
+    
+    public ThreadDetailVO getThreadForView(Long threadId) {
+        // 1. 查询领域对象
+        ThreadE threadE = threadGateway.getThreadDetail(threadId);
+        
+        // 2. 权限校验
+        forumPermissionResolver.checkPermission(threadE.getForumId(), "thread:view");
+        
+        // 3. 转换为 VO
+        return BeanUtil.toBean(threadE, ThreadDetailVO.class);
+    }
+}
+```
+
+#### 4.2.2 MVC 模式下的 Application
+
+**职责：** 直接处理业务逻辑，作为 Service 层
+
+**规范：**
+- 使用 `@Service` 注解
+- 类名以 `Application` 结尾
+- 直接调用 Infrastructure 层的 Mapper
+- 处理事务（`@Transactional`）
+- 数据校验和转换
+- **无需 Domain 层**
+
+**示例：**
+```java
+@Service
+@RequiredArgsConstructor
+public class ForumConfigApplication {
+    private final ConfigApplication configApplication;  // 可以依赖其他模块的 Application
+    
+    public Integer getDefaultForumId() {
+        String defaultValue = configApplication.getConfigValueByKey(ConfigConst.DEFAULT_FORUM_ID);
+        if (StringUtils.isBlank(defaultValue)) {
+            return DEFAULT_FORUM_ID;
+        }
+        return Integer.parseInt(defaultValue);
+    }
+    
+    public WebsiteBaseInfoVO getWebsiteBaseInfo() {
+        String defaultValue = configApplication.getConfigValueByKey(ConfigConst.WEBSITE_BASE_INFO);
+        return JSON.parseObject(defaultValue, WebsiteBaseInfoVO.class);
+    }
+    
+    public boolean updateWebsiteBaseInfo(WebsiteBaseInfoVO vo) {
+        return configApplication.updateConfig(
+            ConfigConst.WEBSITE_BASE_INFO, 
+            JSON.toJSONString(vo)
+        );
+    }
+}
+```
+
+### 4.3 Domain 层（领域层）【仅 DDD 模式】
+
+**职责：** 封装核心业务逻辑和规则
+
+**规范：**
+- 定义领域模型（使用 `E` 后缀）
+- 定义值对象（使用 `V` 后缀）
+- 定义领域服务（`DomainService`）
+- 定义领域网关接口（`Gateway`）
+- **不依赖基础设施层**（通过接口依赖）
+- 包含业务规则验证
+- 状态管理和状态转换
+
+**领域实体示例：**
+```java
+@Data
+@Builder
+public class ThreadE {
+    private Long threadId;
+    private Integer forumId;
+    private String subject;
+    private String content;
+    private AuditStatusV auditStatus;
+    private ThreadPropertyV property;
+    
+    // 领域行为
+    public void outputForView() {
+        // 处理内容展示逻辑
+        this.content = processContentForView(this.content);
+    }
+    
+    public void setAuditResult(AuditStatusV status, String reason) {
+        this.auditStatus = status;
+        // 其他审核相关的业务逻辑
+    }
+}
+```
+
+**值对象示例：**
+```java
+@Data
+@AllArgsConstructor
+public class AuditStatusV {
+    public static final AuditStatusV PASSED = new AuditStatusV(1, "已通过");
+    public static final AuditStatusV AUDITING = new AuditStatusV(0, "审核中");
+    public static final AuditStatusV REJECTED = new AuditStatusV(-1, "已拒绝");
+    
+    private Integer value;
+    private String desc;
+}
+```
+
+**领域服务示例：**
+```java
+@Service
+@RequiredArgsConstructor
+public class ThreadDomainService {
+    private final ThreadGateway threadGateway;
+    
+    public void save(ThreadE threadE) {
+        // 核心业务逻辑
+        validateThread(threadE);
+        threadGateway.save(threadE);
+    }
+    
+    public void passThreads(Integer forumId, List<Long> threadIds, boolean notice) {
+        // 批量审核通过的业务逻辑
+        List<ThreadE> threads = threadGateway.getThreadsByIds(threadIds);
+        threads.forEach(thread -> thread.setAuditResult(AuditStatusV.PASSED, null));
+        threadGateway.batchUpdate(threads);
+        
+        if (notice) {
+            // 发送通知
+        }
+    }
+    
+    private void validateThread(ThreadE threadE) {
+        if (StringUtils.isBlank(threadE.getSubject())) {
+            throw new ValidationException("标题不能为空");
+        }
+        // 其他业务规则校验
+    }
+}
+```
+
+**领域网关接口示例：**
+```java
+public interface ThreadGateway {
+    void save(ThreadE threadE);
+    ThreadE getThread(Long threadId);
+    ThreadE getThreadDetail(Long threadId);
+    List<ThreadE> getThreadsByIds(List<Long> threadIds);
+    void batchUpdate(List<ThreadE> threads);
+    long getAuditingCount(Integer forumId);
+}
+```
+
+### 4.4 Infrastructure 层（基础设施层）
+
+**职责：** 技术实现，数据持久化，外部服务调用
+
+#### 4.4.1 DDD 模式下的 Infrastructure
+
+**规范：**
+- 实现 Domain 层定义的 Gateway 接口
+- 类名以 `GatewayImpl` 结尾
+- 使用 `@Repository` 或 `@Component` 注解
+- PO 与领域对象的相互转换
+- MyBatis-Plus 数据操作
+
+**示例：**
+```java
+@Repository
+@RequiredArgsConstructor
+public class ThreadGatewayImpl implements ThreadGateway {
+    private final IThreadService threadService;
+    
+    @Override
+    public void save(ThreadE threadE) {
+        ThreadPO threadPO = convertE2PO(threadE);
+        threadService.save(threadPO);
+        threadE.setThreadId(threadPO.getThreadId());
+    }
+    
+    @Override
+    public ThreadE getThread(Long threadId) {
+        ThreadPO threadPO = threadService.getById(threadId);
+        return convertPO2E(threadPO);
+    }
+    
+    private ThreadPO convertE2PO(ThreadE threadE) {
+        // 转换逻辑
+        return BeanUtil.toBean(threadE, ThreadPO.class);
+    }
+    
+    private ThreadE convertPO2E(ThreadPO threadPO) {
+        // 转换逻辑
+        return BeanUtil.toBean(threadPO, ThreadE.class);
+    }
+}
+```
+
+#### 4.4.2 MVC 模式下的 Infrastructure
+
+**规范：**
+- 定义 MyBatis-Plus Mapper 接口
+- 接口名以 `I*Service` 命名
+- 继承 `IService<PO>` 接口
+- 实现类以 `*ServiceImpl` 命名
+- 继承 `ServiceImpl<Mapper, PO>`
+
+**Mapper 接口示例：**
+```java
+public interface IConfigService extends IService<ConfigPO> {
+    ConfigPO getConfigByKey(String key);
+    boolean updateConfigValue(String key, String value);
+}
+```
+
+**Mapper 实现示例：**
+```java
+@Service
+public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, ConfigPO> 
+    implements IConfigService {
+    
+    @Override
+    public ConfigPO getConfigByKey(String key) {
+        return this.getOne(Wrappers.<ConfigPO>lambdaQuery()
+            .eq(ConfigPO::getConfigKey, key));
+    }
+    
+    @Override
+    public boolean updateConfigValue(String key, String value) {
+        return this.update(Wrappers.<ConfigPO>lambdaUpdate()
+            .eq(ConfigPO::getConfigKey, key)
+            .set(ConfigPO::getConfigValue, value));
+    }
+}
+```
+
+---
+
+## 五、统一规范
+
+### 5.1 数据对象规范
+
+| 对象类型 | 说明 | 使用场景 | 命名规范 |
+|---------|------|---------|---------|
+| **Cmd** | 命令对象 | Adapter 层接收写操作参数 | `*Cmd` |
+| **Query** | 查询对象 | Adapter 层接收查询参数 | `*Query` / `*PageQuery` |
+| **VO** | 视图对象 | Adapter 层返回给前端 | `*VO` |
+| **DTO** | 数据传输对象 | 层间数据传输 | `*DTO` |
+| **E** | 领域实体 | Domain 层业务模型 | `*E` |
+| **V** | 值对象 | Domain 层不可变对象 | `*V` |
+| **PO** | 持久化对象 | Infrastructure 层数据库映射 | `*PO` |
+
+### 5.2 命名规范
+
+#### 类命名
+- Controller：`*Controller`
+- Application：`*Application`
+- DomainService：`*DomainService`
+- Gateway：`*Gateway`
+- GatewayImpl：`*GatewayImpl`
+- Mapper 接口：`I*Service`
+- Mapper 实现：`*ServiceImpl`
+
+#### 方法命名
+- 类名使用大驼峰命名法：`UserController`、`ThreadApplication`
+- 方法和变量使用小驼峰命名法：`findUserById`、`isOrderValid`
+- 常量使用全大写：`MAX_RETRY_ATTEMPTS`、`DEFAULT_PAGE_SIZE`
+- 布尔类型使用 `is*` / `has*` 前缀：`isDeleted`、`hasPermission`
+
+### 5.3 分页查询规范
+
+- 统一使用 `CustomPage<T>` 封装分页结果
+- 分页参数：`pageNo` / `pageSize`
+- 查询参数使用 `*PageQuery` 封装
+- 使用 `DataBaseUtils.createCustomPage()` 处理分页转换
+
+**示例：**
+```java
+public CustomPage<ThreadVO> queryThreads(ThreadQuery threadQuery) {
+    Page<ThreadPO> threadPOPage = threadService.queryThreads(threadQuery);
+    return DataBaseUtils.createCustomPage(threadPOPage, this::convertPO2VO);
+}
+```
+
+### 5.4 数据验证规范
+
+- 使用 `ValidationException` 处理业务校验异常
+- 使用 `@Valid` / `@Validated` 进行参数校验
+- 在 Application 层进行业务规则验证
+- 在 Domain 层进行领域规则验证
+
+**示例：**
+```java
+// Cmd 对象使用 JSR-303 注解
+public class ThreadCmd {
+    @NotBlank(message = "标题不能为空")
+    @Size(max = 100, message = "标题长度不能超过100")
+    private String subject;
+    
+    @NotBlank(message = "内容不能为空")
+    private String content;
+}
+
+// Application 层业务校验
+if (threadE.getAuditStatus().equals(AuditStatusV.AUDITING)) {
+    throw new ValidationException("帖子审核中，不允许修改");
+}
+```
+
+### 5.5 异常处理规范
+
+- 使用 `ValidationException` 处理业务校验错误（4xx）
+- 使用 `BusinessException` 处理业务逻辑错误（5xx）
+- 使用 `@ControllerAdvice` 统一异常处理
+- 异常信息清晰明确，面向用户
+
+### 5.6 事务管理规范
+
+- 在 Application 层使用 `@Transactional` 注解
+- 避免在 Controller 层使用事务
+- 注意事务传播级别的选择
+- 长事务拆分，避免锁表
+
+**示例：**
+```java
+@Transactional(rollbackFor = Exception.class)
+public void createThread(Integer forumId, ThreadCmd threadCmd) {
+    // 事务操作
+}
+```
+
+### 5.7 缓存处理规范
+
+- 优先使用本地缓存（Caffeine）
+- 合理使用分布式缓存（Redis）
+- 使用 `GenericCache` 工具类
+- 注意缓存一致性
+
+**示例：**
+```java
+@Service
+@RequiredArgsConstructor
+public class ThreadApplication {
+    private final GenericCache<String, List<ThreadVO>> threadsHotCache;
+    
+    public List<ThreadVO> queryHotThreads(Integer days, Integer limit) {
+        return threadsHotCache.computeIfAbsent(
+            String.format("%d-%d", days, limit),
+            key -> {
+                // 查询逻辑
+                return queryFromDatabase(days, limit);
+            }
+        );
+    }
+}
+```
+
+### 5.8 代码风格规范
+
+- 使用 Lombok 简化代码：`@Data`、`@Builder`、`@RequiredArgsConstructor`
+- 统一使用构造器注入，避免字段注入
+- 代码注释完整规范（类、方法、复杂逻辑）
+- 使用 `@Schema` 注解提供 API 文档
+- 遵循阿里巴巴 Java 开发手册规范
+
+### 5.9 数据库操作规范
+
+- 使用 MyBatis-Plus 进行数据操作
+- 统一使用逻辑删除（`@TableLogic`）
+- PO 继承基础实体类（`BasePO`）包含：
+  - `createTime`：创建时间
+  - `updateTime`：更新时间
+  - `createBy`：创建人
+  - `updateBy`：更新人
+  - `isDeleted`：删除标识
+- 使用 `BaseEntityUtils` 处理基础字段
+
+**示例：**
+```java
+@Data
+@TableName("bbs_thread")
+public class ThreadPO extends BasePO {
+    @TableId(type = IdType.AUTO)
+    private Long threadId;
+    private Integer forumId;
+    private String subject;
+    private String content;
+    
+    @TableLogic
+    private Boolean isDeleted;
+}
+```
+
+### 5.10 日志规范
+
+- 使用 `@Slf4j` 注解
+- 日志级别合理使用：
+  - `error`：错误异常
+  - `warn`：警告信息
+  - `info`：关键流程
+  - `debug`：调试信息
+- 避免打印敏感信息
+
+**示例：**
+```java
+@Slf4j
+@Service
+public class ThreadApplication {
+    public void createThread(ThreadCmd cmd) {
+        log.info("创建帖子, forumId={}, subject={}", cmd.getForumId(), cmd.getSubject());
+        try {
+            // 业务逻辑
+        } catch (Exception e) {
+            log.error("创建帖子失败, cmd={}", cmd, e);
+            throw e;
+        }
+    }
+}
+```
+
+---
+
+## 六、开发流程
+
+### 6.1 DDD 模式开发流程
+
+1. **定义领域模型（Domain）**
+   - 创建领域实体（`*E`）
+   - 创建值对象（`*V`）
+   - 定义领域网关接口（`*Gateway`）
+   - 实现领域服务（`*DomainService`）
+
+2. **实现基础设施（Infrastructure）**
+   - 创建 PO 对象（`*PO`）
+   - 定义 Mapper 接口（`I*Service`）
+   - 实现 Gateway 接口（`*GatewayImpl`）
+
+3. **编写应用服务（Application）**
+   - 创建 Application 类（`*Application`）
+   - 编排领域对象
+   - 处理事务和权限
+
+4. **实现控制器（Adapter）**
+   - 创建 Controller（`*Controller`）
+   - 定义 API 接口
+   - 处理请求和响应
+
+### 6.2 MVC 模式开发流程
+
+1. **定义数据模型（Infrastructure）**
+   - 创建 PO 对象（`*PO`）
+   - 定义 Mapper 接口（`I*Service`）
+   - 实现 Mapper（`*ServiceImpl`）
+
+2. **编写应用服务（Application）**
+   - 创建 Application 类（`*Application`）
+   - 直接调用 Mapper
+   - 处理业务逻辑
+
+3. **实现控制器（Adapter）**
+   - 创建 Controller（`*Controller`）
+   - 定义 API 接口
+   - 处理请求和响应
+
+---
+
+## 七、最佳实践
+
+### 7.1 何时重构 MVC 为 DDD？
+
+当 MVC 模式的代码出现以下情况时，应考虑重构为 DDD：
+
+- Application 层方法超过 100 行
+- 出现大量的 `if-else` 业务判断
+- 业务规则散落在多处
+- 需要频繁修改业务逻辑
+- 出现了相似的业务逻辑复制
+
+### 7.2 模块间调用规范
+
+- **优先调用 Application 层**：模块间调用统一通过 Application 层
+- **避免调用 Domain 层**：Domain 层仅在模块内部使用
+- **禁止调用 Infrastructure 层**：Infrastructure 层不对外暴露
+
+**示例：**
+```java
+// ✅ 正确：调用其他模块的 Application
+@Service
+@RequiredArgsConstructor
+public class ThreadApplication {
+    private final ForumApplication forumApplication;  // 调用其他模块
+    private final AuditApplication auditApplication;
+}
+
+// ❌ 错误：跨模块调用 Gateway 或 Mapper
+@Service
+@RequiredArgsConstructor
+public class ThreadApplication {
+    private final ForumGateway forumGateway;  // ❌ 不要这样做
+    private final IForumService forumService;  // ❌ 不要这样做
+}
+```
+
+### 7.3 代码复用策略
+
+- **公共工具类**：放在 `nx-common` 模块
+- **通用业务逻辑**：抽取到 `nx-platform` 的对应模块
+- **领域服务**：仅在模块内复用
+- **值对象**：可在模块间共享
+
+---
+
+## 八、总结
+
+| 对比项 | DDD 模式 | MVC 模式 |
+|-------|---------|---------|
+| **适用场景** | 复杂写场景 | 简单查询/CRUD |
+| **是否有 Domain 层** | ✅ 有 | ❌ 无 |
+| **Application 职责** | 业务编排 | 直接处理业务 |
+| **Infrastructure 调用** | 通过 Gateway 接口 | Application 直接调用 Mapper |
+| **业务逻辑位置** | Domain 层 | Application 层 |
+| **复杂度** | 高 | 低 |
+| **可维护性** | 高（业务复杂时）| 高（业务简单时）|
+
+**核心原则：**
+- ✅ **按业务领域分组**：先划分业务域，再选择模式
+- ✅ **简单场景用 MVC**：查询、配置、简单 CRUD
+- ✅ **复杂场景用 DDD**：核心业务、复杂状态管理
+- ✅ **渐进式重构**：MVC 可以重构为 DDD
+- ✅ **统一编码规范**：无论哪种模式，遵循统一规范
+
+---
+
+**最后更新：** 2025-10-25

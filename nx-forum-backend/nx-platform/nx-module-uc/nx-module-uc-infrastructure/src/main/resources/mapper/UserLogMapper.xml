@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leyuz.uc.log.UserLogMapper">
+    
+    <select id="queryUserLogs" resultType="com.leyuz.uc.log.UserLogPO">
+        SELECT * FROM uc_user_logs
+        WHERE 1=1
+        <if test="params.userId != null and params.userId > 0">
+            AND create_by = #{params.userId}
+        </if>
+        <if test="params.ipAddress != null and params.ipAddress != ''">
+            AND ip_address = #{params.ipAddress}
+        </if>
+        <if test="params.logType != null">
+            AND log_type = #{params.logType}
+        </if>
+        ORDER BY log_id DESC
+    </select>
+    
+</mapper>
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leyuz.uc.auth.role.UserRoleMapper">
+    
+    <!-- 分页查询用户角色列表（支持通过用户名查询） -->
+    <select id="queryUserRoles" resultType="com.leyuz.uc.auth.role.UserRolePO">
+        SELECT ur.* FROM uc_user_roles ur
+        WHERE ur.is_deleted = 0
+        <if test="params.roleKey != null and params.roleKey != ''">
+            AND ur.role_key = #{params.roleKey}
+        </if>
+        <if test="params.roleScope != null and params.roleScope != ''">
+            AND ur.role_scope = #{params.roleScope}
+        </if>
+        <if test="params.userId != null and params.userId > 0">
+            AND ur.user_id = #{params.userId}
+        </if>
+        <if test="params.userName != null and params.userName != ''">
+            AND ur.user_id IN (
+                SELECT user_id FROM uc_users 
+                WHERE user_name LIKE CONCAT('%', #{params.userName}, '%') 
+                AND is_deleted = 0
+            )
+        </if>
+        ORDER BY ur.create_time DESC
+    </select>
+    
+</mapper>
+

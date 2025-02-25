@@ -1,0 +1,22 @@
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: linkedhashmap
+      keyConvertor: fastjson
+      limit: 1000
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson
+      valueEncoder: java
+      valueDecoder: java
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      database: ${spring.data.redis.database:0}
+      host: ${spring.data.redis.host:127.0.0.1}
+      port: ${spring.data.redis.port:6379}
+      password: ${spring.data.redis.password:}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.leyuz.boot</groupId>
+        <artifactId>nx-forum-backend</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>nx-biz-forum</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>nx-forum-adapter</module>
+        <module>nx-forum-app</module>
+        <module>nx-forum-domain</module>
+        <module>nx-forum-infrastructure</module>
+        <module>nx-forum-start</module>
+    </modules>
+</project>

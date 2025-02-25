@@ -1,0 +1,102 @@
+spring:
+  application:
+    name: nx-forum
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      # spring.datasource.hikari.max-lifetime 的值要小于 MySQL 的 wait_timeout
+      max-lifetime: 3600000
+      # 连接池最大连接数，默认是10
+      maximum-pool-size: 30
+      #最小空闲连接数,缺省：跟maximumPoolSize相同
+      #minimum-idle: 10
+      connection-timeout: 30000
+      #idle-timeout: 30000
+      validationTimeout: 300000
+    type: com.alibaba.druid.pool.DruidDataSource
+  data:
+    redis:
+      port: 6379
+      password:
+      database: 0
+      lettuce:
+        pool:
+          max-idle: 16
+          max-active: 32
+          min-idle: 8
+      host: 127.0.0.1
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  flyway:
+    enabled: true
+    # 禁止清理数据库表
+    clean-disabled: true
+    # 如果数据库不是空表，需要设置成 true，否则启动报错
+    baseline-on-migrate: true
+    # 与 baseline-on-migrate: true 搭配使用
+    baseline-version: 0
+    locations: classpath:db/migration
+    # 添加以下调试配置
+    validate-on-migrate: true
+    out-of-order: false
+    placeholder-replacement: false
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+
+logging:
+  config: classpath:logback-spring.xml
+server:
+  servlet:
+    context-path: /${spring.application.name}/
+mybatis-plus:
+  # 指定sql映射文件
+  mapper-locations: classpath*:mapper/*.xml
+
+# springdoc配置： https://springdoc.org/properties.html
+springdoc:
+  api-docs:
+    enabled: true # 启用API文档
+  swagger-ui:
+    enabled: true # 启用Swagger UI
+    path: /swagger-ui.html
+    operationsSorter: alpha
+    tags-sorter: alpha
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.leyuz.bbs,com.leyuz.uc,com.leyuz.module,com.leyuz.custom
+  default-flat-param-object: true
+
+# knife4j的增强配置
+knife4j:
+  enable: true # 启用knife4j
+  setting:
+    language: zh_cn
+
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson2
+      limit: 1000
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson2
+      valueEncoder: ${cache.redis.encoder:java}
+      valueDecoder: ${cache.redis.decoder:java}
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      database: ${spring.data.redis.database:0}
+      host: ${spring.data.redis.host:127.0.0.1}
+      port: ${spring.data.redis.port:6379}

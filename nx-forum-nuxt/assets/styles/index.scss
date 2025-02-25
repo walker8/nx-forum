@@ -1,0 +1,200 @@
+// 全局 CSS 变量
+@use './variables.css';
+// Transition
+@use './transition.scss';
+// Element Plus
+@use './element-plus.scss';
+// Vxe Table
+@use './vxe-table.scss';
+// 注册多主题
+// @use "./theme/register.scss";
+
+// 业务页面几乎都应该在根元素上挂载 class="app-container"，以保持页面美观
+.app-container {
+  padding: 20px;
+}
+
+body,
+html {
+  height: 100%;
+  -webkit-font-smoothing: unset !important;
+}
+
+body {
+  margin: 0;
+  background-color: var(--v3-body-bg-color);
+  -moz-osx-font-smoothing: grayscale;
+  font-family:
+    -apple-system,
+    system-ui,
+    Segoe UI,
+    Roboto,
+    Ubuntu,
+    'Helvetica Neue',
+    Helvetica,
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    '微软雅黑',
+    Arial,
+    sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+div:focus {
+  outline: none;
+}
+.el-card {
+  --el-card-padding: 15px;
+}
+.full-width-message .el-message-box__message {
+  width: 100%;
+}
+@media screen and (max-width: 768px) {
+  // 移动端移除el-card样式
+  .el-card.is-always-shadow {
+    box-shadow: unset;
+  }
+  .el-card {
+    border-radius: unset;
+    border: unset;
+    overflow: unset;
+    color: unset;
+    transition: unset;
+    --el-card-border-color: unset;
+    --el-card-border-radius: unset;
+    --el-card-padding: 10px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  // 移动端移除el-footer样式
+  .search-layout {
+    .el-footer {
+      --el-footer-height: 0;
+    }
+  }
+}
+
+.thread-list,
+.author-card,
+.article-hot {
+  .el-card__body {
+    padding: 0px;
+  }
+}
+.article-hot {
+  .rank-num {
+    font-size: 14px;
+    color: #999;
+    min-width: 16px;
+  }
+  .rank-num.top-3 {
+    color: #ff6b6b;
+    font-weight: bold;
+  }
+  .post-title {
+    line-height: 1.4;
+  }
+}
+.thread-list {
+  em {
+    color: red;
+    font-style: normal;
+  }
+}
+.article-content,
+.comment-reply,
+.comment-content {
+  a:not([href='']) {
+    color: #1e80ff;
+    position: relative;
+    padding-right: 18px; // 给图标留出空间
+
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231e80ff' d='M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7z'/%3E%3C/svg%3E");
+      background-size: contain;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.fixed-tabbar {
+  .van-tabbar {
+    position: fixed;
+  }
+}
+
+.forum-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 让容器至少占据整个视口高度 */
+  .common-layout {
+    height: 100%;
+    width: fit-content;
+  }
+  .m-header {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  .m-header .el-card {
+    --el-card-padding: 10px;
+  }
+  .forum-main {
+    padding-top: 0px;
+    max-width: 720px;
+  }
+  .forum-menu {
+    .no-scrollbar {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none; /* Chrome, Safari and Opera */
+    }
+  }
+  @media screen and (max-width: 720px) {
+    .common-layout {
+      width: 100%;
+    }
+  }
+  @media screen and (max-width: 960px) {
+    .el-main {
+      padding: 0px;
+    }
+    .forum-main {
+      width: calc(100vw - 40px);
+    }
+  }
+  @media screen and (min-width: 960px) {
+    .forum-main {
+      width: 720px;
+    }
+  }
+  .content {
+    flex-grow: 1; /* 让主要内容区域尽可能占据剩余空间 */
+  }
+}
+.forum-user-layout {
+  .el-header {
+    --el-header-padding: 0px;
+  }
+  .el-main {
+    --el-main-padding: 0px;
+  }
+}

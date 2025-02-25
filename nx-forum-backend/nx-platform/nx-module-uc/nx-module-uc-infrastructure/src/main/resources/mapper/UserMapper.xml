@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leyuz.uc.user.UserMapper">
+    
+    <select id="queryUsers" resultType="com.leyuz.uc.user.UserPO">
+        SELECT * FROM uc_users
+        WHERE is_deleted = 0
+        <if test="params.lastActiveIp != null and params.lastActiveIp != ''">
+            AND last_active_ip = #{params.lastActiveIp}
+        </if>
+        <if test="params.userId != null">
+            AND user_id = #{params.userId}
+        </if>
+        <if test="params.userName != null and params.userName != ''">
+            AND user_name LIKE CONCAT('%', #{params.userName}, '%')
+        </if>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER BY ${orderBy}
+        </if>
+        <if test="isAsc != null and isAsc">
+            ASC
+        </if>
+        <if test="isAsc != null and !isAsc">
+            DESC
+        </if>
+    </select>
+    
+</mapper>
+
