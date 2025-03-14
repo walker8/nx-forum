@@ -2,8 +2,22 @@
 
 NX Forum 是一个基于 Spring Boot + Nuxt 构建的现代化开源论坛系统。
 
+- 前后端分离，方便后期维护
+- 前端使用 Nuxt3 构建，支持 SSR，对 SEO 有很好的支持
+- 模块化设计，可独立部署
+
+前端仓库：[nx-forum-nuxt](https://github.com/walker8/nx-forum-nuxt) 测试账号admin/12345678
+
+## 注意事项
+
+- 当前项目为测试版本，仅供学习和测试环境使用，不可用于生产环境
+- 因为是测试版本，未经过充分测试，后续升级亦不考虑兼容性
+- 目前只实现了核心功能，后续会继续完善剩余功能开发
+- 正式版本预计在 2025 年中下旬发布，敬请期待
+
 ## 项目结构
 
+```
 nx-parent/
 ├── nx-biz-forum/ # 论坛业务模块
 │ ├── nx-forum-adapter/ # 接口适配层
@@ -20,6 +34,7 @@ nx-parent/
 │ ├── nx-module-uc-domain/
 │ └── nx-module-uc-infrastructure/
 └── README.md
+```
 
 ## 技术栈
 
@@ -77,7 +92,7 @@ nx-parent/
 - JDK 17+
 - Maven 3.6+
 - MySQL 8.0+
-- Redis 6.0+
+- Redis 6.0+（可选）
 
 ## 配置说明
 
@@ -85,9 +100,13 @@ nx-parent/
 
 - 数据库配置
 - Redis 配置
-- 文件上传限制
-- API 文档配置
+- 文件上传地址
 - 日志配置
+
+```
+# 文件上传路径本地测试建议配前端项目的public目录地址，方便快速调试，生产环境建议使用 nginx 反向代理
+file.upload.path=/Users/walker/Code/nx-forum-nuxt3/public/
+```
 
 ## API 文档
 
@@ -95,10 +114,8 @@ nx-parent/
 
 ## 开发团队
 
-- Walker (nicholas199109@gmail.com)
+- Walker
 
 ## 许可证
 
 MIT
-
-[待补充]
