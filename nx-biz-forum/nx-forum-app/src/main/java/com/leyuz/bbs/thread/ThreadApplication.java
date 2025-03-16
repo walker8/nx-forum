@@ -269,8 +269,7 @@ public class ThreadApplication {
 
     public CustomPage<AdminThreadVO> queryThreadsByAdmin(ThreadQuery threadQuery) {
         log.info("queryAdminThreads forumId={}", threadQuery.getForumId());
-        threadQuery.setForumId(threadQuery.getForumId());
-        Page<ThreadPO> threadPOPage = forumThreadQueryStrategy.query(threadQuery);
+        Page<ThreadPO> threadPOPage = threadQueryStrategyFactory.getStrategy("admin").query(threadQuery);
         return DataBaseUtils.createCustomPage(threadPOPage, threadConvert::convertThreadPO2AdminVO);
     }
 

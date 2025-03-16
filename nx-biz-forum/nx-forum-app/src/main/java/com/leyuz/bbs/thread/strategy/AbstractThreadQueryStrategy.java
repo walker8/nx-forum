@@ -2,7 +2,6 @@ package com.leyuz.bbs.thread.strategy;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.leyuz.bbs.common.dataobject.AuditStatusV;
 import com.leyuz.bbs.domain.thread.dataobject.ThreadPropertyTypeV;
 import com.leyuz.bbs.domain.thread.dataobject.ThreadPropertyV;
 import com.leyuz.bbs.thread.ThreadPO;
@@ -24,22 +23,22 @@ import java.util.stream.Collectors;
 
 /**
  * 帖子查询策略抽象基类
- * 
+ *
  * @author walker
  * @since 2025-03-01
  */
 @RequiredArgsConstructor
 public abstract class AbstractThreadQueryStrategy implements ThreadQueryStrategy {
-    
+
     protected final IThreadService threadService;
     protected final UserApplication userApplication;
-    
+
     private static final List<String> orderByColumns = Arrays.asList("last_comment_time", "create_time", "update_time", "views");
-    
+
     /**
      * 获取帖子分页结果（包含置顶帖）
-     * 
-     * @param forumId 论坛ID
+     *
+     * @param forumId     论坛ID
      * @param threadQuery 查询参数
      * @return 查询结果
      */
@@ -59,7 +58,14 @@ public abstract class AbstractThreadQueryStrategy implements ThreadQueryStrategy
         }
         return threadPOPage;
     }
-    
+
+    protected Page<ThreadPO> getThreadPOPageWithoutTop(Integer forumId, ThreadQuery threadQuery) {
+        Page<ThreadPO> threadPOPage;
+        threadPOPage = queryThreads(forumId, threadQuery);
+        threadPOPage.getRecords().forEach(m -> changeTopProperty(m, false));
+        return threadPOPage;
+    }
+
     /**
      * 修改帖子置顶属性
      */
@@ -73,7 +79,7 @@ public abstract class AbstractThreadQueryStrategy implements ThreadQueryStrategy
         threadPropertyV.setTop(value ? 1 : 0);
         threadPO.setProperty(JSON.toJSONString(threadPropertyV));
     }
-    
+
     /**
      * 查询帖子列表
      */

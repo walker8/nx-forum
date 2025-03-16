@@ -85,11 +85,11 @@ public class ThreadServiceImpl extends ServiceImpl<ThreadMapper, ThreadPO> imple
     public List<ThreadPO> queryTopThreads(Integer forumId) {
         Page<ThreadPO> page = new Page<>(1, 5);
         QueryWrapper<ThreadPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("p.attribute", ThreadPropertyAttributeTopV.GLOBAL.getValue());
         if (forumId != null && forumId > 0) {
-            queryWrapper.eq("p.forum_id", forumId);
-            queryWrapper.eq("p.attribute", ThreadPropertyAttributeTopV.CURRENT_FORUM.getValue());
-        } else {
-            queryWrapper.eq("p.attribute", ThreadPropertyAttributeTopV.GLOBAL.getValue());
+            queryWrapper.or().apply("(p.forum_id = {0} AND p.attribute = {1})",
+                    forumId,
+                    ThreadPropertyAttributeTopV.CURRENT_FORUM.getValue());
         }
         queryWrapper.eq("p.property_type", ThreadPropertyTypeV.TOP.getValue());
         return threadMapper.selectPropertyList(page, queryWrapper);
