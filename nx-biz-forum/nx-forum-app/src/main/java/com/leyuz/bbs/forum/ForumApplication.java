@@ -280,11 +280,13 @@ public class ForumApplication {
         forumPO.setForumAccess(enableForumAccess);
         BaseEntityUtils.setUpdateBaseEntity(forumPO);
         forumService.updateById(forumPO);
+        List<ForumAccessPO> existingForumAccessList = forumAccessService.getByForumId(forumId);
+        Map<String, Long> existingForumAccessMap = existingForumAccessList.stream().collect(Collectors.toMap(ForumAccessPO::getRoleKey, ForumAccessPO::getId));
         List<ForumAccessPO> updateForumAccessList = accessList.stream()
-                .filter(dto -> dto.getId() != null)
+                .filter(dto -> existingForumAccessMap.get(dto.getRoleKey()) != null)
                 .map(dto -> {
                     ForumAccessPO po = new ForumAccessPO();
-                    po.setId(dto.getId());
+                    po.setId(existingForumAccessMap.get(dto.getRoleKey()));
                     po.setForumId(forumId);
                     po.setRoleKey(dto.getRoleKey());
                     po.setPerms(dto.getPerms() == null ? "[]" : JSON.toJSONString(dto.getPerms()));
@@ -294,7 +296,7 @@ public class ForumApplication {
                 }).collect(Collectors.toList());
         forumAccessService.batchUpdateForumAccess(updateForumAccessList);
         List<ForumAccessPO> createForumAccessList = accessList.stream()
-                .filter(dto -> dto.getId() == null)
+                .filter(dto -> existingForumAccessMap.get(dto.getRoleKey()) == null)
                 .map(dto -> {
                     ForumAccessPO po = new ForumAccessPO();
                     po.setForumId(forumId);
