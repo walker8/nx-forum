@@ -35,6 +35,7 @@ public class VerifyCodeService {
         variables.put("expireMinutes", "20");
         switch (verifyType) {
             case REGISTER:
+                variables.put("userName", "注册用户");
                 mailApplication.sendTemplateEmail(MailApplication.MailTemplateType.VERIFY_CODE, email, variables);
                 break;
             case LOGIN:
