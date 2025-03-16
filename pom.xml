@@ -209,6 +209,11 @@
                 <artifactId>flyway-mysql</artifactId>
                 <version>11.3.4</version>
             </dependency>
+            <dependency>
+                <groupId>com.twelvemonkeys.imageio</groupId>
+                <artifactId>imageio-webp</artifactId>
+                <version>3.12.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -22,9 +22,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 @Service
@@ -70,12 +73,15 @@ public class AttachApplication {
 
     private String saveImage(byte[] bytes, String imageSuffix, long fileSizeKB) {
         try {
-            BufferedImage bufferedImage = ImgUtil.toImage(bytes);
-            int height = bufferedImage.getHeight();
-            int width = bufferedImage.getWidth();
+            // 检测图片格式
             if (StringUtils.isEmpty(imageSuffix)) {
                 imageSuffix = detectByFileHeader(bytes);
             }
+            BufferedImage bufferedImage = toImage(bytes, imageSuffix);
+
+            int height = bufferedImage.getHeight();
+            int width = bufferedImage.getWidth();
+
             String fileHash = DigestUtil.md5Hex(bytes);
             ImageVO imageVO = imageApplication.getImage(fileHash, ImageTypeV.THREAD);
             if (imageVO != null) {
@@ -112,6 +118,24 @@ public class AttachApplication {
         }
     }
 
+    private BufferedImage toImage(byte[] bytes, String imageSuffix) throws IOException {
+        BufferedImage bufferedImage;
+
+        // 对webp格式特殊处理
+        if ("webp".equalsIgnoreCase(imageSuffix)) {
+            try (InputStream is = new ByteArrayInputStream(bytes)) {
+                bufferedImage = ImageIO.read(is);
+                if (bufferedImage == null) {
+                    throw new BizException("无法解析webp图片格式");
+                }
+            }
+        } else {
+            // 使用原有方法处理其他格式
+            bufferedImage = ImgUtil.toImage(bytes);
+        }
+        return bufferedImage;
+    }
+
     public String downloadImage(String imageUrl) {
         if (StringUtils.isEmpty(imageUrl) || !imageUrl.startsWith("http")) {
             return "";
@@ -121,7 +145,7 @@ public class AttachApplication {
             byte[] imageData = HttpDownloader.downloadBytes(imageUrl, 10 * 1000);
             return saveImage(imageData, "", 0);
         } catch (Exception e) {
-            log.error("下载图片失败，imageUrl = {}", imageUrl);
+            log.error("下载图片失败，错误原因：{}, imageUrl = {}", e.getMessage(), imageUrl);
             return "";
         }
     }
@@ -147,6 +171,13 @@ public class AttachApplication {
             if (bytes[0] == 0x47 && bytes[1] == 0x49 &&
                     bytes[2] == 0x46 && bytes[3] == 0x38) {
                 return "gif";
+            }
+            // WebP: 52 49 46 46 (RIFF) + 8字节 + 57 45 42 50 (WEBP)
+            if (bytes.length >= 12 && bytes[0] == 0x52 && bytes[1] == 0x49 &&
+                    bytes[2] == 0x46 && bytes[3] == 0x46 &&
+                    bytes[8] == 0x57 && bytes[9] == 0x45 &&
+                    bytes[10] == 0x42 && bytes[11] == 0x50) {
+                return "webp";
             }
         }
         throw new BizException("unknown image type");
