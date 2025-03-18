@@ -95,15 +95,19 @@ public class AttachApplication {
                 if (width > MAX_IMAGE_WIDTH) {
                     float radio = (float) width / MAX_IMAGE_WIDTH;
                     height = (int) (height / radio);
+                    width = MAX_IMAGE_WIDTH;
                 }
+                fileName = "/" + fileHash + ".jpeg";
                 Thumbnails.of(bufferedImage)
                         .size(width, height)
+                        .outputFormat("jpeg")
                         .toFile(fileUploadPath + filePath + fileName);
             } else {
                 FileUtil.writeBytes(bytes, fileUploadPath + filePath + fileName);
             }
             // 保存图片信息
             long newFileSizeB = FileUtil.size(new File(fileUploadPath + filePath + fileName));
+            log.info("图片格式：{}, 图片大小：{}KB --> {}KB，图片路径：{}", imageSuffix, fileSizeKB, newFileSizeB / 1024, filePath + fileName);
             imageApplication.save(ImageCmd.builder()
                     .imagePath(filePath + fileName)
                     .imageType(ImageTypeV.THREAD)
@@ -143,7 +147,8 @@ public class AttachApplication {
         try {
             // 从URL下载图片为字节数组
             byte[] imageData = HttpDownloader.downloadBytes(imageUrl, 10 * 1000);
-            return saveImage(imageData, "", 0);
+            long originalKB = imageData.length / 1024;
+            return saveImage(imageData, "", originalKB);
         } catch (Exception e) {
             log.error("下载图片失败，错误原因：{}, imageUrl = {}", e.getMessage(), imageUrl);
             return "";
@@ -198,7 +203,7 @@ public class AttachApplication {
         if (!contentType.startsWith("image")) {
             throw new ValidationException("图片格式不正确！");
         }
-        String imageSuffix = CharSequenceUtil.subAfter(contentType, "/", true);
+        String imageSuffix = "jpeg";
         try {
             // 获取文件的字节
             byte[] bytes = file.getBytes();
@@ -214,6 +219,7 @@ public class AttachApplication {
             Thumbnails.of(bufferedImage)
                     .sourceRegion(Positions.CENTER, 400, 400)
                     .size(200, 200)
+                    .outputFormat(imageSuffix)
                     .keepAspectRatio(false)
                     .toFile(fileUploadPath + filePath + fileName);
             // 保存图片信息
