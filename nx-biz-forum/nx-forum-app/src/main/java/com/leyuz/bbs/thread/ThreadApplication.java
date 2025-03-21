@@ -405,6 +405,11 @@ public class ThreadApplication {
             // 使用热门帖子查询策略
             Page<ThreadPO> threadPOPage = threadQueryStrategyFactory.getStrategy("hot").query(query);
 
+            threadPOPage.getRecords().forEach(threadPO -> {
+                threadPO.setCreateTime(null);
+                threadPO.setUpdateTime(null);
+                threadPO.setBrief(null);
+            });
             return threadPOPage.getRecords().stream()
                     .map(threadConvert::convertThreadPO2VO)
                     .collect(Collectors.toList());
