@@ -289,6 +289,8 @@ public class ThreadE {
     private void init() {
         // 初始化文档
         initDocument();
+        // 格式化文档样式
+        optimizeDocument(document);
         // 初始化a标签
         initLink();
         // 移除script标签
@@ -301,6 +303,54 @@ public class ThreadE {
         userAgent = HeaderUtils.getUserAgent();
         if (document != null) {
             content = document.body().toString();
+        }
+    }
+
+    /**
+     * 格式化文档样式
+     *
+     * @param document
+     */
+    private void optimizeDocument(Document document) {
+        if (document != null) {
+            // 删除svg标签
+            document.select("svg").remove();
+            // 标题去除a标签
+            document.select("h1, h2, h3, h4, h5, h6").forEach(heading -> heading.select("a").unwrap());
+            // 对标题进行重新排序
+            int maxHeadingLevel = 6;
+            for (int i = 1; i <= 6; i++) {
+                if (!document.select("h" + i).isEmpty()) {
+                    maxHeadingLevel = i;
+                    break;
+                }
+            }
+            if (maxHeadingLevel > 1) {
+                // 如果最大只有h3标签，则进行重新排序
+                for (int i = 6; i >= maxHeadingLevel; i--) {
+                    for (Element heading : document.select("h" + i)) {
+                        heading.tagName("h" + (i - maxHeadingLevel + 1));
+                    }
+                }
+            }
+            // 格式化code块
+            document.getElementsByTag("code").forEach(code -> code.html(code.text()));
+            // 如果pre标签没有class属性，则添加class属性
+            document.getElementsByTag("pre").forEach(pre -> {
+                if (!pre.hasAttr("class")) {
+                    pre.attr("class", "language-bash");
+                }
+            });
+            // 去除img标签里除src和alt外的所有属性
+            document.select("img").forEach(img -> {
+                String src = img.attr("src");
+                String alt = img.attr("alt");
+                img.clearAttributes();
+                img.attr("src", src);
+                if (!alt.isEmpty()) {
+                    img.attr("alt", alt);
+                }
+            });
         }
     }
 

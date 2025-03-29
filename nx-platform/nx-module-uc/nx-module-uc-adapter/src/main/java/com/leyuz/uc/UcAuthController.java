@@ -63,7 +63,7 @@ public class UcAuthController {
     @PostMapping("/email/verify-code")
     @PermitAll
     @RateLimiter(rules = {
-            @RateLimitRule(key = "#email+'_'+#type", time = 60, count = 1, timeUnit = TimeUnit.SECONDS, message = "当前请求过于频繁，请60秒后再试"),
+            @RateLimitRule(key = "#email+'_'+#type", time = 50, count = 1, timeUnit = TimeUnit.SECONDS, message = "当前请求过于频繁，请60秒后再试"),
             @RateLimitRule(key = "#email", time = 1, count = 10, timeUnit = TimeUnit.HOURS, message = "当前IP请求过于频繁，请1小时后再试"),
             @RateLimitRule(key = "email", time = 1, count = 50, timeUnit = TimeUnit.HOURS, limitType = LimitType.IP, message = "当前IP请求过于频繁，请1小时后再试")
     })
@@ -78,7 +78,7 @@ public class UcAuthController {
     @PostMapping("/phone/verify-code")
     @PermitAll
     @RateLimiter(rules = {
-            @RateLimitRule(key = "#phone+'_'+#type", time = 60, count = 1, timeUnit = TimeUnit.SECONDS, message = "当前请求过于频繁，请60秒后再试"),
+            @RateLimitRule(key = "#phone+'_'+#type", time = 50, count = 1, timeUnit = TimeUnit.SECONDS, message = "当前请求过于频繁，请60秒后再试"),
             @RateLimitRule(key = "#phone", time = 1, count = 8, timeUnit = TimeUnit.HOURS, message = "当前IP请求过于频繁，请1小时后再试"),
             @RateLimitRule(key = "phone", time = 1, count = 30, timeUnit = TimeUnit.HOURS, limitType = LimitType.IP, message = "当前IP请求过于频繁，请1小时后再试")
     })

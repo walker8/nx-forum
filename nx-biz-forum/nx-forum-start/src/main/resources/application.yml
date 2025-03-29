@@ -61,21 +61,21 @@ mybatis-plus:
 # springdoc配置： https://springdoc.org/properties.html
 springdoc:
   api-docs:
-    enabled: false # 禁用API文档
+    enabled: true # 启用API文档
   swagger-ui:
-    enabled: false # 禁用Swagger UI
+    enabled: true # 启用Swagger UI
     path: /swagger-ui.html
     operationsSorter: alpha
     tags-sorter: alpha
   group-configs:
     - group: 'default'
       paths-to-match: '/**'
-      packages-to-scan: com.leyuz.bbs,com.leyuz.uc,com.leyuz.module
+      packages-to-scan: com.leyuz.bbs,com.leyuz.uc,com.leyuz.module,com.leyuz.custom
   default-flat-param-object: true
 
 # knife4j的增强配置
 knife4j:
-  enable: false # 禁用knife4j
+  enable: true # 启用knife4j
   setting:
     language: zh_cn
 

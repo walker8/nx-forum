@@ -3,6 +3,7 @@ package com.leyuz.common.utils;
 import com.leyuz.common.context.RequestHeader;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 请求头工具类
@@ -88,6 +89,9 @@ public class HeaderUtils {
      */
     public static String getDomain() {
         String referer = getReferer();
+        if (StringUtils.isEmpty(referer)) {
+            return "";
+        }
         String[] split = referer.split("/");
         if (split.length > 2) {
             return split[2];
