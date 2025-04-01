@@ -9,6 +9,7 @@ import com.leyuz.common.utils.HeaderUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ValidationException.class)
     public SingleResponse exceptionHandler(ValidationException e) {
         return SingleResponse.buildFailure(ResultCode.VALIDATION_ERROR_CODE, e.getMessage());
+    }
+
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public SingleResponse exceptionHandler(UsernameNotFoundException e) {
+        return SingleResponse.buildFailure(ResultCode.AUTH_FAILED_CODE, e.getMessage());
     }
 
     @ExceptionHandler(value = AuditException.class)
