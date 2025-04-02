@@ -7,7 +7,7 @@ import com.leyuz.uc.auth.exception.MyAccessDeniedHandler;
 import com.leyuz.uc.auth.exception.MyAuthenticationEntryPoint;
 import com.leyuz.uc.auth.filter.RequestHeaderFilter;
 import com.leyuz.uc.auth.filter.TokenFilter;
-import com.leyuz.uc.domain.auth.token.TokenGateway;
+import com.leyuz.uc.user.TokenApplication;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -47,7 +47,7 @@ public class SecurityConfig {
 
     private final MyAuthenticationEntryPoint authenticationEntryPoint;
     private final MyAccessDeniedHandler accessDeniedHandler;
-    private final TokenGateway tokenGateway;
+    private final TokenApplication tokenApplication;
     private final ApplicationContext applicationContext;
 
     /**
@@ -89,7 +89,7 @@ public class SecurityConfig {
         // 头信息过滤器
         http.addFilterBefore(new RequestHeaderFilter(), UsernamePasswordAuthenticationFilter.class);
         // Token 校验过滤器
-        http.addFilterBefore(new TokenFilter(tokenGateway), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new TokenFilter(tokenApplication), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

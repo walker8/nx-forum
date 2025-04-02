@@ -35,12 +35,12 @@ public class AdminUserController {
     @PreAuthorize("@permissionResolver.hasRole('UC_ADMIN')")
     public SingleResponse queryUsersByAdmin(@RequestParam(defaultValue = "") Long userId,
                                             @RequestParam(defaultValue = "") String userName,
-                                            @RequestParam(defaultValue = "") String loginIp,
+                                            @RequestParam(defaultValue = "") String lastActiveIp,
                                             @RequestParam(defaultValue = "") String orderBy,
                                             @RequestParam(defaultValue = "1") int pageNo,
                                             @RequestParam(defaultValue = "10") int pageSize) {
         UserQuery query = UserQuery.builder().userId(userId).userName(userName)
-                .orderBy(orderBy).loginIp(loginIp).pageNo(pageNo).pageSize(pageSize).build();
+                .orderBy(orderBy).lastActiveIp(lastActiveIp).pageNo(pageNo).pageSize(pageSize).build();
         CustomPage<AdminUserVO> threadRespPage = userApplication.queryUsersByAdmin(query);
         return SingleResponse.of(threadRespPage);
     }

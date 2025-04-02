@@ -27,9 +27,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserPO> implements 
     public Page<UserPO> queryUsers(PageQuery pageQuery) {
         QueryWrapper<UserPO> queryWrapper = pageQuery.toQueryWrapper();
         Map<String, Object> params = pageQuery.getParams();
-        String loginIp = MapUtil.getStr(params, "loginIp");
-        if (StringUtils.isNotBlank(loginIp)) {
-            queryWrapper.eq("login_ip", loginIp);
+        String lastActiveIp = MapUtil.getStr(params, "lastActiveIp");
+        if (StringUtils.isNotBlank(lastActiveIp)) {
+            queryWrapper.eq("last_active_ip", lastActiveIp);
         }
         Long userId = MapUtil.getLong(params, "userId");
         if (userId != null) {

@@ -16,4 +16,6 @@ public interface UserGateway {
     void update(UserE userE);
 
     void deleteById(Long userId);
+
+    void updateLastActiveDate(Long userId);
 }

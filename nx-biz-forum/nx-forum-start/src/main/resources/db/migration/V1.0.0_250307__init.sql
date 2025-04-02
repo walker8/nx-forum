@@ -860,8 +860,8 @@ CREATE TABLE `uc_users` (
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
   `avatar` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '头像地址',
   `account_status` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '帐号状态（0正常 1停用 2已注销）',
-  `login_ip` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '最后登录IP',
-  `login_date` datetime NOT NULL COMMENT '最后登录时间',
+  `last_active_ip` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '最后活跃IP',
+  `last_active_date` datetime NOT NULL COMMENT '最后活跃时间',
   `intro` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '个人介绍',
   `create_by` bigint unsigned NOT NULL DEFAULT 0 COMMENT '创建者',
   `create_time` datetime NOT NULL COMMENT '创建时间',
@@ -872,7 +872,10 @@ CREATE TABLE `uc_users` (
   KEY `uc_users_email_IDX` (`email`) USING BTREE,
   KEY `uc_users_user_name_IDX` (`user_name`) USING BTREE,
   KEY `uc_users_phone_IDX` (`phone`) USING BTREE,
-  KEY `uc_users_login_ip_IDX` (`login_ip`) USING BTREE
+  KEY `uc_users_last_active_ip_IDX` (`last_active_ip`) USING BTREE,
+  KEY `uc_users_create_time_IDX` (`create_time`) USING BTREE,
+  KEY `uc_users_update_time_IDX` (`update_time`) USING BTREE,
+  KEY `uc_users_last_active_date_IDX` (`last_active_date`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

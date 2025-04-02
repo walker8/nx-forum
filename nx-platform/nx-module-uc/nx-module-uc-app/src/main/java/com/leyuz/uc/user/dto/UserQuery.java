@@ -17,7 +17,7 @@ public class UserQuery extends Query {
     private static final long serialVersionUID = 3372400457990252129L;
     private Long userId;
     private String userName;
-    private String loginIp;
+    private String lastActiveIp;
     private Integer pageNo;
     private Integer pageSize;
     private String orderBy;

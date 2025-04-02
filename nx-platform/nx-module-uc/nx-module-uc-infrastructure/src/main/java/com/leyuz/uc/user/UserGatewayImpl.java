@@ -2,6 +2,7 @@ package com.leyuz.uc.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.leyuz.common.utils.BaseEntityUtils;
+import com.leyuz.common.utils.HeaderUtils;
 import com.leyuz.uc.domain.user.UserE;
 import com.leyuz.uc.domain.user.dataobject.UserStatusV;
 import com.leyuz.uc.domain.user.gateway.UserGateway;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,8 +31,8 @@ public class UserGatewayImpl implements UserGateway {
                 userPO.setPassword(encoder.encode(userE.getPassword()));
             }
             userPO.setAvatar(userE.getAvatar());
-            userPO.setLoginIp(userE.getLoginIp());
-            userPO.setLoginDate(userE.getLoginDate());
+            userPO.setLastActiveIp(userE.getLastActiveIp());
+            userPO.setLastActiveDate(userE.getLastActiveDate());
             userPO.setAccountStatus((byte) userE.getStatus().getValue());
             BaseEntityUtils.setCreateBaseEntity(userPO);
             userService.save(userPO);
@@ -62,6 +65,12 @@ public class UserGatewayImpl implements UserGateway {
         }
         if (StringUtils.isNotEmpty(userE.getIntro())) {
             userPO.setIntro(userE.getIntro());
+        }
+        if (StringUtils.isNotEmpty(userE.getLastActiveIp())) {
+            userPO.setLastActiveIp(userE.getLastActiveIp());
+        }
+        if (userE.getLastActiveDate() != null) {
+            userPO.setLastActiveDate(userE.getLastActiveDate());
         }
         userPO.setUserId(userE.getUserId());
         BaseEntityUtils.setUpdateBaseEntity(userPO);
@@ -135,5 +144,16 @@ public class UserGatewayImpl implements UserGateway {
         userPO.setIsDeleted(true);
         BaseEntityUtils.setUpdateBaseEntity(userPO);
         userService.updateById(userPO);
+    }
+
+    @Override
+    public void updateLastActiveDate(Long userId) {
+        if (userId != null && userId > 0) {
+            UserPO userPO = new UserPO();
+            userPO.setUserId(userId);
+            userPO.setLastActiveIp(HeaderUtils.getIp());
+            userPO.setLastActiveDate(LocalDateTime.now());
+            userService.updateById(userPO);
+        }
     }
 }

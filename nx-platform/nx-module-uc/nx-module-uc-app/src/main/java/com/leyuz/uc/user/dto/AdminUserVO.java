@@ -17,14 +17,14 @@ public class AdminUserVO extends DTO {
     private Long userId;
 
     private String email;
-    private String loginIp;
+    private String lastActiveIp;
     private String location;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime updateTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime loginDate;
+    private LocalDateTime lastActiveDate;
 
     // 帐号状态（0正常 1停用 2已注销）
     private Integer accountStatus;

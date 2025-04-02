@@ -57,11 +57,17 @@ public class UserApplication {
     private final LoginFailureService loginFailureService;
     private final ApplicationEventPublisher eventPublisher;
 
-    private static final List<String> orderByColumns = Arrays.asList("user_id", "create_time", "update_time");
+    private static final List<String> orderByColumns = Arrays.asList("user_id", "create_time", "update_time", "last_active_date");
 
     private final GenericCache<Long, UserE> userIdCache;
 
     public void saveUserByAdmin(UserCmd userCmd) {
+        saveUser(userCmd);
+        // 记录用户创建日志 - 通过事件方式处理
+        publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "管理员创建用户: " + userCmd.getUserName(), OperationStatusV.SUCCESS.getCode());
+    }
+
+    public void saveUser(UserCmd userCmd) {
         UserE userE = UserE.builder()
                 .userName(userCmd.getUserName())
                 .phone(userCmd.getPhone())
@@ -69,9 +75,6 @@ public class UserApplication {
                 .email(userCmd.getEmail())
                 .build();
         userDomainService.save(userE);
-
-        // 记录用户创建日志 - 通过事件方式处理
-        publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "管理员创建用户: " + userCmd.getUserName(), OperationStatusV.SUCCESS.getCode());
     }
 
     public void updateUserByAdmin(UserCmd userCmd) {
@@ -250,7 +253,7 @@ public class UserApplication {
                 .isAsc(false)
                 .build();
         Map<String, Object> params = pageQuery.getParams();
-        params.put("loginIp", query.getLoginIp());
+        params.put("lastActiveIp", query.getLastActiveIp());
         params.put("userId", query.getUserId());
         params.put("userName", query.getUserName());
         Page<UserPO> userPOPage = userService.queryUsers(pageQuery);
@@ -259,7 +262,7 @@ public class UserApplication {
 
     private AdminUserVO toAdminUserVO(UserPO userPO) {
         AdminUserVO userVo = BeanUtil.toBean(userPO, AdminUserVO.class);
-        userVo.setLocation(AddressUtils.getCityByIP(userPO.getLoginIp()));
+        userVo.setLocation(AddressUtils.getCityByIP(userPO.getLastActiveIp()));
         return userVo;
     }
 
@@ -284,7 +287,7 @@ public class UserApplication {
             return;
         }
         for (Long userId : userIds) {
-            this.deleteUserByAdmin(userId);
+            deleteUserByAdmin(userId);
         }
     }
 
@@ -451,7 +454,7 @@ public class UserApplication {
         // 执行密码复杂度校验
         registerConfigApplication.validatePassword(userCmd.getPassword());
         // 调用原有注册逻辑
-        saveUserByAdmin(userCmd);
+        saveUser(userCmd);
 
         verifyCodeService.deleteCache(account, AccountTypeV.of(type), VerifyType.REGISTER);
     }

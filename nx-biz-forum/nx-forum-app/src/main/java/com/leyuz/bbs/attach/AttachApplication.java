@@ -90,6 +90,7 @@ public class AttachApplication {
             String fileName = "/" + fileHash + "." + imageSuffix;
             String filePath = "/uploads/image/" + DateUtil.format(DateUtil.date(), "yyyyMM");
             createDirPath(fileUploadPath + filePath);
+            long newFileSizeB = 0L;
             if (fileSizeKB > maxCompressedImageSizeKB && !"gif".equalsIgnoreCase(imageSuffix)) {
                 // 需要压缩图片
                 if (width > MAX_IMAGE_WIDTH) {
@@ -102,11 +103,17 @@ public class AttachApplication {
                         .size(width, height)
                         .outputFormat("jpeg")
                         .toFile(fileUploadPath + filePath + fileName);
+                newFileSizeB = FileUtil.size(new File(fileUploadPath + filePath + fileName));
+                if (newFileSizeB / 1024 > fileSizeKB) {
+                    // 压缩后的图片比原来的还大则使用原图
+                    FileUtil.writeBytes(bytes, fileUploadPath + filePath + fileName);
+                    newFileSizeB = fileSizeKB * 1024;
+                }
             } else {
                 FileUtil.writeBytes(bytes, fileUploadPath + filePath + fileName);
+                newFileSizeB = fileSizeKB * 1024;
             }
             // 保存图片信息
-            long newFileSizeB = FileUtil.size(new File(fileUploadPath + filePath + fileName));
             log.info("图片格式：{}, 图片大小：{}KB --> {}KB，图片路径：{}", imageSuffix, fileSizeKB, newFileSizeB / 1024, filePath + fileName);
             imageApplication.save(ImageCmd.builder()
                     .imagePath(filePath + fileName)

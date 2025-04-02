@@ -45,6 +45,11 @@ public class CacheConfig {
     }
 
     @Bean
+    public GenericCache<String, Long> userTokenCache(CacheService cacheService) {
+        return new GenericCache<>(cacheService, stats, "user:token:", 5, CacheType.REMOTE);
+    }
+
+    @Bean
     public GenericCache<String, List<RoleDTO>> roleListCache(CacheService cacheService) {
         return new GenericCache<>(cacheService, stats, "user:role:", 3600, CacheType.REMOTE);
     }

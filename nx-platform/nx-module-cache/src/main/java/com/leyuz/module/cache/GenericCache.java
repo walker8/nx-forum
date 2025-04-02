@@ -23,6 +23,15 @@ public class GenericCache<K, V> {
     private Cache<K, V> cache;
 
 
+    /**
+     * 初始化缓存对象
+     *
+     * @param cacheService 缓存服务
+     * @param stats        是否开启统计
+     * @param keyPrefix    key前缀
+     * @param expire       过期时间（秒）
+     * @param cacheType    缓存类型
+     */
     public GenericCache(CacheService cacheService, Boolean stats, String keyPrefix, long expire, CacheType cacheType) {
         this.cacheService = cacheService;
         this.keyPrefix = keyPrefix;

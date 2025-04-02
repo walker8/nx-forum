@@ -55,9 +55,9 @@ public class UserPO extends BaseEntity {
     private String avatar;
 
     /**
-     * 最后登录IP
+     * 最后活跃IP
      */
-    private String loginIp;
+    private String lastActiveIp;
 
     /**
      * 个人介绍
@@ -65,9 +65,9 @@ public class UserPO extends BaseEntity {
     private String intro;
 
     /**
-     * 最后登录时间
+     * 最后活跃时间
      */
-    private LocalDateTime loginDate;
+    private LocalDateTime lastActiveDate;
 
     /**
      * 帐号状态（0正常 1停用 2注销）

@@ -34,14 +34,14 @@ public class UserE {
     private UserStatusV status;
 
     /**
-     * 最后登录IP
+     * 最后活跃IP
      */
-    private String loginIp;
+    private String lastActiveIp;
 
     /**
-     * 最后登录时间
+     * 最后活跃时间
      */
-    private LocalDateTime loginDate;
+    private LocalDateTime lastActiveDate;
 
     /**
      * 注册时间
@@ -63,8 +63,8 @@ public class UserE {
         checkPhone();
         checkUserName();
         checkEmail();
-        loginDate = LocalDateTime.now();
-        loginIp = HeaderUtils.getIp();
+        lastActiveDate = LocalDateTime.now();
+        lastActiveIp = HeaderUtils.getIp();
         status = UserStatusV.NORMAL;
     }
 

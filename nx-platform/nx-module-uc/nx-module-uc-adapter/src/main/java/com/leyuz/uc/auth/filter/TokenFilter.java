@@ -4,13 +4,14 @@ import com.leyuz.common.security.ResultCode;
 import com.leyuz.common.utils.HeaderUtils;
 import com.leyuz.uc.auth.AuthUserDetails;
 import com.leyuz.uc.auth.ResponseUtils;
-import com.leyuz.uc.domain.auth.token.TokenGateway;
+import com.leyuz.uc.user.TokenApplication;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +26,13 @@ import java.util.Collections;
  * @author Walker
  * @since 2024/1/7
  */
+@Slf4j
 public class TokenFilter extends OncePerRequestFilter {
 
-    private TokenGateway tokenGateway;
+    private final TokenApplication tokenApplication;
 
-    public TokenFilter(TokenGateway tokenGateway) {
-        this.tokenGateway = tokenGateway;
+    public TokenFilter(TokenApplication tokenApplication) {
+        this.tokenApplication = tokenApplication;
     }
 
     /**
@@ -44,7 +46,7 @@ public class TokenFilter extends OncePerRequestFilter {
         try {
             if (StringUtils.isNotBlank(HeaderUtils.getToken())) {
                 // token有效正常访问
-                Long userId = tokenGateway.findUserIdByToken(HeaderUtils.getToken());
+                Long userId = tokenApplication.getUserIdByToken(HeaderUtils.getToken());
                 if (userId > 0) {
                     AuthUserDetails authUserDetails = new AuthUserDetails();
                     authUserDetails.setUserId(userId);
@@ -62,6 +64,7 @@ public class TokenFilter extends OncePerRequestFilter {
             } else if (ex instanceof ExpiredJwtException) {
                 ResponseUtils.writeErrMsg(response, ResultCode.builder().code(ResultCode.AUTH_FAILED_CODE).msg("签名已过期").build());
             } else {
+                log.error("TokenFilter Error", ex);
                 ResponseUtils.writeErrMsg(response, ResultCode.builder().code(ResultCode.AUTH_FAILED_CODE).msg(ex.getMessage()).build());
             }
         }
