@@ -22,7 +22,7 @@ import java.util.Set;
 public class ForumPermissionResolver {
     private final AuthApplication authApplication;
     private final ForumApplication forumApplication;
-    @Value("${auth.debug:false}")
+    @Value("${nx.auth.debug:false}")
     private boolean enableAuthDebug;
     private static final List<String> forumAccessPerms = Arrays.asList("thread:view", "thread:new", "comment:new", "forum:visit:section");
     private static final String GLOBAL_ROLE_SCOPE = "ALL";

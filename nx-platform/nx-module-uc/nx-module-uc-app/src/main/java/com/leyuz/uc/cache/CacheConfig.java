@@ -13,7 +13,7 @@ import java.util.List;
 
 @Configuration("ucCacheConfig")
 public class CacheConfig {
-    @Value("${stats.enabled:false}")
+    @Value("${nx.stats.enabled:false}")
     private Boolean stats;
 
     public static final String LOGIN_FAIL_COUNT_CACHE = "login:failCount";

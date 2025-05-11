@@ -19,7 +19,7 @@ import java.time.Duration;
 public class CacheService {
     @Autowired
     private CacheManager cacheManager;
-    @Value("${cache.redis.enabled:false}")
+    @Value("${nx.cache.redis.enabled:false}")
     private boolean redisEnabled;
     // 默认缓存时间
     private static final long DEFAULT_TIMEOUT = 3600;

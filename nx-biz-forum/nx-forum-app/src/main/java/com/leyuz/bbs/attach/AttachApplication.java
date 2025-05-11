@@ -36,10 +36,10 @@ import java.util.Optional;
 public class AttachApplication {
     private final ImageApplication imageApplication;
 
-    @Value("${file.upload.path}")
+    @Value("${nx.file.upload.path}")
     private String fileUploadPath;
 
-    @Value("${image.compressed.max.size:200}")
+    @Value("${nx.image.compressed.max.size:200}")
     private Integer maxCompressedImageSizeKB;
 
     private static final Integer MAX_IMAGE_WIDTH = 1200;

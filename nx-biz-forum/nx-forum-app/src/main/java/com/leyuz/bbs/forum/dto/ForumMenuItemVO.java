@@ -20,4 +20,9 @@ public class ForumMenuItemVO {
      * 论坛图标
      */
     private String iconName;
+
+    /**
+     * 论坛20字短介绍 纯文本
+     */
+    private String shortBrief;
 }

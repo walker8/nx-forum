@@ -272,7 +272,7 @@ public class CommentGatewayImpl implements CommentGateway {
             wrapper.orderByAsc("create_time");
         } else if (CommentOrderV.HOT.equals(orderV)) {
             wrapper.orderByDesc("likes");
-            wrapper.orderByDesc("create_time");
+            wrapper.orderByAsc("create_time");
         }
     }
 

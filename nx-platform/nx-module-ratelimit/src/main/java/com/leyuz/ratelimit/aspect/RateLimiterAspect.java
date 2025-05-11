@@ -17,6 +17,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -39,6 +40,9 @@ import java.util.concurrent.TimeUnit;
 public class RateLimiterAspect {
     @Autowired
     private CacheService cacheService;
+    @Value("${nx.rate-limit.disabled:false}")
+    private boolean disableRateLimit;
+
     private final ExpressionParser parser = new SpelExpressionParser();
     private final ParameterNameDiscoverer nameDiscoverer = new DefaultParameterNameDiscoverer();
 
@@ -51,6 +55,10 @@ public class RateLimiterAspect {
 
     @Before("@annotation(rateLimiter)")
     public void doBefore(JoinPoint point, RateLimiter rateLimiter) {
+        if (disableRateLimit) {
+            // 不限流，方便测试环境调试
+            return;
+        }
         RateLimitRule[] rules = rateLimiter.rules();
 
         // 处理单条规则的情况

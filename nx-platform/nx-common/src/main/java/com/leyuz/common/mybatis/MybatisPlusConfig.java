@@ -29,7 +29,7 @@ public class MybatisPlusConfig {
      * SQL统计插件（保持条件加载）
      */
     @Bean
-    @ConditionalOnProperty(name = "stats.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "nx.stats.enabled", havingValue = "true")
     public QueryStatsInterceptor queryStatsInterceptor() {
         return new QueryStatsInterceptor();
     }
@@ -38,7 +38,7 @@ public class MybatisPlusConfig {
      * 统一配置SqlSessionFactory
      */
     @Bean
-    @ConditionalOnProperty(name = "stats.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "nx.stats.enabled", havingValue = "true")
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);

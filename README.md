@@ -105,7 +105,7 @@ nx-parent/
 
 ```
 # 文件上传路径本地测试建议配前端项目的public目录地址，方便快速调试，生产环境建议使用 nginx 反向代理
-file.upload.path=/Users/walker/Code/nx-forum-nuxt3/public/
+nx.file.upload.path=/Users/walker/Code/nx-forum-nuxt3/public/
 ```
 
 ## API 文档

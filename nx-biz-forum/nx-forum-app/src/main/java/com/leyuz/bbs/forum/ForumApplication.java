@@ -175,7 +175,7 @@ public class ForumApplication {
 
     public List<ForumMenuItemVO> getUserForumMenu() {
         return forumMenuItemCache.computeIfAbsent("all", menu -> {
-            List<ForumPO> forumPOList = forumService.getAllForumShowMenu();
+            List<ForumPO> forumPOList = forumService.getAllForum();
             return Optional.ofNullable(forumPOList).orElse(new ArrayList<>())
                     .stream().filter(f -> !f.getIsSystem()).map(this::convertToForumMenuItemVO).collect(Collectors.toList());
         });

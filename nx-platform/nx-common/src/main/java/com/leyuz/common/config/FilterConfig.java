@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FilterConfig {
     @Bean
-    @ConditionalOnProperty(name = "stats.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "nx.stats.enabled", havingValue = "true")
     public FilterRegistrationBean<QueryStatsFilter> queryStatsFilter() {
         FilterRegistrationBean<QueryStatsFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new QueryStatsFilter());

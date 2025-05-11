@@ -12,7 +12,7 @@ import java.util.List;
 
 @Configuration("configCacheConfig")
 public class CacheConfig {
-    @Value("${stats.enabled:false}")
+    @Value("${nx.stats.enabled:false}")
     private Boolean stats;
 
     @Bean

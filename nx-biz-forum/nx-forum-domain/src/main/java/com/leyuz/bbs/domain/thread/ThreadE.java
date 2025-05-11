@@ -147,6 +147,8 @@ public class ThreadE {
     public void create() {
         // 初始化
         init();
+        userIp = HeaderUtils.getIp();
+        userAgent = HeaderUtils.getUserAgent();
         views = 0;
         comments = 0;
         likes = 0;
@@ -299,8 +301,6 @@ public class ThreadE {
         initImagesAndBrief();
         // 校验标题和内容
         checkSubjectAndContent();
-        userIp = HeaderUtils.getIp();
-        userAgent = HeaderUtils.getUserAgent();
         if (document != null) {
             content = document.body().toString();
         }

@@ -15,7 +15,7 @@ import java.util.List;
 
 @Configuration
 public class ForumCacheConfig {
-    @Value("${stats.enabled:false}")
+    @Value("${nx.stats.enabled:false}")
     private Boolean stats;
 
     /**
