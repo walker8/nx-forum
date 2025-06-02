@@ -130,6 +130,7 @@ public class UserGatewayImpl implements UserGateway {
                     .intro(userPO.getIntro())
                     .status(UserStatusV.of(userPO.getAccountStatus()))
                     .createTime(userPO.getCreateTime())
+                    .lastActiveDate(userPO.getLastActiveDate())
                     // 密码校验时使用
                     .password(userPO.getPassword())
                     .build();

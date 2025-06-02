@@ -171,6 +171,7 @@ public class UserApplication {
                 userVO.setUserId(userE.getUserId());
                 userVO.setIntro(userE.getIntro());
                 userVO.setCreateTime(userE.getCreateTime());
+                userVO.setLastActiveDate(userE.getLastActiveDate());
                 return userVO;
             }
         }

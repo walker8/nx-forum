@@ -17,4 +17,6 @@ public class UserVO extends DTO {
     private String intro;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime lastActiveDate;
 }

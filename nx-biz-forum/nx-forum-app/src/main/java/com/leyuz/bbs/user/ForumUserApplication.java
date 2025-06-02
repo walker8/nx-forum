@@ -54,6 +54,7 @@ public class ForumUserApplication {
                 .avatar(userVO.getAvatar())
                 .intro(userVO.getIntro())
                 .createTime(userVO.getCreateTime())
+                .lastActiveDate(userVO.getLastActiveDate())
                 .followed(userFollowApplication.isFollowing(userId))
                 .build();
     }
