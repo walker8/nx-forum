@@ -114,6 +114,19 @@ public class ThreadGatewayImpl implements ThreadGateway {
     }
 
     @Override
+    public String getThreadContent(Long threadId) {
+        QueryWrapper<ThreadContentPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("thread_id", threadId);
+        queryWrapper.eq("is_deleted", false);
+        ThreadContentPO threadContentPO = threadContentService.getOne(queryWrapper);
+        if (threadContentPO != null) {
+            return threadContentPO.getContent();
+        } else {
+            return "";
+        }
+    }
+
+    @Override
     public boolean increaseComments(Long threadId, int num) {
         if (num <= 0) {
             return false;

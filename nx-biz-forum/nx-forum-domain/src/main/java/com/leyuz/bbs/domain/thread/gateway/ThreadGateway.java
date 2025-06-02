@@ -21,6 +21,8 @@ public interface ThreadGateway {
 
     ThreadE getThreadDetail(Long threadId);
 
+    String getThreadContent(Long threadId);
+
     void update(ThreadE threadE);
 
     boolean increaseComments(Long threadId, int num);

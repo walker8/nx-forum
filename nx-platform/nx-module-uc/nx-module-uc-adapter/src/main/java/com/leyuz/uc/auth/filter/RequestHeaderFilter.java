@@ -34,8 +34,17 @@ public class RequestHeaderFilter extends OncePerRequestFilter {
         requestHeader.setDeviceId(request.getHeader("X-Device-Id"));
         requestHeader.setToken(Optional.ofNullable(getCookieValue(request, "x_token")).orElse(request.getHeader("X-Token")));
         requestHeader.setAccessToken(Optional.ofNullable(getCookieValue(request, "accessToken")).orElse(request.getHeader(HttpHeaders.AUTHORIZATION)));
+        requestHeader.setDomain(getDomain(request));
         HeaderUtils.setHeader(requestHeader);
         filterChain.doFilter(request, response);
+    }
+
+    private String getDomain(HttpServletRequest request) {
+        String[] result = request.getRequestURL().toString().split("/");
+        if (result.length < 2) {
+            return "";
+        }
+        return result[0] + "//" + result[2];
     }
 
     /**

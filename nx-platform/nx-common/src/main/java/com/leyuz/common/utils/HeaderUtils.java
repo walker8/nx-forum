@@ -83,20 +83,29 @@ public class HeaderUtils {
     }
 
     /**
-     * 获取域名
+     * 获取域名（带schema）
      *
      * @return
      */
     public static String getDomain() {
-        String referer = getReferer();
-        if (StringUtils.isEmpty(referer)) {
-            return "";
-        }
-        String[] split = referer.split("/");
-        if (split.length > 2) {
-            return split[2];
+        RequestHeader requestHeader = HTTP_REQUEST_CONTEXT.get();
+        if (requestHeader != null) {
+            return requestHeader.getDomain();
         }
         return "";
+    }
+
+    /**
+     * 获取域名（不带schema）
+     *
+     * @return
+     */
+    public static String getHost() {
+        String domain = getDomain();
+        if (StringUtils.isEmpty(domain)) {
+            return "";
+        }
+        return domain.split("/")[2];
     }
 
     public static String getDeviceId() {

@@ -161,8 +161,8 @@ public class ThreadApplication {
             String src = img.attr("src");
             if (StringUtils.isNotEmpty(src) && src.startsWith("http")) {
                 // 获取域名
-                String domain = HeaderUtils.getDomain();
-                if (StringUtils.isNotEmpty(domain) && src.contains(domain)) {
+                String host = HeaderUtils.getHost();
+                if (StringUtils.isNotEmpty(host) && src.contains(host)) {
                     // 本地图片无需重复下载
                     return;
                 }

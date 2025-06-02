@@ -36,4 +36,8 @@ public class RequestHeader {
      * 设备id
      */
     private String deviceId;
+    /**
+     * 域名（带schema）
+     */
+    private String domain;
 }
