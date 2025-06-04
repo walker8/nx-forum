@@ -39,7 +39,17 @@ public interface CommentGateway {
 
     CustomPage<CommentE> queryCommentsByUserId(Long userId, int pageNo, int pageSize);
 
-    CustomPage<CommentReplyE> queryCommentRelies(Long commentId, CommentOrderV orderV, int pageNo, int pageSize);
+    /**
+     * 查询评论下的回复，如果指定了replyId，则优先查询该回复
+     *
+     * @param commentId 评论ID
+     * @param replyId   指定的回复ID，可以为null
+     * @param orderV    排序方式
+     * @param pageNo    页码
+     * @param pageSize  每页大小
+     * @return 回复列表分页结果
+     */
+    CustomPage<CommentReplyE> queryCommentRelies(Long commentId, Long replyId, CommentOrderV orderV, int pageNo, int pageSize);
 
     long getCommentAuditingCount(Integer forumId);
 

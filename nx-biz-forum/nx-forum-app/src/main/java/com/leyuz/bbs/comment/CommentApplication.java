@@ -142,7 +142,7 @@ public class CommentApplication {
         // 补充评论回复列表
         commentList.forEach(commentVO -> {
             if (commentVO.getReplyCount() > 0) {
-                CustomPage<CommentReplyE> commentReplyCustomPage = commentGateway.queryCommentRelies(commentVO.getCommentId(), CommentOrderV.TIME_ASC, 1, 2);
+                CustomPage<CommentReplyE> commentReplyCustomPage = commentGateway.queryCommentRelies(commentVO.getCommentId(), null, CommentOrderV.TIME_ASC, 1, 2);
                 List<CommentReplyVO> commentReplyVOList = commentConvert.toCommentReplyVOList(commentReplyCustomPage);
                 commentVO.setReplies(commentReplyVOList);
             }
@@ -174,8 +174,8 @@ public class CommentApplication {
         return commentVOCustomPage;
     }
 
-    public CustomPage<CommentReplyVO> queryCommentReplies(Long commentId, int order, int pageNo, int pageSize) {
-        CustomPage<CommentReplyE> commentReplyCustomPage = commentGateway.queryCommentRelies(commentId, CommentOrderV.of(order), pageNo, pageSize);
+    public CustomPage<CommentReplyVO> queryCommentReplies(Long commentId, Long replyId, int order, int pageNo, int pageSize) {
+        CustomPage<CommentReplyE> commentReplyCustomPage = commentGateway.queryCommentRelies(commentId, replyId, CommentOrderV.of(order), pageNo, pageSize);
         return commentConvert.toCommentReplyVOCustomPage(commentReplyCustomPage);
     }
 
@@ -225,7 +225,7 @@ public class CommentApplication {
         return DataBaseUtils.createCustomPage(commentReplyPOPage, this::toAdminCommentReplyVO);
     }
 
-    public CommentVO getCommentVOById(Long commentId) {
+    public CommentVO getCommentVOById(Long commentId, Long replyId) {
         CommentE commentE = commentGateway.getComment(commentId);
         if (commentE == null) {
             throw new ValidationException("评论不存在或已被删除");
@@ -241,7 +241,7 @@ public class CommentApplication {
             commentVO.setThreadTitle("该帖子已删除");
         }
         if (commentVO.getReplyCount() > 0) {
-            commentVO.setReplies(queryCommentReplies(commentId, CommentOrderV.TIME_DESC.getValue(), 1, 20).getRecords());
+            commentVO.setReplies(queryCommentReplies(commentId, replyId, CommentOrderV.TIME_DESC.getValue(), 1, 20).getRecords());
         }
         return commentVO;
     }

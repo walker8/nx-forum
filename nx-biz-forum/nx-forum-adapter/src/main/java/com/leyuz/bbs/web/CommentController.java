@@ -59,8 +59,8 @@ public class CommentController {
     @Operation(summary = "查询评论详情")
     @GetMapping("/{commentId}")
     @PermitAll
-    public SingleResponse getCommentVOById(@PathVariable("commentId") Long commentId) {
-        CommentVO commentVO = commentApplication.getCommentVOById(commentId);
+    public SingleResponse getCommentVOById(@PathVariable("commentId") Long commentId, @RequestParam(required = false) Long replyId) {
+        CommentVO commentVO = commentApplication.getCommentVOById(commentId, replyId);
         return SingleResponse.of(commentVO);
     }
 
@@ -68,10 +68,11 @@ public class CommentController {
     @GetMapping("/{commentId}/replies")
     @PermitAll
     public SingleResponse queryCommentReplies(@PathVariable("commentId") Long commentId,
+                                              @RequestParam(required = false) Long replyId,
                                               @RequestParam(defaultValue = "0") int order,
                                               @RequestParam(defaultValue = "1") int pageNo,
                                               @RequestParam(defaultValue = "10") int pageSize) {
-        CustomPage<CommentReplyVO> commentReply = commentApplication.queryCommentReplies(commentId, order, pageNo, pageSize);
+        CustomPage<CommentReplyVO> commentReply = commentApplication.queryCommentReplies(commentId, replyId, order, pageNo, pageSize);
         return SingleResponse.of(commentReply);
     }
 
