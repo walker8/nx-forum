@@ -131,8 +131,8 @@ public class CommentApplication {
         }
     }
 
-    public CustomPage<CommentVO> queryComments(Long threadId, int order, int pageNo, int pageSize) {
-        CustomPage<CommentE> commentCustomPage = commentGateway.queryComments(threadId, CommentOrderV.of(order), pageNo, pageSize);
+    public CustomPage<CommentVO> queryComments(Long threadId, Long commentId, int order, int pageNo, int pageSize) {
+        CustomPage<CommentE> commentCustomPage = commentGateway.queryComments(threadId, commentId, CommentOrderV.of(order), pageNo, pageSize);
         CustomPage<CommentVO> commentVOCustomPage = new CustomPage<>();
         BeanUtils.copyProperties(commentCustomPage, commentVOCustomPage);
         // 将查询结果转换为 CommentVO 列表

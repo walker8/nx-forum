@@ -48,10 +48,11 @@ public class CommentController {
     @GetMapping("")
     @PermitAll
     public SingleResponse queryComments(@RequestParam Long threadId,
+                                        @RequestParam(required = false) Long commentId,
                                         @RequestParam(defaultValue = "0") int order,
                                         @RequestParam(defaultValue = "1") int pageNo,
                                         @RequestParam(defaultValue = "10") int pageSize) {
-        CustomPage<CommentVO> comments = commentApplication.queryComments(threadId, order, pageNo, pageSize);
+        CustomPage<CommentVO> comments = commentApplication.queryComments(threadId, commentId, order, pageNo, pageSize);
         return SingleResponse.of(comments);
     }
 

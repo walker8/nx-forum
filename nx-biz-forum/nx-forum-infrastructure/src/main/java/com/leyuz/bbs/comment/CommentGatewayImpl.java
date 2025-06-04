@@ -193,7 +193,7 @@ public class CommentGatewayImpl implements CommentGateway {
     }
 
     @Override
-    public CustomPage<CommentE> queryComments(Long threadId, CommentOrderV orderV, int pageNo, int pageSize) {
+    public CustomPage<CommentE> queryComments(Long threadId, Long commentId, CommentOrderV orderV, int pageNo, int pageSize) {
         // 创建分页对象
         Page<CommentPO> page = new Page<>(pageNo, pageSize);
         // 执行分页查询
@@ -201,7 +201,23 @@ public class CommentGatewayImpl implements CommentGateway {
         wrapper.eq("is_deleted", 0);
         wrapper.eq("audit_status", AuditStatusV.PASSED);
         wrapper.eq("thread_id", threadId);
-        queryOrderBy(orderV, wrapper);
+
+        // 如果指定了commentId，则优先查询该评论
+        if (commentId != null) {
+            String orderBy = "";
+            if (CommentOrderV.TIME_DESC.equals(orderV)) {
+                orderBy = "create_time DESC";
+            } else if (CommentOrderV.TIME_ASC.equals(orderV)) {
+                orderBy = "create_time ASC";
+            } else if (CommentOrderV.HOT.equals(orderV)) {
+                orderBy = "likes DESC, create_time ASC";
+            }
+            wrapper.last("ORDER BY CASE WHEN comment_id = " + commentId + " THEN 0 ELSE 1 END," + orderBy);
+        } else {
+            // 使用常规排序
+            queryOrderBy(orderV, wrapper);
+        }
+
         Page<CommentPO> commentPOPage = commentService.page(page, wrapper);
         return DataBaseUtils.createCustomPage(commentPOPage, this::convert);
     }

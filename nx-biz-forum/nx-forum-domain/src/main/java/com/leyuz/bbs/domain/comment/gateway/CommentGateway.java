@@ -25,7 +25,17 @@ public interface CommentGateway {
 
     boolean decreaseReplies(Long commentId, int number);
 
-    CustomPage<CommentE> queryComments(Long threadId, CommentOrderV orderV, int pageNo, int pageSize);
+    /**
+     * 查询帖子下的评论，如果指定了commentId，则优先查询该评论
+     *
+     * @param threadId  帖子ID
+     * @param commentId 指定的评论ID，可以为null
+     * @param orderV    排序方式
+     * @param pageNo    页码
+     * @param pageSize  每页大小
+     * @return 评论列表分页结果
+     */
+    CustomPage<CommentE> queryComments(Long threadId, Long commentId, CommentOrderV orderV, int pageNo, int pageSize);
 
     CustomPage<CommentE> queryCommentsByUserId(Long userId, int pageNo, int pageSize);
 
