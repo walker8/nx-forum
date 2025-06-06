@@ -1,5 +1,6 @@
 package com.leyuz.bbs.thread.mybatis;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +64,8 @@ public class ThreadServiceImpl extends ServiceImpl<ThreadMapper, ThreadPO> imple
         }
         Integer days = MapUtil.getInt(params, "days");
         if (days != null && days > 0) {
-            queryWrapper.ge(tableAlias + "create_time", System.currentTimeMillis() - days * 24 * 60 * 60 * 1000);
+            // 查询days天内的帖子，即创建时间大于等于days天前的时间点
+            queryWrapper.ge(tableAlias + "create_time", DateUtil.offsetDay(new Date(), -days));
         }
         Map<String, Object> excludeThreadMap = MapUtil.getAny(params, "excludeThreadIds");
         if (!excludeThreadMap.isEmpty()) {

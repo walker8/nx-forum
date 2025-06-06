@@ -95,7 +95,7 @@ public class ThreadController {
     @GetMapping("/hot")
     @PermitAll
     public SingleResponse queryHotThreads(
-            @RequestParam(defaultValue = "7") Integer days,
+            @RequestParam(defaultValue = "14") Integer days,
             @RequestParam(defaultValue = "10") Integer limit) {
         return SingleResponse.of(threadApplication.queryHotThreads(days, limit));
     }

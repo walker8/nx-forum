@@ -31,6 +31,6 @@ public class HotThreadQueryStrategy extends AbstractThreadQueryStrategy {
     public Page<ThreadPO> query(ThreadQuery threadQuery) {
         threadQuery.setOrderBy("views");
         threadQuery.setDays(threadQuery.getDays());
-        return getThreadPOPage(0, threadQuery);
+        return getThreadPOPageWithoutTop(0, threadQuery);
     }
 } 
