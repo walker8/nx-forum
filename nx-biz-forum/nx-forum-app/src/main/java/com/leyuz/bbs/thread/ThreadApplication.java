@@ -411,6 +411,7 @@ public class ThreadApplication {
                 threadPO.setBrief(null);
             });
             return threadPOPage.getRecords().stream()
+                    .filter(m -> StringUtils.isNotEmpty(m.getSubject()))
                     .map(threadConvert::convertThreadPO2VO)
                     .collect(Collectors.toList());
         });
