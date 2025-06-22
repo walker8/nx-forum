@@ -100,7 +100,7 @@ CREATE TABLE `bbs_custom_page_contents` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`content_id`) USING BTREE,
   KEY `bbs_custom_page_contents_page_id_IDX` (`page_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面内容版本表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面内容版本表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,7 +123,7 @@ CREATE TABLE `bbs_custom_pages` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`page_id`) USING BTREE,
   KEY `bbs_custom_pages_page_code_IDX` (`page_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -178,7 +178,7 @@ CREATE TABLE `bbs_forums` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`forum_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -418,7 +418,7 @@ CREATE TABLE `bbs_user_properties` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `bbs_user_properties_user_id_IDX` (`user_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='论坛用户属性表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='论坛用户属性表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -440,7 +440,7 @@ CREATE TABLE `common_configs` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`config_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='共用配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='共用配置表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -488,7 +488,7 @@ CREATE TABLE `uc_permissions` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`perm_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='权限表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -508,7 +508,7 @@ CREATE TABLE `uc_role_permissions` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=866 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='角色和权限关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='角色和权限关联表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -532,7 +532,7 @@ CREATE TABLE `uc_roles` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`role_id`) USING BTREE,
   KEY `uc_roles_role_name_IDX` (`role_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -556,7 +556,7 @@ CREATE TABLE `uc_user_login_tokens` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `uc_user_login_tokens_token_IDX` (`token`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -578,7 +578,7 @@ CREATE TABLE `uc_user_roles` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -626,3 +626,35 @@ CREATE TABLE `uc_users` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-03-08  1:12:26
+
+--
+-- Table structure for table `bbs_reports`
+--
+
+DROP TABLE IF EXISTS `bbs_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bbs_reports` (
+  `report_id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '举报ID (主键)',
+  `target_id` bigint unsigned NOT NULL COMMENT '被举报内容ID (帖子ID或评论ID)',
+  `target_type` tinyint unsigned NOT NULL COMMENT '举报目标类型 (1:主题, 2:评论 3:楼中楼回复)',
+  `forum_id` int unsigned NOT NULL DEFAULT '0' COMMENT '所属版块ID (冗余字段，便于查询)',
+  `reported_content` varchar(500) CHARACTER utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '被举报内容（冗余字段）' ,
+  `report_type` tinyint unsigned NOT NULL COMMENT '举报原因类型',
+  `report_reason` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户填写的补充说明',
+  `handle_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '处理状态 (0:待处理, 1:已处理-违规, 2:已处理-驳回)',
+  `handle_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '处理结果说明',
+  `user_ip` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '举报人IP地址',
+  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '举报人客户端useragent',
+  `create_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '举报人ID',
+  `create_time` datetime NOT NULL COMMENT '举报时间',
+  `update_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '处理人ID',
+  `update_time` datetime NOT NULL COMMENT '处理时间',
+  `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志 (0:存在, 1:删除)',
+  PRIMARY KEY (`report_id`) USING BTREE,
+  KEY `bbs_reports_forum_id_IDX` (`forum_id`) USING BTREE,
+  KEY `bbs_reports_create_by_IDX` (`create_by`) USING BTREE,
+  KEY `bbs_reports_update_by_IDX` (`update_by`) USING BTREE,
+  KEY `bbs_reports_handle_status_IDX` (`handle_status`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='用户举报表';
+/*!40101 SET character_set_client = @saved_cs_client */;

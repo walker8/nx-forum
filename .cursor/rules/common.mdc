@@ -1,0 +1,147 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+项目架构规范与设计原则
+
+一、项目结构
+
+1. 模块划分
+
+- nx-biz-forum 论坛业务
+  - nx-forum-adapter 论坛适配层
+  - nx-forum-app 论坛应用层
+  - nx-forum-domain 论坛领域层
+  - nx-forum-infrastructure 论坛基础设施层
+- nx-platform 作为平台通用能力
+  - nx-common 存放公共组件和工具类
+  - nx-module-\* 按业务域划分子模块
+    - \*-adapter: 适配层，处理外部请求
+    - \*-app: 应用层，处理业务逻辑
+    - \*-domain: 领域层，定义领域模型和接口
+    - \*-infrastructure: 基础设施层，实现领域接口
+
+2. 包结构规范
+
+- com.leyuz.{module}.{domain}：按领域划分包
+- 每个领域下细分：controller、service、repository、model 等
+
+二、分层设计规范
+
+1. Adapter 层（适配层）
+
+- 统一使用 @RestController 注解
+- 方法命名规范：query*/list*/get*/create*/update\*/delete\*
+- 统一使用 SingleResponse/MultiResponse 包装响应
+- 使用 @Operation 注解文档化 API
+- 入参使用 *Cmd/*Query 命名
+- 统一异常处理
+- 使用 @Schema 注解提供 API 文档
+
+2. Application 层（应用层）
+
+- 使用 @Service 注解
+- 类名以 Application 结尾
+- 负责组织领域对象
+- 处理事务（@Transactional）
+- 数据转换：领域对象与 DTO 互转
+- 参数校验和业务规则验证
+
+3. Domain 层（领域层）
+
+- 定义领域模型（使用 E 后缀）
+- 定义领域外部依赖接口（Gateway）
+- 定义值对象（使用 V 后缀）
+- 封装领域逻辑和规则
+- 不依赖基础设施层
+
+4. Infrastructure 层（基础设施层）
+
+- 实现领域接口
+- 数据库访问实现
+- 类名以 Impl 结尾
+- 使用 MyBatis-Plus 进行数据操作
+- PO 对象与领域对象转换
+
+对于一些比较简单的逻辑，可以不需要使用领域层，直接在应用层实现
+
+三、统一规范
+
+1. 数据对象规范
+
+- DTO：数据传输对象，用于外部交互
+- PO：持久化对象，用于数据库映射
+- VO：视图对象，用于展示层
+- E：领域实体，表示领域模型
+- V：值对象，表示不可变特征
+
+2. 命名规范
+
+- Controller：\*Controller
+- Application：\*Application
+- Gateway：\*Gateway
+- Gateway 实现：\*GatewayImpl
+- Service：I\*Service
+- Service 实现：\*ServiceImpl
+
+- 类名使用大驼峰命名法（如 UserController、OrderService）
+- 方法和变量名使用小驼峰命名法（如 findUserById、isOrderValid）
+- 常量使用全大写（如 MAX_RETRY_ATTEMPTS、DEFAULT_PAGE_SIZE）
+
+3. 分页查询规范
+
+- 统一使用 CustomPage 封装分页结果
+- 分页参数：pageNum/pageSize
+- 查询参数使用 \*PageQuery 封装
+- 使用 DataBaseUtils 处理分页转换
+
+4. 数据验证规范
+
+- 使用 ValidationException 处理业务校验
+- 统一异常处理
+- 参数校验在应用层处理
+
+5. 缓存处理规范
+
+- 优先使用本地缓存
+- 合理使用分布式缓存
+- 缓存注解统一管理
+
+6. 代码风格
+
+- 使用 lombok 简化代码
+- 统一使用构造器注入
+- 使用 @RequiredArgsConstructor
+- 代码注释完整规范
+- 使用 @Schema 注解提供 API 文档
+
+7. 数据库操作规范
+
+- 使用 MyBatis-Plus
+- 统一使用逻辑删除
+- 继承基础实体类（创建时间、更新时间等）
+- 使用 BaseEntityUtils 处理基础字段
+
+8. 权限控制规范
+
+- 基于角色的权限控制
+- 统一的用户认证
+- 灵活的权限分配机制
+- 支持角色优先级
+
+9. 业务规则
+
+- 统一的业务异常处理
+- 领域驱动的业务实现
+- 职责单一原则
+- 高内聚低耦合
+
+10. Spring Boot 具体规范
+
+- 使用 Spring Boot starters 快速设置项目和管理依赖
+- 正确使用注解（如 @SpringBootApplication、@RestController、@Service）
+- 有效利用 Spring Boot 的自动配置特性
+- 使用 @ControllerAdvice 和 @ExceptionHandler 实现异常处理
+- 适当使用 Java 17 或更高版本特性（如 records、sealed classes、模式匹配）
+- 利用 Spring Boot 3.x 特性和最佳实践

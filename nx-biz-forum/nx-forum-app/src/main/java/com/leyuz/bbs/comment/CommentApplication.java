@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -309,6 +310,10 @@ public class CommentApplication {
         }
     }
 
+    public void deleteComment(Long commentId, String reason, Boolean notice) {
+        commentDomainService.deleteComments(0, Collections.singletonList(commentId), reason, notice);
+    }
+
     public void operateCommentRepliesByAdmin(Integer forumId, List<Long> replyIds, String operation, String reason, Boolean notice) {
         switch (operation) {
             case OperationConstant.PASS:
@@ -330,5 +335,9 @@ public class CommentApplication {
             default:
                 throw new ValidationException("操作类型不正确");
         }
+    }
+
+    public void deleteCommentReply(Long replyId, String reason, Boolean notice) {
+        commentDomainService.deleteCommentReplies(0, Collections.singletonList(replyId), reason, notice);
     }
 }

@@ -106,7 +106,7 @@ CREATE TABLE `bbs_custom_page_contents` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`content_id`) USING BTREE,
   KEY `bbs_custom_page_contents_page_id_IDX` (`page_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面内容版本表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面内容版本表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,7 +140,7 @@ CREATE TABLE `bbs_custom_pages` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`page_id`) USING BTREE,
   KEY `bbs_custom_pages_page_code_IDX` (`page_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='自定义页面表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -214,7 +214,7 @@ CREATE TABLE `bbs_forums` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`forum_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -463,7 +463,7 @@ CREATE TABLE `bbs_user_properties` (
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `bbs_user_properties_user_id_IDX` (`user_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='论坛用户属性表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='论坛用户属性表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -494,7 +494,7 @@ CREATE TABLE `common_configs` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`config_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='共用配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='共用配置表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -541,7 +541,7 @@ CREATE TABLE `uc_permissions` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`perm_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='权限表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -558,19 +558,18 @@ INSERT INTO `uc_permissions` VALUES (9,25,'新建评论',0,'comment:new',3,0,'',
 INSERT INTO `uc_permissions` VALUES (10,25,'删除评论',0,'comment:delete',3,1,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (11,0,'用户权限',0,'',1,1,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (12,0,'管理权限',0,'admin:manage',2,2,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (13,19,'访问论坛',0,'forum:visit',3,0,'',1,NOW(),1,NOW(),1);
-INSERT INTO `uc_permissions` VALUES (14,12,'系统管理',0,'admin:system',2,2,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (14,12,'系统管理',0,'admin:system',2,1,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (15,14,'基本设置',0,'admin:system:basic',2,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (16,14,'版块管理',0,'admin:system:forum',2,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (17,14,'审核设置',0,'admin:system:audit',2,0,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (18,12,'帖子管理',0,'admin:thread',2,3,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (18,12,'帖子管理',0,'admin:thread',2,2,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (19,11,'访问论坛',0,'forum:visit',2,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (20,19,'访问版块',0,'forum:visit:section',3,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (21,18,'主题查询',0,'admin:thread:search',2,0,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (22,18,'评论查询',0,'admin:comment:search',2,0,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (22,18,'评论查询',0,'admin:comment:search',2,1,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (23,21,'删除主题',0,'admin:thread:delete',3,0,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (24,11,'主题管理',0,'',1,0,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (25,11,'评论管理',0,'',1,0,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (24,11,'主题管理',0,'',1,1,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (25,11,'评论管理',0,'',1,2,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (26,21,'置顶主题',0,'admin:thread:top',3,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (27,21,'关闭主题',0,'admin:thread:close',3,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (28,21,'主题精华',0,'admin:thread:digest',3,0,'',1,NOW(),1,NOW(),0);
@@ -584,15 +583,16 @@ INSERT INTO `uc_permissions` VALUES (35,22,'删除评论',0,'admin:comment:delet
 INSERT INTO `uc_permissions` VALUES (36,22,'通过评论',0,'admin:comment:pass',3,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (37,22,'拒绝评论',0,'admin:comment:reject',3,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (38,22,'还原评论',0,'admin:comment:restore',3,0,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (39,19,'访问其他',0,'forum:visit:other',3,0,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (40,11,'附件上传',0,'',1,2,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (39,19,'访问其他',0,'forum:visit:other',3,1,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (40,11,'附件上传',0,'',1,3,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (41,40,'上传图片',0,'image:upload',3,2,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (42,40,'上传头像',0,'avatar:upload',3,1,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (43,14,'自定义页面',0,'admin:system:page',2,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (44,14,'图片管理',0,'admin:system:image',2,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (45,12,'用户管理',0,'admin:user',2,3,'',1,NOW(),1,NOW(),0);
-INSERT INTO `uc_permissions` VALUES (46,45,'小黑屋',0,'admin:user:ban',2,3,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (46,45,'小黑屋',0,'admin:user:ban',2,0,'',1,NOW(),1,NOW(),0);
 INSERT INTO `uc_permissions` VALUES (47,12,'管理首页',0,'admin:home',2,0,'',1,NOW(),1,NOW(),0);
+INSERT INTO `uc_permissions` VALUES (48,18,'用户举报',0,'admin:user:report',2,2,'',1,NOW(),1,NOW(),0);
 /*!40000 ALTER TABLE `uc_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -613,7 +613,7 @@ CREATE TABLE `uc_role_permissions` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=996 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='角色和权限关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='角色和权限关联表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -622,133 +622,136 @@ CREATE TABLE `uc_role_permissions` (
 
 LOCK TABLES `uc_role_permissions` WRITE;
 /*!40000 ALTER TABLE `uc_role_permissions` DISABLE KEYS */;
-INSERT INTO `uc_role_permissions` VALUES (151,'GUEST',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (152,'GUEST',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (153,'GUEST',39,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (154,'GUEST',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (833,'USER',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (834,'USER',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (835,'USER',8,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (836,'USER',4,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (837,'USER',9,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (838,'USER',42,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (839,'USER',41,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (840,'USER',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (844,'MUTED_USER',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (845,'MUTED_USER',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (846,'MUTED_USER',42,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (847,'MUTED_USER',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (848,'CREATOR',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (849,'CREATOR',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (850,'CREATOR',39,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (851,'CREATOR',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (852,'CREATOR',8,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (853,'CREATOR',4,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (854,'CREATOR',7,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (855,'CREATOR',9,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (856,'CREATOR',10,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (857,'CREATOR',42,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (858,'CREATOR',41,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (896,'SUPER_MODERATOR',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (897,'SUPER_MODERATOR',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (898,'SUPER_MODERATOR',39,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (899,'SUPER_MODERATOR',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (900,'SUPER_MODERATOR',8,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (901,'SUPER_MODERATOR',4,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (902,'SUPER_MODERATOR',7,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (903,'SUPER_MODERATOR',9,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (904,'SUPER_MODERATOR',10,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (905,'SUPER_MODERATOR',42,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (906,'SUPER_MODERATOR',41,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (907,'SUPER_MODERATOR',18,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (908,'SUPER_MODERATOR',21,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (909,'SUPER_MODERATOR',23,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (910,'SUPER_MODERATOR',26,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (911,'SUPER_MODERATOR',27,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (912,'SUPER_MODERATOR',28,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (913,'SUPER_MODERATOR',29,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (914,'SUPER_MODERATOR',30,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (915,'SUPER_MODERATOR',31,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (916,'SUPER_MODERATOR',32,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (917,'SUPER_MODERATOR',33,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (918,'SUPER_MODERATOR',34,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (919,'SUPER_MODERATOR',22,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (920,'SUPER_MODERATOR',35,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (921,'SUPER_MODERATOR',36,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (922,'SUPER_MODERATOR',37,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (923,'SUPER_MODERATOR',38,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (924,'SUPER_MODERATOR',45,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (925,'SUPER_MODERATOR',46,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (926,'SUPER_MODERATOR',12,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (927,'MODERATOR',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (928,'MODERATOR',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (929,'MODERATOR',39,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (930,'MODERATOR',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (931,'MODERATOR',8,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (932,'MODERATOR',4,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (933,'MODERATOR',7,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (934,'MODERATOR',9,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (935,'MODERATOR',10,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (936,'MODERATOR',42,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (937,'MODERATOR',41,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (938,'MODERATOR',18,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (939,'MODERATOR',21,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (940,'MODERATOR',23,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (941,'MODERATOR',26,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (942,'MODERATOR',27,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (943,'MODERATOR',28,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (944,'MODERATOR',29,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (945,'MODERATOR',30,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (946,'MODERATOR',31,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (947,'MODERATOR',32,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (948,'MODERATOR',33,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (949,'MODERATOR',34,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (950,'MODERATOR',22,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (951,'MODERATOR',35,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (952,'MODERATOR',36,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (953,'MODERATOR',37,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (954,'MODERATOR',38,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (955,'MODERATOR',45,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (956,'MODERATOR',46,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (957,'MODERATOR',12,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (958,'ADMIN',19,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (959,'ADMIN',20,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (960,'ADMIN',39,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (961,'ADMIN',3,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (962,'ADMIN',8,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (963,'ADMIN',4,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (964,'ADMIN',7,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (965,'ADMIN',9,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (966,'ADMIN',10,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (967,'ADMIN',42,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (968,'ADMIN',41,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (969,'ADMIN',12,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (970,'ADMIN',47,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (971,'ADMIN',14,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (972,'ADMIN',15,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (973,'ADMIN',16,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (974,'ADMIN',17,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (975,'ADMIN',43,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (976,'ADMIN',44,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (977,'ADMIN',18,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (978,'ADMIN',21,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (979,'ADMIN',23,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (980,'ADMIN',26,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (981,'ADMIN',27,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (982,'ADMIN',28,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (983,'ADMIN',29,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (984,'ADMIN',30,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (985,'ADMIN',31,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (986,'ADMIN',32,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (987,'ADMIN',33,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (988,'ADMIN',34,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (989,'ADMIN',22,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (990,'ADMIN',35,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (991,'ADMIN',36,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (992,'ADMIN',37,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (993,'ADMIN',38,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (994,'ADMIN',45,1,NOW(),1,NOW(),0);
-INSERT INTO `uc_role_permissions` VALUES (995,'ADMIN',46,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (1,'GUEST',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (2,'GUEST',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (3,'GUEST',39,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (4,'GUEST',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (5,'USER',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (6,'USER',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (7,'USER',8,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (8,'USER',4,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (9,'USER',9,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (10,'USER',42,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (11,'USER',41,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (12,'USER',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (13,'MUTED_USER',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (14,'MUTED_USER',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (15,'MUTED_USER',42,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (16,'MUTED_USER',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (17,'CREATOR',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (18,'CREATOR',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (19,'CREATOR',39,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (20,'CREATOR',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (21,'CREATOR',8,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (22,'CREATOR',4,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (23,'CREATOR',7,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (24,'CREATOR',9,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (25,'CREATOR',10,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (26,'CREATOR',42,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (27,'CREATOR',41,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (28,'ADMIN',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (29,'ADMIN',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (30,'ADMIN',39,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (31,'ADMIN',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (32,'ADMIN',8,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (33,'ADMIN',4,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (34,'ADMIN',7,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (35,'ADMIN',9,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (36,'ADMIN',10,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (37,'ADMIN',42,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (38,'ADMIN',41,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (39,'ADMIN',12,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (40,'ADMIN',47,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (41,'ADMIN',14,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (42,'ADMIN',15,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (43,'ADMIN',16,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (44,'ADMIN',17,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (45,'ADMIN',43,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (46,'ADMIN',44,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (47,'ADMIN',18,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (48,'ADMIN',21,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (49,'ADMIN',23,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (50,'ADMIN',26,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (51,'ADMIN',27,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (52,'ADMIN',28,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (53,'ADMIN',29,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (54,'ADMIN',30,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (55,'ADMIN',31,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (56,'ADMIN',32,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (57,'ADMIN',33,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (58,'ADMIN',34,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (59,'ADMIN',22,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (60,'ADMIN',35,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (61,'ADMIN',36,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (62,'ADMIN',37,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (63,'ADMIN',38,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (64,'ADMIN',48,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (65,'ADMIN',45,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (66,'ADMIN',46,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (67,'SUPER_MODERATOR',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (68,'SUPER_MODERATOR',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (69,'SUPER_MODERATOR',39,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (70,'SUPER_MODERATOR',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (71,'SUPER_MODERATOR',8,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (72,'SUPER_MODERATOR',4,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (73,'SUPER_MODERATOR',7,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (74,'SUPER_MODERATOR',9,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (75,'SUPER_MODERATOR',10,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (76,'SUPER_MODERATOR',42,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (77,'SUPER_MODERATOR',41,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (78,'SUPER_MODERATOR',18,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (79,'SUPER_MODERATOR',21,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (80,'SUPER_MODERATOR',23,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (81,'SUPER_MODERATOR',26,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (82,'SUPER_MODERATOR',27,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (83,'SUPER_MODERATOR',28,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (84,'SUPER_MODERATOR',29,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (85,'SUPER_MODERATOR',30,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (86,'SUPER_MODERATOR',31,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (87,'SUPER_MODERATOR',32,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (88,'SUPER_MODERATOR',33,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (89,'SUPER_MODERATOR',34,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (90,'SUPER_MODERATOR',22,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (91,'SUPER_MODERATOR',35,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (92,'SUPER_MODERATOR',36,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (93,'SUPER_MODERATOR',37,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (94,'SUPER_MODERATOR',38,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (95,'SUPER_MODERATOR',48,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (96,'SUPER_MODERATOR',45,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (97,'SUPER_MODERATOR',46,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (98,'SUPER_MODERATOR',12,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (99,'MODERATOR',19,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (100,'MODERATOR',20,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (101,'MODERATOR',39,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (102,'MODERATOR',3,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (103,'MODERATOR',8,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (104,'MODERATOR',4,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (105,'MODERATOR',7,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (106,'MODERATOR',9,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (107,'MODERATOR',10,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (108,'MODERATOR',42,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (109,'MODERATOR',41,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (110,'MODERATOR',18,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (111,'MODERATOR',21,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (112,'MODERATOR',23,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (113,'MODERATOR',26,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (114,'MODERATOR',27,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (115,'MODERATOR',28,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (116,'MODERATOR',29,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (117,'MODERATOR',30,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (118,'MODERATOR',31,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (119,'MODERATOR',32,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (120,'MODERATOR',33,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (121,'MODERATOR',34,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (122,'MODERATOR',22,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (123,'MODERATOR',35,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (124,'MODERATOR',36,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (125,'MODERATOR',37,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (126,'MODERATOR',38,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (127,'MODERATOR',48,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (128,'MODERATOR',45,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (129,'MODERATOR',46,1,NOW(),1,NOW(),0);
+INSERT INTO `uc_role_permissions` VALUES (130,'MODERATOR',12,1,NOW(),1,NOW(),0);
 /*!40000 ALTER TABLE `uc_role_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -771,7 +774,7 @@ CREATE TABLE `uc_roles` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`role_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -832,7 +835,7 @@ CREATE TABLE `uc_user_roles` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `is_deleted` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '删除标志（0代表存在 1代表删除）',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -876,7 +879,7 @@ CREATE TABLE `uc_users` (
   KEY `uc_users_create_time_IDX` (`create_time`) USING BTREE,
   KEY `uc_users_update_time_IDX` (`update_time`) USING BTREE,
   KEY `uc_users_last_active_date_IDX` (`last_active_date`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -888,6 +891,62 @@ LOCK TABLES `uc_users` WRITE;
 INSERT INTO `uc_users` VALUES (1,'admin','email@domain.com','','$2a$10$L0cG3rXxjpOOumYGkKERZuAoRNOXJlDnII8VFT1QAAKooeK3/N/xK','',0,'127.0.0.1',NOW(),'',0,NOW(),1,NOW(),0);
 /*!40000 ALTER TABLE `uc_users` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `uc_user_logs`
+--
+
+DROP TABLE IF EXISTS `uc_user_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `uc_user_logs` (
+  `log_id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `log_type` tinyint unsigned NOT NULL COMMENT '日志类型（1登录 2登出 3注册 4信息修改 5密码修改）',
+  `log_content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '日志内容',
+  `ip_address` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '操作IP地址',
+  `user_agent` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户代理信息',
+  `operation_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '操作状态（0成功 1失败）',
+  `create_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '创建者',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`log_id`) USING BTREE,
+  KEY `uc_user_logs_create_by_IDX` (`create_by`) USING BTREE,
+  KEY `uc_user_logs_ create_time_IDX` (`create_time`) USING BTREE,
+  KEY `uc_user_logs_log_type_IDX` (`log_type`) USING BTREE,
+  KEY `uc_user_logs_ip_address_IDX` (`ip_address`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='用户操作日志表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `bbs_reports`
+--
+
+DROP TABLE IF EXISTS `bbs_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bbs_reports` (
+   `report_id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '举报ID (主键)',
+   `target_id` bigint unsigned NOT NULL COMMENT '被举报内容ID (帖子ID或评论ID)',
+   `target_type` tinyint unsigned NOT NULL COMMENT '举报目标类型 (1:主题, 2:评论 3:楼中楼回复)',
+   `forum_id` int unsigned NOT NULL DEFAULT '0' COMMENT '所属版块ID (冗余字段，便于查询)',
+   `reported_content` varchar(500) CHARACTER set utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '被举报内容（冗余字段）' ,
+   `report_type` tinyint unsigned NOT NULL COMMENT '举报原因类型',
+   `report_reason` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '用户填写的补充说明',
+   `handle_status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '处理状态 (0:待处理, 1:已处理-违规, 2:已处理-驳回)',
+   `handle_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '处理结果说明',
+   `user_ip` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '举报人IP地址',
+   `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '举报人客户端useragent',
+   `create_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '举报人ID',
+   `create_time` datetime NOT NULL COMMENT '举报时间',
+   `update_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '处理人ID',
+   `update_time` datetime NOT NULL COMMENT '处理时间',
+   `is_deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '删除标志 (0:存在, 1:删除)',
+   PRIMARY KEY (`report_id`) USING BTREE,
+   KEY `bbs_reports_forum_id_IDX` (`forum_id`) USING BTREE,
+   KEY `bbs_reports_create_by_IDX` (`create_by`) USING BTREE,
+   KEY `bbs_reports_update_by_IDX` (`update_by`) USING BTREE,
+   KEY `bbs_reports_handle_status_IDX` (`handle_status`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='用户举报表';
 
 --
 -- Dumping routines for database 'nx-forum'

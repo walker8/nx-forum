@@ -2,6 +2,7 @@ package com.leyuz.bbs.admin;
 
 import com.alibaba.cola.dto.SingleResponse;
 import com.leyuz.bbs.comment.CommentApplication;
+import com.leyuz.bbs.report.ReportApplication;
 import com.leyuz.bbs.thread.ThreadApplication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +33,8 @@ public class AdminController {
     private ThreadApplication threadApplication;
     @Autowired
     private CommentApplication commentApplication;
+    @Autowired
+    private ReportApplication reportApplication;
 
     @Operation(summary = "查询帖子审核数量")
     @GetMapping("/posts/auditing/count")
@@ -44,7 +47,9 @@ public class AdminController {
         map.put("commentAuditCount", commentAuditCount);
         long replyAuditCount = commentApplication.getReplyAuditingCount(forumId);
         map.put("replyAuditCount", replyAuditCount);
-        map.put("totalAuditCount", threadAuditCount + commentAuditCount + replyAuditCount);
+        long pendingReportCount = reportApplication.getPendingReportCount(forumId);
+        map.put("pendingReportCount", pendingReportCount);
+        map.put("totalAuditCount", threadAuditCount + commentAuditCount + replyAuditCount + pendingReportCount);
         return SingleResponse.of(map);
     }
 

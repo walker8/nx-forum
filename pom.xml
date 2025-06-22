@@ -22,6 +22,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <mapstruct-plus.version>1.4.6</mapstruct-plus.version>
         <guava.version>33.4.0-jre</guava.version>
+        <lombok.version>1.18.34</lombok.version>
         <!-- 离线IP地址定位库 -->
         <ip2region.version>2.7.0</ip2region.version>
     </properties>
@@ -51,6 +52,11 @@
                 <groupId>com.leyuz.boot</groupId>
                 <artifactId>nx-forum-app</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.leyuz.boot</groupId>

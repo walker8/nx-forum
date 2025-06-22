@@ -42,6 +42,7 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -351,6 +352,10 @@ public class ThreadApplication {
             }
             default -> throw new ValidationException("操作类型不正确");
         };
+    }
+
+    public void deleteThread(Long threadId, String reason, boolean notice) {
+        threadDomainService.deleteThreads(0, Collections.singletonList(threadId), reason, notice);
     }
 
     public CustomPage<ThreadVO> queryThreadsByUserId(Long userId, int pageNo, int pageSize) {
