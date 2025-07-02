@@ -115,6 +115,7 @@ alwaysApply: true
 - 使用 @RequiredArgsConstructor
 - 代码注释完整规范
 - 使用 @Schema 注解提供 API 文档
+- 遵循阿里巴巴 Java 开发手册规范
 
 7. 数据库操作规范
 
