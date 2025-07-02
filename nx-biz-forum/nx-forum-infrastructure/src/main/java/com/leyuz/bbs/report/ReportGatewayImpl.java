@@ -68,6 +68,16 @@ public class ReportGatewayImpl implements ReportGateway {
         return reportMapper.selectCount(wrapper);
     }
 
+    @Override
+    public boolean existsPendingReport(Long userId, Long targetId, ReportTargetTypeEnum targetType) {
+        LambdaQueryWrapper<ReportPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ReportPO::getCreateBy, userId)
+                .eq(ReportPO::getTargetId, targetId)
+                .eq(ReportPO::getTargetType, targetType.getValue())
+                .eq(ReportPO::getHandleStatus, ReportHandleStatusEnum.PENDING.getValue());
+        return reportMapper.selectCount(wrapper) > 0;
+    }
+
     private ReportPO toPO(ReportE report) {
         ReportPO po = new ReportPO();
         po.setReportId(report.getReportId());

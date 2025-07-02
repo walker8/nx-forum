@@ -41,6 +41,12 @@ public class ReportApplication {
     private final NotificationApplication notificationApplication;
 
     public void createReport(ReportCreateCmd cmd) {
+        // 禁止重复举报校验
+        Long userId = HeaderUtils.getUserId();
+        boolean duplicate = reportGateway.existsPendingReport(userId, cmd.getTargetId(), cmd.getTargetType());
+        if (duplicate) {
+            throw new ValidationException("请勿重复举报，待处理举报已存在");
+        }
         ReportE report = new ReportE();
         report.setReportReason(cmd.getReportReason());
         report.setTargetId(cmd.getTargetId());
