@@ -1,4 +1,4 @@
-package com.leyuz.module.config.infrastructure.mybatis;
+package com.leyuz.module.config.infrastructure.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leyuz.module.config.infrastructure.ConfigPO;

@@ -1,4 +1,4 @@
-package com.leyuz.uc.auth.token.mybatis;
+package com.leyuz.uc.auth.token.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leyuz.uc.auth.token.UserLoginTokenPO;

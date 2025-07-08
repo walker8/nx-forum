@@ -1,4 +1,4 @@
-package com.leyuz.uc.auth.permission.mybatis;
+package com.leyuz.uc.auth.permission.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leyuz.uc.auth.permission.PermissionPO;

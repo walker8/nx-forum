@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuz.common.mybatis.PageQuery;
 import com.leyuz.uc.user.UserPO;
+import com.leyuz.uc.user.mybatis.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

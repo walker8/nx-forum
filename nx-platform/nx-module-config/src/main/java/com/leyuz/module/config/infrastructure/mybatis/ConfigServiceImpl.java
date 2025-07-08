@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuz.common.utils.BaseEntityUtils;
 import com.leyuz.module.config.infrastructure.ConfigPO;
+import com.leyuz.module.config.infrastructure.mybatis.mapper.ConfigMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

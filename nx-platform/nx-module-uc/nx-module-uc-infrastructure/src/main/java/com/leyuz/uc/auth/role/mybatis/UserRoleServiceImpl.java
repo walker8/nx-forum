@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuz.common.mybatis.PageQuery;
 import com.leyuz.common.utils.BaseEntityUtils;
 import com.leyuz.uc.auth.role.UserRolePO;
+import com.leyuz.uc.auth.role.mybatis.mapper.UserRoleMapper;
 import com.leyuz.uc.user.UserPO;
 import com.leyuz.uc.user.mybatis.IUserService;
 import lombok.RequiredArgsConstructor;

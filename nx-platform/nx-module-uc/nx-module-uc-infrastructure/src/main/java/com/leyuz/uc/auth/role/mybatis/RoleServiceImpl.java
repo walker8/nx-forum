@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuz.common.mybatis.PageQuery;
 import com.leyuz.uc.auth.role.RolePO;
+import com.leyuz.uc.auth.role.mybatis.mapper.RoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;

@@ -2,6 +2,7 @@ package com.leyuz.uc.auth.token.mybatis;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuz.uc.auth.token.UserLoginTokenPO;
+import com.leyuz.uc.auth.token.mybatis.mapper.UserLoginTokenMapper;
 import org.springframework.stereotype.Service;
 
 /**

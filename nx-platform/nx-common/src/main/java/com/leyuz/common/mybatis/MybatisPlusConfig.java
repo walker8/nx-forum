@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -35,11 +36,13 @@ public class MybatisPlusConfig {
     }
 
     /**
-     * 统一配置SqlSessionFactory
+     * 统一配置自定义SqlSessionFactory
+     * 仅当启用统计插件且没有其他sqlSessionFactory时生效
      */
-    @Bean
+    @Bean(name = "customSqlSessionFactory")
+    @Primary
     @ConditionalOnProperty(name = "nx.stats.enabled", havingValue = "true")
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+    public SqlSessionFactory customSqlSessionFactory(DataSource dataSource) throws Exception {
         MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
 

@@ -59,7 +59,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.leyuz.Application</mainClass>
+                    <mainClass>com.leyuz.bbs.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>

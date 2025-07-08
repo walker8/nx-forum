@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuz.common.utils.BaseEntityUtils;
 import com.leyuz.uc.auth.role.RolePermissionPO;
+import com.leyuz.uc.auth.role.mybatis.mapper.RolePermissionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

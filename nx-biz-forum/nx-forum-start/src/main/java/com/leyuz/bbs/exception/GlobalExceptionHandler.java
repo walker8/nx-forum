@@ -1,4 +1,4 @@
-package com.leyuz.exception;
+package com.leyuz.bbs.exception;
 
 import com.alibaba.cola.dto.SingleResponse;
 import com.alibaba.cola.exception.BizException;

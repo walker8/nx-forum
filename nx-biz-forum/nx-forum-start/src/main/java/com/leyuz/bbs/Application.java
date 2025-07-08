@@ -1,6 +1,8 @@
-package com.leyuz;
+package com.leyuz.bbs;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Mapper;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @Slf4j
+@MapperScan(value = "com.leyuz.bbs", annotationClass = Mapper.class)
 public class Application {
 
     public static void main(String[] args) {

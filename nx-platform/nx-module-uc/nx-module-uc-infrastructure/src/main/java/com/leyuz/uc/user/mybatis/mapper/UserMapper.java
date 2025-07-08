@@ -1,4 +1,4 @@
-package com.leyuz.uc.user.mybatis;
+package com.leyuz.uc.user.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leyuz.uc.user.UserPO;

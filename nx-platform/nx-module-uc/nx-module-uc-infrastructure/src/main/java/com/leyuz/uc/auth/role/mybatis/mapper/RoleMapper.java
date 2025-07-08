@@ -1,4 +1,4 @@
-package com.leyuz.uc.auth.role.mybatis;
+package com.leyuz.uc.auth.role.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leyuz.uc.auth.role.RolePO;
