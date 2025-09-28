@@ -62,5 +62,9 @@
             <groupId>com.rometools</groupId>
             <artifactId>rome</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+        </dependency>
     </dependencies>
 </project>

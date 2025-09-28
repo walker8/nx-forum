@@ -326,11 +326,18 @@ public class ThreadE {
                 }
             }
             if (maxHeadingLevel > 1) {
-                // 如果最大只有h3标签，则进行重新排序
-                for (int i = 6; i >= maxHeadingLevel; i--) {
-                    for (Element heading : document.select("h" + i)) {
-                        heading.tagName("h" + (i - maxHeadingLevel + 1));
-                    }
+                // 如果最小标题级别大于1，则进行重新排序（如h2->h1, h3->h2, h4->h3）
+                // 先收集所有需要修改的标题元素，避免动态查询导致重复修改
+                List<Element> allHeadings = new ArrayList<>();
+                for (int i = maxHeadingLevel; i <= 6; i++) {
+                    allHeadings.addAll(document.select("h" + i));
+                }
+                // 对每个标题元素进行重新排序
+                for (Element heading : allHeadings) {
+                    String tagName = heading.tagName();
+                    int level = Integer.parseInt(tagName.substring(1)); // h2 -> 2
+                    int newLevel = level - maxHeadingLevel + 1;
+                    heading.tagName("h" + newLevel);
                 }
             }
             // 格式化code块

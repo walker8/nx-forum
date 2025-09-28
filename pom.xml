@@ -225,6 +225,11 @@
                 <artifactId>rome</artifactId>
                 <version>2.1.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark-all</artifactId>
+                <version>0.64.8</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
