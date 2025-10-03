@@ -1,15 +1,16 @@
 package com.leyuz.uc.cache;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import com.alicp.jetcache.anno.CacheType;
 import com.leyuz.module.cache.CacheService;
 import com.leyuz.module.cache.GenericCache;
 import com.leyuz.uc.auth.role.dto.RoleDTO;
 import com.leyuz.uc.domain.user.UserE;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration("ucCacheConfig")
 public class CacheConfig {
@@ -42,6 +43,11 @@ public class CacheConfig {
     @Bean
     public GenericCache<Long, UserE> userIdCache(CacheService cacheService) {
         return new GenericCache<>(cacheService, stats, "user:id:", 3600, CacheType.REMOTE);
+    }
+
+    @Bean
+    public GenericCache<Long, String> emailChangeStepCache(CacheService cacheService) {
+        return new GenericCache<>(cacheService, stats, "email:change:", 900, CacheType.REMOTE);
     }
 
     @Bean

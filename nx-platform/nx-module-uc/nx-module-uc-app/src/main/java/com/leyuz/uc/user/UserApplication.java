@@ -60,6 +60,7 @@ public class UserApplication {
     private static final List<String> orderByColumns = Arrays.asList("user_id", "create_time", "update_time", "last_active_date");
 
     private final GenericCache<Long, UserE> userIdCache;
+    private final GenericCache<Long, String> emailChangeStepCache;
 
     public void saveUserByAdmin(UserCmd userCmd) {
         saveUser(userCmd);
@@ -342,6 +343,38 @@ public class UserApplication {
     }
 
     /**
+     * 发送验证码到当前登录用户的邮箱
+     */
+    public void sendCurrentUserEmailVerifyCode() {
+        UserE userE = getByIdFromCache(HeaderUtils.getUserId());
+
+        String email = userE.getEmail();
+        if (StringUtils.isBlank(email)) {
+            throw new ValidationException("用户邮箱为空，无法发送验证码");
+        }
+
+        verifyCodeService.sendEmailVerifyCode(email, userE.getUserName(), VerifyType.CHANGE_EMAIL);
+    }
+
+    /**
+     * 发送验证码到新邮箱（用于邮箱换绑）
+     *
+     * @param newEmail 新邮箱地址
+     */
+    public void sendNewEmailVerifyCode(String newEmail) {
+        UserE currentUser = getByIdFromCache(HeaderUtils.getUserId());
+        // 检查当前邮箱验证是否已通过
+        String verificationStatus = emailChangeStepCache.get(currentUser.getUserId());
+        if (!"verified".equals(verificationStatus)) {
+            throw new ValidationException("请先完成当前邮箱验证");
+        }
+        // 检查新邮箱是否可用
+        validateNewEmail(newEmail, currentUser.getUserId());
+
+        verifyCodeService.sendEmailVerifyCode(newEmail, currentUser.getUserName(), VerifyType.CHANGE_EMAIL);
+    }
+
+    /**
      * 发送手机验证码
      *
      * @param phone 手机号码
@@ -372,6 +405,9 @@ public class UserApplication {
             case REGISTER -> registerConfigApplication.validateSmsRegisterEnabled();
             case LOGIN -> loginConfigApplication.validatePhoneCodeLoginEnabled();
             case RESET_PASSWORD -> loginConfigApplication.validatePhoneResetPasswordEnabled();
+            case CHANGE_EMAIL -> {
+                // 邮箱换绑功能默认启用，无需额外配置检查
+            }
         }
     }
 
@@ -380,6 +416,9 @@ public class UserApplication {
             case REGISTER -> registerConfigApplication.validateEmailRegisterEnabled();
             case LOGIN -> loginConfigApplication.validateEmailCodeLoginEnabled();
             case RESET_PASSWORD -> loginConfigApplication.validateEmailResetPasswordEnabled();
+            case CHANGE_EMAIL -> {
+                // 邮箱换绑功能默认启用，无需额外配置检查
+            }
         }
     }
 
@@ -522,6 +561,72 @@ public class UserApplication {
     }
 
     /**
+     * 验证当前邮箱
+     *
+     * @param cmd 验证命令
+     */
+    public void verifyCurrentEmail(VerifyCurrentEmailCmd cmd) {
+        UserE userE = getByIdFromCache(HeaderUtils.getUserId());
+
+        String currentEmail = userE.getEmail();
+        if (StringUtils.isBlank(currentEmail)) {
+            throw new ValidationException("当前用户没有绑定邮箱");
+        }
+
+        // 验证验证码
+        verifyCodeService.verifyCode(currentEmail, cmd.getVerifyCode(), AccountTypeV.EMAIL, VerifyType.CHANGE_EMAIL);
+
+        // 验证成功后删除验证码缓存
+        verifyCodeService.deleteCache(currentEmail, AccountTypeV.EMAIL, VerifyType.CHANGE_EMAIL);
+
+        // 设置当前邮箱验证通过的标记，有效期15分钟
+        emailChangeStepCache.put(userE.getUserId(), "verified", 900L);
+
+        publishLogEvent(LogTypeV.INFO_UPDATE.getCode(),
+                "邮箱换绑第一步验证成功，当前邮箱：" + DesensitizedUtil.email(currentEmail),
+                OperationStatusV.SUCCESS.getCode());
+    }
+
+    /**
+     * 设置新邮箱
+     *
+     * @param cmd 换绑命令
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void changeToNewEmail(ChangeToNewEmailCmd cmd) {
+        Long userId = HeaderUtils.getUserId();
+
+        // 检查当前邮箱验证是否已通过
+        String verificationStatus = emailChangeStepCache.get(userId);
+        if (!"verified".equals(verificationStatus)) {
+            throw new ValidationException("请先完成当前邮箱验证");
+        }
+
+        String newEmail = cmd.getNewEmail();
+        // 检查新邮箱是否可用
+        validateNewEmail(newEmail, userId);
+
+        // 验证新邮箱验证码
+        verifyCodeService.verifyCode(newEmail, cmd.getVerifyCode(), AccountTypeV.EMAIL, VerifyType.CHANGE_EMAIL);
+
+        // 更新用户邮箱
+        UserE updateUserE = UserE.builder()
+                .userId(userId)
+                .email(newEmail)
+                .build();
+        userDomainService.update(updateUserE);
+
+        // 清除缓存
+        userIdCache.remove(userId);
+        verifyCodeService.deleteCache(newEmail, AccountTypeV.EMAIL, VerifyType.CHANGE_EMAIL);
+
+        // 清除当前邮箱验证标记
+        emailChangeStepCache.remove(userId);
+
+        publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "邮箱换绑成功：" + DesensitizedUtil.email(newEmail), OperationStatusV.SUCCESS.getCode());
+    }
+
+    /**
      * 发布日志事件
      *
      * @param logType 日志类型代码
@@ -539,5 +644,26 @@ public class UserApplication {
                 .operationStatus(status)
                 .build();
         eventPublisher.publishEvent(loginEvent);
+    }
+
+    /**
+     * 检查新邮箱是否可用
+     *
+     * @param newEmail      新邮箱地址
+     * @param currentUserId 当前用户ID
+     */
+    private void validateNewEmail(String newEmail, Long currentUserId) {
+        if (StringUtils.isBlank(newEmail)) {
+            throw new ValidationException("请输入新邮箱地址");
+        }
+
+        UserE existingUser = userGateway.getByEmail(newEmail);
+        if (existingUser != null) {
+            if (existingUser.getUserId().equals(currentUserId)) {
+                throw new ValidationException("该邮箱已绑定当前用户");
+            } else {
+                throw new ValidationException("该邮箱已被其他用户绑定");
+            }
+        }
     }
 }

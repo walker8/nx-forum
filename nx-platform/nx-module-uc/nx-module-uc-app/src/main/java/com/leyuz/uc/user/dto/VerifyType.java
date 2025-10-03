@@ -1,12 +1,13 @@
 package com.leyuz.uc.user.dto;
 
 public enum VerifyType {
-    REGISTER("register"), LOGIN("login"), RESET_PASSWORD("reset-password");
+    REGISTER("register"), LOGIN("login"), RESET_PASSWORD("reset-password"), CHANGE_EMAIL("change-email");
 
     public static VerifyType of(String value) {
         return switch (value) {
             case "register" -> REGISTER;
             case "reset-password" -> RESET_PASSWORD;
+            case "change-email" -> CHANGE_EMAIL;
             default -> LOGIN;
         };
     }

@@ -38,7 +38,7 @@ public class VerifyCodeService {
                 variables.put("userName", "注册用户");
                 mailApplication.sendTemplateEmail(MailApplication.MailTemplateType.VERIFY_CODE, email, variables);
                 break;
-            case LOGIN:
+            case LOGIN, CHANGE_EMAIL:
                 variables.put("userName", userName);
                 mailApplication.sendTemplateEmail(MailApplication.MailTemplateType.VERIFY_CODE, email, variables);
                 break;
@@ -78,4 +78,5 @@ public class VerifyCodeService {
             mailCache.remove(account);
         }
     }
+
 }
