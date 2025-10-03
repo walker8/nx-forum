@@ -13,18 +13,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.cola.dto.SingleResponse;
-import com.leyuz.uc.config.RegisterConfigApplication;
 import com.leyuz.uc.user.UserApplication;
-import com.leyuz.uc.user.dto.ChangeToNewEmailCmd;
 import com.leyuz.uc.user.dto.UserAccountVO;
 import com.leyuz.uc.user.dto.UserCmd;
 import com.leyuz.uc.user.dto.UserVO;
-import com.leyuz.uc.user.dto.VerifyCurrentEmailCmd;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
-import jakarta.validation.Valid;
 
 /**
  * <p>
@@ -41,8 +37,6 @@ public class UcUserController {
 
     @Autowired
     private UserApplication userApplication;
-    @Autowired
-    private RegisterConfigApplication registerConfigApplication;
 
     @Operation(summary = "用户注册")
     @PostMapping
@@ -97,31 +91,4 @@ public class UcUserController {
         return SingleResponse.of(userList);
     }
 
-    @Operation(summary = "发送验证码到当前用户邮箱")
-    @PostMapping("/current/email/send-verify-code")
-    public SingleResponse sendCurrentUserEmailVerifyCode() {
-        userApplication.sendCurrentUserEmailVerifyCode();
-        return SingleResponse.of("验证码已发送到您的邮箱，请查收");
-    }
-
-    @Operation(summary = "发送验证码到新邮箱")
-    @PostMapping("/current/email/send-new-verify-code")
-    public SingleResponse sendNewEmailVerifyCode(@RequestParam String newEmail) {
-        userApplication.sendNewEmailVerifyCode(newEmail);
-        return SingleResponse.of("验证码已发送到新邮箱，请查收");
-    }
-
-    @Operation(summary = "验证当前邮箱")
-    @PostMapping("/current/email/verify-current")
-    public SingleResponse verifyCurrentEmail(@Valid @RequestBody VerifyCurrentEmailCmd cmd) {
-        userApplication.verifyCurrentEmail(cmd);
-        return SingleResponse.of("当前邮箱验证成功");
-    }
-
-    @Operation(summary = "设置新邮箱")
-    @PostMapping("/current/email/change-to-new")
-    public SingleResponse changeToNewEmail(@Valid @RequestBody ChangeToNewEmailCmd cmd) {
-        userApplication.changeToNewEmail(cmd);
-        return SingleResponse.of("邮箱换绑成功");
-    }
 }
