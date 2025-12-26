@@ -17,18 +17,13 @@
         </template>
         <div class="comment-editor" v-if="!disabled">
           <client-only>
-            <div style="padding-right: 10px">
-              <el-avatar :size="40" :src="user.avatar || '/img/avatar.png'" />
+            <div class="login-tip" v-if="!user.userId">
+              <span class="login" @click="navigateToLogin">登录</span>后才能评论
             </div>
-            <div style="width: 100%">
-              <div class="login-tip" v-if="!user.userId">
-                <span class="login" @click="navigateToLogin">登录</span>后才能评论
-              </div>
-              <div class="login-tip" v-else-if="!isLoading && !hasPermission('comment:new', forumId)">
-                当前用户组无评论权限
-              </div>
-              <editor-emotion :thread-id="threadId" @submit="initComments" :disabled="disabled" v-else />
+            <div class="login-tip" v-else-if="!isLoading && !hasPermission('comment:new', forumId)">
+              当前用户组无评论权限
             </div>
+            <editor-comment :thread-id="threadId" @submit="initComments" :disabled="disabled" v-else />
           </client-only>
         </div>
         <div class="comment-list">
@@ -61,7 +56,7 @@
                       <span style="margin-left: 3px">{{ comment.likes }}</span>
                     </div>
                     <div class="reply" v-if="hasPermission('comment:new', forumId)">
-                      <div class="comment-reply-cancel" @click="comment.showEditor = false" v-if="comment.showEditor">
+                      <div class="comment-reply-cancel" @click="cancelReply(comment)" v-if="comment.showEditor">
                         取消回复
                       </div>
                       <div v-else @click="!disabled && toComment(comment)" :class="{
@@ -78,8 +73,13 @@
                   </div>
                 </div>
                 <div style="width: 100%; margin-top: 7px" v-if="comment.showEditor">
-                  <editor-emotion :comment-id="comment.commentId" :reply-author-name="comment.newReplyAuthorName"
-                    :init-focus="true" @submit="initCommentReplies(comment)" />
+                  <editor-comment 
+                    :comment-id="comment.commentId" 
+                    :reply-author-name="comment.newReplyAuthorName"
+                    :init-focus="true" 
+                    @submit="initCommentReplies(comment)"
+                    @cancel="cancelReply(comment)"
+                  />
                 </div>
                 <div class="comment-reply-list" v-if="comment.replies?.length">
                   <comment-replies :comment="comment" :author-id="authorId" :disabled="disabled" :forum-id="forumId" />
@@ -223,6 +223,11 @@ const toComment = async (comment: Comment) => {
   comment.newReplyAuthorName = comment.authorName
   comment.showEditor = true
 }
+
+const cancelReply = (comment: Comment) => {
+  comment.showEditor = false
+  comment.newReplyAuthorName = undefined
+}
 const clickComment = (element: any, message: string) => {
   imageViewer.value.showImage(element, message)
 }
@@ -269,7 +274,6 @@ function onReportComment(comment: CommentVO) {
 </script>
 
 <style lang="scss" scoped>
-.comment-editor,
 .comment-item {
   display: flex;
 }
@@ -359,6 +363,9 @@ function onReportComment(comment: CommentVO) {
   }
 }
 
+.comment-editor {
+  margin-bottom: 20px;
+}
 .comment-other {
   margin-top: 10px;
   font-size: 14px;

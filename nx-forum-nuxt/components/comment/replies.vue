@@ -43,7 +43,7 @@
         </div>
         <div class="ml-2" v-if="hasPermission('comment:new')">
           <div
-            @click="reply._showEditor = false"
+            @click="cancelReply(reply)"
             v-if="reply._showEditor"
             class="cursor-pointer text-[#409eff]"
           >
@@ -69,12 +69,13 @@
         </div>
       </div>
       <div style="width: 100%; margin-top: 7px" v-if="reply._showEditor">
-        <editor-emotion
+        <editor-comment
           :comment-id="comment.commentId"
           :reply-author-id="reply._replyAuthorId"
           :reply-author-name="reply._replyAuthorName"
           :init-focus="true"
           @submit="refreshCommentReplies(comment)"
+          @cancel="cancelReply(reply)"
           :disabled="disabled"
         />
       </div>
@@ -191,6 +192,12 @@ const toReply = (reply: ExtendedCommentReplyVO, authorId: number) => {
   }
   reply._replyAuthorName = reply.authorName
   reply._showEditor = true
+}
+
+const cancelReply = (reply: ExtendedCommentReplyVO) => {
+  reply._showEditor = false
+  reply._replyAuthorId = undefined
+  reply._replyAuthorName = undefined
 }
 const loadMoreReplies = (comment: ExtendedCommentVO) => {
   comment.loading = true
