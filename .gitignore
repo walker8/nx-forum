@@ -5,6 +5,10 @@ openspec/
 .cursor/commands/
 AGENTS.md
 
+### iflow  ###
+.iflow
+IFLOW.md
+
 ### eclipse ###
 .apt_generated
 .classpath

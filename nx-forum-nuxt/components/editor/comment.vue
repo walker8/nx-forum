@@ -5,8 +5,8 @@
 
     <!-- 评论输入组件 -->
     <div
-      ref="wrapperRef"
-      :class="[
+        ref="wrapperRef"
+        :class="[
         'comment-input-wrapper',
         {
           'is-expanded': isExpanded,
@@ -18,30 +18,30 @@
       <!-- 折叠状态（未点击时） -->
       <div v-if="!isExpanded" class="comment-collapsed" @click="expandInput">
         <el-avatar
-          :size="isMobile ? 32 : 40"
-          :src="user.avatar || '/img/avatar.png'"
-          class="comment-avatar"
+            :size="isMobile ? 32 : 40"
+            :src="user.avatar || '/img/avatar.png'"
+            class="comment-avatar"
         />
         <div class="comment-input-placeholder">
           {{ placeHolder }}
         </div>
         <div class="comment-icons-collapsed">
           <el-icon
-            class="cursor-pointer"
-            :size="isMobile ? 18 : 20"
-            color="rgb(145, 150, 161)"
-            @click.stop="expandInput"
+              class="cursor-pointer"
+              :size="isMobile ? 18 : 20"
+              color="rgb(145, 150, 161)"
+              @click.stop="expandInput"
           >
-            <Icon name="tabler:mood-smile-beam" />
+            <Icon name="tabler:mood-smile-beam"/>
           </el-icon>
           <el-icon
-            v-if="commentId <= 0"
-            class="cursor-pointer"
-            :size="isMobile ? 18 : 20"
-            color="rgb(145, 150, 161)"
-            @click.stop="expandInput"
+              v-if="commentId <= 0"
+              class="cursor-pointer"
+              :size="isMobile ? 18 : 20"
+              color="rgb(145, 150, 161)"
+              @click.stop="expandInput"
           >
-            <Icon name="tabler:photo-plus" />
+            <Icon name="tabler:photo-plus"/>
           </el-icon>
         </div>
       </div>
@@ -51,79 +51,75 @@
         <!-- PC端显示用户名和头像 -->
         <div v-if="!isMobile && user.userName" class="comment-user-info">
           <el-avatar
-            :size="32"
-            :src="user.avatar || '/img/avatar.png'"
-            class="comment-avatar-inline"
+              :size="32"
+              :src="user.avatar || '/img/avatar.png'"
+              class="comment-avatar-inline"
           />
           <span class="comment-username">{{ user.userName }}</span>
         </div>
 
-        <!-- 输入框容器（包裹 textarea 和工具栏） -->
+        <!-- 输入框容器（包裹编辑器和工具栏） -->
         <div class="comment-input-container">
           <!-- 输入框 -->
-          <el-input
-            ref="inputRef"
-            v-model="message"
-            type="textarea"
-            class="comment-textarea"
-            :class="{ 'is-mobile-textarea': isMobile }"
-            :autosize="isMobile ? { minRows: 3, maxRows: 6 } : { minRows: 2, maxRows: 8 }"
-            :maxlength="commentId ? 500 : 1000"
-            :show-word-limit="false"
-            :placeholder="placeHolder"
-            @blur="inputBlur"
-            @focus="inputFocus"
+          <CommentEditor
+              ref="editorRef"
+              v-model="message"
+              class="comment-textarea"
+              :class="{ 'is-mobile-textarea': isMobile }"
+              :placeholder="placeHolder"
+              :disabled="disabled"
+              :maxlength="commentId ? 500 : 1000"
           />
 
           <!-- 工具栏（在输入框下方） -->
           <div class="comment-toolbar">
             <div class="comment-toolbar-left">
               <span class="comment-word-count">
-                {{ message.length }} / {{ commentId ? 500 : 1000 }}
+                {{ editorRef?.getText()?.length || 0 }} / {{ commentId ? 500 : 1000 }}
               </span>
               <el-popover
-                v-model:visible="showEmotions"
-                placement="top-start"
-                width="auto"
-                trigger="click"
-                popper-class="comment-emotion-popover"
+                  v-model:visible="showEmotions"
+                  placement="top-start"
+                  width="auto"
+                  trigger="click"
+                  popper-class="comment-emotion-popover"
               >
                 <template #reference>
                   <el-icon
-                    class="cursor-pointer hover:text-[#409eff]"
-                    :size="isMobile ? 20 : 22"
-                    color="rgb(51, 51, 51)"
+                      class="cursor-pointer hover:text-[#409eff]"
+                      :size="isMobile ? 20 : 22"
+                      color="rgb(51, 51, 51)"
                   >
-                    <Icon name="tabler:mood-smile-beam" />
+                    <Icon name="tabler:mood-smile-beam"/>
                   </el-icon>
                 </template>
                 <div class="emotion-selector">
                   <div
-                    v-for="emotion in emotions"
-                    :key="emotion.name"
-                    @click="addEmoji(emotion)"
-                    class="emotion-item"
-                    :title="emotion.name"
+                      v-for="emotion in emotions"
+                      :key="emotion.name"
+                      @click="addEmoji(emotion)"
+                      class="emotion-item"
+                      :title="emotion.name"
                   >
-                    <el-image class="emotion-image" :src="emotion.url" :alt="emotion.name" />
+                    <el-image class="emotion-image" :src="emotion.url" :alt="emotion.name"/>
                   </div>
                 </div>
               </el-popover>
               <el-icon
-                v-if="commentId <= 0"
-                :size="isMobile ? 20 : 22"
-                class="cursor-pointer hover:text-[#409eff]"
-                :color="fileList?.length > 0 ? '#409eff' : 'rgb(51, 51, 51)'"
-                @click.stop="toggleImage"
+                  v-if="commentId <= 0"
+                  :size="isMobile ? 20 : 22"
+                  class="cursor-pointer hover:text-[#409eff]"
+                  :color="fileList?.length > 0 ? '#409eff' : 'rgb(51, 51, 51)'"
+                  @click.stop="toggleImage"
               >
-                <Icon name="tabler:photo-plus" />
+                <Icon name="tabler:photo-plus"/>
               </el-icon>
             </div>
             <div class="comment-toolbar-right">
               <el-button
-                type="primary"
-                @click.stop="submit"
-                :disabled="(message === null || message.trim() === '') && fileList?.length <= 0"
+                  type="primary"
+                  @click.stop="submit"
+                  :disabled="editorRef?.isEmpty() && fileList?.length <= 0"
               >
                 {{ commentId > 0 ? '回复' : '发送' }}
               </el-button>
@@ -133,14 +129,14 @@
 
         <!-- 图片上传区域 -->
         <van-uploader
-          v-model="fileList"
-          multiple
-          :max-count="9"
-          :max-size="10 * 1024 * 1024"
-          @oversize="onOversize"
-          result-type="file"
-          v-show="showImage"
-          class="comment-uploader"
+            v-model="fileList"
+            multiple
+            :max-count="9"
+            :max-size="10 * 1024 * 1024"
+            @oversize="onOversize"
+            result-type="file"
+            v-show="showImage"
+            class="comment-uploader"
         />
       </div>
     </div>
@@ -148,14 +144,15 @@
 </template>
 
 <script setup lang="ts">
-import type { UploaderFileListItem } from 'vant'
-import { uploadImage } from '@/apis/image'
-import { createComment, createCommentReply } from '@/apis/comment'
-import { ElMessage, ElInput } from 'element-plus'
-import type { Emotion } from '~/composables/useEmotions'
+import type {UploaderFileListItem} from 'vant'
+import {uploadImage} from '@/apis/image'
+import {createComment, createCommentReply} from '@/apis/comment'
+import {ElMessage} from 'element-plus'
+import type {Emotion} from '~/composables/useEmotions'
+import CommentEditor from './comment-editor.vue'
 
 const thread = useThread()
-const { user } = useCurrentUser()
+const {user} = useCurrentUser()
 
 const props = defineProps({
   commentId: {
@@ -186,7 +183,7 @@ const props = defineProps({
 
 const emits = defineEmits(['submit', 'cancel'])
 
-const { commentId, threadId, replyAuthorId, replyAuthorName, initFocus } = props
+const {commentId, threadId, replyAuthorId, replyAuthorName, initFocus} = props
 const placeHolder = computed(() => {
   if (replyAuthorName) {
     return `回复 ${replyAuthorName}:`
@@ -194,11 +191,10 @@ const placeHolder = computed(() => {
   return '写留言'
 })
 
-const message = ref('')
+const message = ref('<p></p>')
 const showImage = ref(false)
-const inputRef = ref()
+const editorRef = ref<InstanceType<typeof CommentEditor>>()
 const wrapperRef = ref<HTMLElement>()
-let inputBlurIndex = 0
 
 const showEmotions = ref(false)
 const isExpanded = ref(false)
@@ -209,16 +205,16 @@ const isMobile = ref(false)
 
 // 监听回复相关 props 变化，如果清空则重置编辑器
 watch(
-  [() => props.commentId, () => props.replyAuthorName],
-  ([newCommentId, newReplyAuthorName], [oldCommentId, oldReplyAuthorName]) => {
-    // 如果从有回复状态变为无回复状态，重置编辑器
-    if ((oldCommentId > 0 || oldReplyAuthorName) && newCommentId === 0 && !newReplyAuthorName) {
-      collapseInput()
-      message.value = ''
-      fileList.value = []
-      showImage.value = false
+    [() => props.commentId, () => props.replyAuthorName],
+    ([newCommentId, newReplyAuthorName], [oldCommentId, oldReplyAuthorName]) => {
+      // 如果从有回复状态变为无回复状态，重置编辑器
+      if ((oldCommentId > 0 || oldReplyAuthorName) && newCommentId === 0 && !newReplyAuthorName) {
+        collapseInput()
+        message.value = '<p></p>'
+        fileList.value = []
+        showImage.value = false
+      }
     }
-  }
 )
 
 onMounted(() => {
@@ -240,7 +236,6 @@ onMounted(() => {
   if (initFocus) {
     nextTick(() => {
       expandInput()
-      inputRef.value?.focus()
     })
   }
 })
@@ -250,7 +245,10 @@ const expandInput = () => {
   if (props.disabled) return
   isExpanded.value = true
   nextTick(() => {
-    inputRef.value?.focus()
+    // 等待编辑器完全初始化后再 focus
+    setTimeout(() => {
+      editorRef.value?.focus()
+    }, 50)
   })
 }
 
@@ -284,7 +282,7 @@ const handleClickOutside = (event: MouseEvent) => {
     isFocused.value = false
 
     // 检查是否有内容
-    const hasContent = message.value.trim() !== '' || fileList.value.length > 0
+    const hasContent = !editorRef.value?.isEmpty() || fileList.value.length > 0
     // 如果没有内容且表情弹框和图片上传未打开，则自动折叠
     if (!hasContent && !showEmotions.value && !showImage.value) {
       if (commentId > 0) {
@@ -295,37 +293,21 @@ const handleClickOutside = (event: MouseEvent) => {
       }
     } else {
       // 有内容时，只是失焦但不折叠
-      inputRef.value?.blur()
+      editorRef.value?.blur()
     }
   }
 }
 
-const inputBlur = (e: Event) => {
-  // 保存光标位置，用于插入表情等操作
-  inputBlurIndex = (e.target as HTMLTextAreaElement).selectionStart
-  // 不在这里执行失焦逻辑，由 handleClickOutside 统一处理
-}
-
-const inputFocus = (e: Event) => {
-  isFocused.value = true
-  if (!isExpanded.value) {
-    expandInput()
-  }
-  ;(e.target as HTMLTextAreaElement).setSelectionRange(inputBlurIndex, inputBlurIndex)
-}
-
-const { emotions } = useEmotions()
+const {emotions} = useEmotions()
 
 function toggleImage() {
   showImage.value = !showImage.value
 }
 
 function addEmoji(emotion: Emotion) {
-  message.value =
-    message.value.slice(0, inputBlurIndex) + emotion.name + message.value.slice(inputBlurIndex)
-  inputBlurIndex = inputBlurIndex + emotion.name.length
+  editorRef.value?.insertEmotion(emotion)
   showEmotions.value = false // 关闭表情弹框
-  inputRef.value.focus()
+  editorRef.value?.focus()
 }
 
 const fileList = ref<Array<UploaderFileListItem>>([])
@@ -342,42 +324,68 @@ const submit = async () => {
     return
   }
 
+  // HTML 实体解码函数
+  const decodeHTMLEntities = (text: string) => {
+    const textarea = document.createElement('textarea')
+    textarea.innerHTML = text
+    return textarea.value
+  }
+
+  // 获取编辑器的 HTML 内容
+  let content = editorRef.value?.getHTML() || ''
+
+  // 将表情图片转换为纯文本标记
+  // 例如: <img src="..." data-name="[呵呵]"> → [呵呵]
+  content = content.replace(/<img[^>]*data-name="([^"]*)"[^>]*>/g, '$1')
+
+  // 保留换行：将 HTML 换行标签转换为换行符
+  content = content.replace(/<br\s*\/?>/gi, '\n')  // <br> → \n
+  content = content.replace(/<\/p>/gi, '\n')       // </p> → \n
+  content = content.replace(/<p>/gi, '')           // 移除 <p>
+  content = content.replace(/<\/?[^>]+(>|$)/g, '') // 移除其他 HTML 标签
+
+  // 解码 HTML 实体
+  // &nbsp; → 空格, &lt; → <, &gt; → >, &amp; → &, &quot; → ", 等
+  content = decodeHTMLEntities(content)
+
+  content = content.trim()
+
   if (commentId > 0) {
-    createCommentReply(commentId, message.value, replyAuthorId)
-      .then((res) => {
-        message.value = ''
-        fileList.value = []
-        showImage.value = false
-        collapseInput()
-        if (res.errCode === '0005') {
-          ElMessage.warning(res.data)
-        } else {
-          ElMessage.success(res.data)
-          thread.value.comments++
-          emits('submit')
-        }
-      })
-      .catch((err) => {
-        ElMessage.error(err)
-      })
+    createCommentReply(commentId, content, replyAuthorId)
+        .then((res) => {
+          message.value = '<p></p>'
+          fileList.value = []
+          showImage.value = false
+          collapseInput()
+          if (res.errCode === '0005') {
+            ElMessage.warning(res.data)
+          } else {
+            ElMessage.success(res.data)
+            thread.value.comments++
+            emits('submit')
+          }
+        })
+        .catch((err) => {
+          ElMessage.error(err)
+        })
   } else {
-    createComment(threadId, message.value, images)
-      .then((res) => {
-        message.value = ''
-        fileList.value = []
-        showImage.value = false
-        collapseInput()
-        if (res.errCode === '0005') {
-          ElMessage.warning(res.data)
-        } else {
-          ElMessage.success(res.data)
-          thread.value.comments++
-          emits('submit')
-        }
-      })
-      .catch((err) => {
-        ElMessage.error(err)
-      })
+    createComment(threadId, content, images)
+        .then((res) => {
+          message.value = '<p></p>'
+          fileList.value = []
+          showImage.value = false
+          collapseInput()
+          if (res.errCode === '0005') {
+            ElMessage.warning(res.data)
+          } else {
+            ElMessage.success(res.data)
+            thread.value.comments++
+            emits('submit')
+          }
+        })
+        .catch((err) => {
+          ElMessage.error(err)
+        })
   }
 }
 
@@ -539,6 +547,7 @@ const upload = async () => {
   transition: border-color 0.2s ease;
   background-color: var(--el-bg-color);
   cursor: text;
+  overflow: hidden; // 确保子元素不会超出圆角
 
   &:focus-within {
     border-color: var(--el-color-primary);
@@ -547,58 +556,34 @@ const upload = async () => {
 
 .comment-textarea {
   width: 100%;
+  border-radius: 4px 4px 0 0; // 顶部圆角
+  overflow: hidden;
 
-  // 移除所有包装元素的边框
-  :deep(.el-textarea__wrapper) {
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  :deep(.el-textarea__inner) {
-    font-size: 16px;
-    line-height: 1.5;
-    padding: 12px;
-    border-radius: 0; // 移除圆角
-    border: none !important; // 完全移除边框
-    border-top: none !important;
-    border-right: none !important;
-    border-bottom: none !important;
-    border-left: none !important;
-    outline: none !important; // 移除轮廓
-    box-shadow: none !important; // 移除阴影
-    transition: none;
-    resize: none;
+  // 编辑器样式
+  :deep(.comment-editor) {
     background-color: transparent;
-    box-sizing: border-box;
-
-    &:focus {
-      outline: none !important;
-      border: none !important;
-      border-top: none !important;
-      border-right: none !important;
-      border-bottom: none !important;
-      border-left: none !important;
-      box-shadow: none !important;
-    }
-
-    &:hover {
-      border: none !important;
-      box-shadow: none !important;
-    }
   }
 
-  // 隐藏默认的字数统计
-  :deep(.el-input__count) {
-    display: none;
+  :deep(.comment-editor-content) {
+    :deep(.ProseMirror) {
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 12px;
+      border-radius: 0;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      box-sizing: border-box;
+      min-height: 60px;
+    }
   }
 
   &.is-mobile-textarea {
-    :deep(.el-textarea__inner) {
-      font-size: 16px !important; // 防止iOS自动放大
-      padding: 12px;
-      border-radius: 0;
-      border: none !important;
-      outline: none !important;
+    :deep(.comment-editor-content) {
+      :deep(.ProseMirror) {
+        font-size: 16px;
+        padding: 12px;
+      }
     }
   }
 }
@@ -667,8 +652,8 @@ const upload = async () => {
     gap: 12px;
   }
 
-  .comment-input-container {
-    border-radius: 4px;
+  .comment-textarea {
+    border-radius: 4px 4px 0 0; // 移动端顶部圆角
   }
 
   .comment-toolbar {
@@ -706,7 +691,7 @@ const upload = async () => {
 .comment-emotion-popover {
   padding: 6px 12px !important;
   max-height: 400px;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden !important;
   box-sizing: border-box;
 
@@ -718,6 +703,8 @@ const upload = async () => {
     column-gap: 2px !important;
     width: 100%;
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
   .emotion-item {
@@ -735,6 +722,8 @@ const upload = async () => {
     background-color: transparent;
     box-sizing: border-box;
     overflow: hidden;
+    width: 100%;
+    height: 40px;
 
     &:hover {
       background-color: var(--el-fill-color-light);
@@ -764,7 +753,8 @@ const upload = async () => {
     max-width: calc(100vw - 32px) !important;
     width: auto !important;
     padding: 10px !important;
-    max-height: 50vh;
+    max-height: 55vh;
+    overflow-y: auto;
 
     .emotion-selector {
       grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -779,6 +769,8 @@ const upload = async () => {
       min-width: 0;
       min-height: 48px;
       border-radius: 8px;
+      width: 100%;
+      height: 48px;
 
       // 移动端触摸反馈
       &:active {
@@ -803,6 +795,8 @@ const upload = async () => {
     width: auto !important;
     min-width: 320px;
     max-width: 500px;
+    max-height: 300px;
+    overflow-y: hidden;
 
     .emotion-selector {
       grid-template-columns: repeat(10, minmax(0, 1fr));
@@ -816,6 +810,41 @@ const upload = async () => {
         background-color: var(--el-fill-color-light);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+// 全局样式：确保表情图片内联显示
+.comment-input-wrapper {
+  :deep(.ProseMirror) {
+    p {
+      display: block;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    img.emotion-img {
+      display: inline !important;
+      height: 22px !important;
+      width: 22px !important;
+      vertical-align: middle !important;
+      margin: 0 2px !important;
+      object-fit: contain !important;
+      pointer-events: none;
+      // 强制不换行
+      float: none !important;
+      clear: none !important;
+    }
+
+    // 隐藏 TipTap 自动添加的元素
+    .ProseMirror-trailingBreak {
+      display: none !important;
+    }
+
+    .ProseMirror-separator {
+      display: none !important;
     }
   }
 }

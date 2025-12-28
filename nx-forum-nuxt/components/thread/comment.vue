@@ -214,6 +214,9 @@ const initCommentReplies = (comment: CommentVO) => {
       const data = res.data
       comment.replies = data.records
       comment.replyCount = data.total
+      // 回复成功后隐藏编辑器
+      comment.showEditor = false
+      comment.newReplyAuthorName = undefined
     })
     .catch((err) => {
       ElMessage.error(err)

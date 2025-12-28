@@ -231,6 +231,12 @@ const refreshCommentReplies = (comment: ExtendedCommentVO) => {
       const data = res.data
       comment.replies = data.records as ExtendedCommentReplyVO[]
       comment.replyCount = data.total
+      // 回复成功后隐藏所有回复的编辑器
+      comment.replies.forEach(reply => {
+        reply._showEditor = false
+        reply._replyAuthorId = undefined
+        reply._replyAuthorName = undefined
+      })
     })
     .catch((err) => {
       ElMessage.error(err as string)
