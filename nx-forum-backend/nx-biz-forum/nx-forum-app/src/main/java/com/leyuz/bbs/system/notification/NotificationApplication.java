@@ -157,6 +157,10 @@ public class NotificationApplication {
         Set<String> mentions = TextUtils.getMentions(commentE.getMessage());
         for (String mention : mentions) {
             UserE userE = userApplication.getByUserNameFromCache(mention);
+            if (userE == null) {
+                // 当前@用户不存在
+                continue;
+            }
             NotificationE notificationE = NotificationE.builder()
                     .notificationStatusV(NotificationStatusV.UNREAD)
                     .notificationTypeV(NotificationTypeV.AT)
@@ -179,6 +183,10 @@ public class NotificationApplication {
         Set<String> mentions = TextUtils.getMentions(commentReplyE.getMessage());
         for (String mention : mentions) {
             UserE userE = userApplication.getByUserNameFromCache(mention);
+            if (userE == null) {
+                // 当前@用户不存在
+                continue;
+            }
             NotificationE notificationE = NotificationE.builder()
                     .notificationStatusV(NotificationStatusV.UNREAD)
                     .notificationTypeV(NotificationTypeV.AT)
