@@ -192,7 +192,7 @@ public class CommentApplication {
                 params.put("userId", 0);
             }
         }
-        params.put("auditStatus", query.getAuditStatusV());
+        params.put("auditStatus", query.getAuditStatusV() != null ? query.getAuditStatusV().getValue() : null);
         params.put("isDeleted", query.getDeleted());
         Page<CommentPO> commentPOPage = commentMapper.queryComments(query.getForumId(), pageQuery);
         return DataBaseUtils.createCustomPage(commentPOPage, this::toAdminCommentVO);
@@ -215,7 +215,7 @@ public class CommentApplication {
                 params.put("userId", 0);
             }
         }
-        params.put("auditStatus", query.getAuditStatusV());
+        params.put("auditStatus", query.getAuditStatusV() != null ? query.getAuditStatusV().getValue() : null);
         params.put("isDeleted", query.getDeleted());
         Page<CommentReplyPO> commentReplyPOPage = commentReplyMapper.queryCommentReplies(query.getForumId(), pageQuery);
         return DataBaseUtils.createCustomPage(commentReplyPOPage, this::toAdminCommentReplyVO);

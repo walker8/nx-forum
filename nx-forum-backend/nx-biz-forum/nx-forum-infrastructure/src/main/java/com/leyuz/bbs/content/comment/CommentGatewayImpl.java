@@ -199,7 +199,7 @@ public class CommentGatewayImpl implements CommentGateway {
         // 执行分页查询
         QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
         wrapper.eq("is_deleted", 0);
-        wrapper.eq("audit_status", AuditStatusV.PASSED);
+        wrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
         wrapper.eq("thread_id", threadId);
 
         // 如果指定了commentId，则优先查询该评论
@@ -229,7 +229,7 @@ public class CommentGatewayImpl implements CommentGateway {
         // 执行分页查询
         QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
         wrapper.eq("is_deleted", 0);
-        wrapper.eq("audit_status", AuditStatusV.PASSED);
+        wrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
         wrapper.eq("create_by", userId);
         wrapper.orderByDesc("create_time");
         Page<CommentPO> commentPOPage = commentMapper.selectPage(page, wrapper);
@@ -267,7 +267,7 @@ public class CommentGatewayImpl implements CommentGateway {
         // 执行分页查询
         QueryWrapper<CommentReplyPO> wrapper = new QueryWrapper<>();
         wrapper.eq("is_deleted", 0);
-        wrapper.eq("audit_status", AuditStatusV.PASSED);
+        wrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
         wrapper.eq("comment_id", commentId);
 
         // 如果指定了replyId，则优先查询该回复

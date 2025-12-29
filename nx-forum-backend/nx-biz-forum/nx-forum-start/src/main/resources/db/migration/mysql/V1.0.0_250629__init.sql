@@ -911,7 +911,7 @@ CREATE TABLE `uc_user_logs` (
   `create_time` datetime NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`log_id`) USING BTREE,
   KEY `uc_user_logs_create_by_IDX` (`create_by`) USING BTREE,
-  KEY `uc_user_logs_ create_time_IDX` (`create_time`) USING BTREE,
+  KEY `uc_user_logs_create_time_IDX` (`create_time`) USING BTREE,
   KEY `uc_user_logs_log_type_IDX` (`log_type`) USING BTREE,
   KEY `uc_user_logs_ip_address_IDX` (`ip_address`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='用户操作日志表';

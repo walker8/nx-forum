@@ -73,10 +73,24 @@ nx-forum/
 
 ### Backend (Java 17 + Maven)
 
+#### Quick Start with H2 (Embedded Database)
+
+```bash
+cd nx-forum-backend/nx-biz-forum/nx-forum-start
+# Modify application.yml: set spring.profiles.active=dev-h2
+mvn spring-boot:run
+```
+
+H2 database requires no installation, data stored in `./data/nx-forum.mv.db` file.
+H2 Console: http://localhost:8083/nx-forum/h2-console (user: sa, password: empty)
+
+#### Standard Start with MySQL
+
 ```bash
 cd nx-forum-backend
 mvn clean install           # Build all modules
 cd nx-biz-forum/nx-forum-start
+# Ensure MySQL is running and database exists
 mvn spring-boot:run         # Start backend server (default: http://localhost:8083)
 ```
 
@@ -150,6 +164,12 @@ Main config: `nx-forum-nuxt/nuxt.config.ts`
 
 ## Common Issues
 
+**H2 and MySQL database switching**:
+- Development environment defaults to MySQL (requires MySQL installed and running)
+- For quick startup, switch to H2 embedded database (no installation required)
+- Modify `application.yml`: change `spring.profiles.active` to `dev-h2` or `dev`
+- Note: H2 and MySQL use separate migration scripts, tables auto-initialize on first startup
+
 **Flyway validation error after updates**:
 - Testing version has incompatible migrations. Delete all database tables and restart.
 
@@ -161,7 +181,7 @@ Main config: `nx-forum-nuxt/nuxt.config.ts`
 - Java 17
 - Spring Boot 3.5.7
 - MyBatis-Plus 3.5.13
-- MySQL 8.0+ with Flyway 11.10.0
+- MySQL 8.0+ or H2 2.3.232 (embedded, dev/test only) with Flyway 11.10.0
 - Redis 6.0+ (optional) with JetCache 2.7.8
 - COLA Architecture 5.0.0
 - Knife4j 4.5.0 (API docs)

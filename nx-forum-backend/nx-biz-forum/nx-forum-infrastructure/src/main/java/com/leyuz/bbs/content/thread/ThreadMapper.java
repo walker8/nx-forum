@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.leyuz.bbs.content.thread.ThreadPO;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyAttributeTopV;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyTypeV;
 import com.leyuz.common.mybatis.PageQuery;
@@ -30,7 +29,7 @@ import java.util.Map;
  */
 @Mapper
 public interface ThreadMapper extends BaseMapper<ThreadPO> {
-    @Select("SELECT t.* FROM bbs_thread_properties p LEFT JOIN  bbs_threads t on p.thread_id = t.thread_id ${ew.customSqlSegment}")
+    @Select("SELECT DISTINCT t.* FROM bbs_thread_properties p LEFT JOIN  bbs_threads t on p.thread_id = t.thread_id ${ew.customSqlSegment}")
     List<ThreadPO> selectPropertyList(Page<ThreadPO> page, @Param(Constants.WRAPPER) QueryWrapper<ThreadPO> queryWrapper);
 
     @Select("SELECT t.* FROM bbs_user_likes l LEFT JOIN  bbs_threads t on l.thread_id = t.thread_id where l.create_by = ${userId} and t.is_deleted = 0 and l.target_type = 0 order by l.id desc")
@@ -110,13 +109,16 @@ public interface ThreadMapper extends BaseMapper<ThreadPO> {
     default List<ThreadPO> queryTopThreads(Integer forumId) {
         Page<ThreadPO> page = new Page<>(1, 5);
         QueryWrapper<ThreadPO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("p.attribute", ThreadPropertyAttributeTopV.GLOBAL.getValue());
-        if (forumId != null && forumId > 0) {
-            queryWrapper.or().apply("(p.forum_id = {0} AND p.attribute = {1})",
-                    forumId,
-                    ThreadPropertyAttributeTopV.CURRENT_FORUM.getValue());
-        }
+        queryWrapper.and(wrapper -> {
+            wrapper.eq("p.attribute", ThreadPropertyAttributeTopV.GLOBAL.getValue());
+            if (forumId != null && forumId > 0) {
+                wrapper.or().apply("(p.forum_id = {0} AND p.attribute = {1})",
+                        forumId,
+                        ThreadPropertyAttributeTopV.CURRENT_FORUM.getValue());
+            }
+        });
         queryWrapper.eq("p.property_type", ThreadPropertyTypeV.TOP.getValue());
+        queryWrapper.eq("t.is_deleted", Boolean.FALSE);
         return selectPropertyList(page, queryWrapper);
     }
 

@@ -4,7 +4,7 @@ spring:
   profiles:
     active: dev
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # driver-class-name 由各 profile 配置文件指定，支持 MySQL 和 H2 切换
     hikari:
       # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
       # spring.datasource.hikari.max-lifetime 的值要小于 MySQL 的 wait_timeout

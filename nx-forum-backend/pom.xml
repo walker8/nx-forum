@@ -46,6 +46,7 @@
         <druid.version>1.2.25</druid.version>
         <mysql-connector.version>9.5.0</mysql-connector.version>
         <flyway.version>11.20.0</flyway.version>
+        <h2.version>2.3.232</h2.version>
         
         <!-- JSON 处理 -->
         <fastjson2.version>2.0.58</fastjson2.version>
@@ -258,6 +259,12 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-mysql</artifactId>
                 <version>${flyway.version}</version>
+            </dependency>
+            <!-- H2 数据库（用于开发/测试环境） -->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.twelvemonkeys.imageio</groupId>

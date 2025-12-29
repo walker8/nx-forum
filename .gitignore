@@ -41,6 +41,7 @@ doc/
 .output
 output
 uploads
+data
 
 ### script ###
 .script
