@@ -17,38 +17,38 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         
         <!-- Spring Boot 相关 -->
-        <spring-boot.version>3.5.7</spring-boot.version>
+        <spring-boot.version>3.5.8</spring-boot.version>
         
         <!-- COLA 架构相关 -->
         <cola.components.version>5.0.0</cola.components.version>
         
         <!-- MyBatis Plus 相关 -->
-        <mybatis-plus-starter.version>3.5.13</mybatis-plus-starter.version>
+        <mybatis-plus-starter.version>3.5.15</mybatis-plus-starter.version>
         <mybatis-spring.version>3.0.4</mybatis-spring.version>
         
         <!-- API 文档相关 -->
         <knife4j.version>4.5.0</knife4j.version>
-        <springdoc-openapi.version>2.8.9</springdoc-openapi.version>
+        <springdoc-openapi.version>2.8.14</springdoc-openapi.version>
         
         <!-- JWT 相关 -->
         <jjwt.version>0.12.6</jjwt.version>
         
         <!-- 对象映射相关 -->
-        <mapstruct-plus.version>1.4.8</mapstruct-plus.version>
+        <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         
         <!-- 工具类库 -->
         <guava.version>33.4.8-jre</guava.version>
-        <lombok.version>1.18.38</lombok.version>
-        <hutool.version>5.8.39</hutool.version>
+        <lombok.version>1.18.42</lombok.version>
+        <hutool.version>5.8.42</hutool.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         
         <!-- 数据库相关 -->
         <druid.version>1.2.25</druid.version>
-        <mysql-connector.version>9.3.0</mysql-connector.version>
-        <flyway.version>11.10.0</flyway.version>
+        <mysql-connector.version>9.5.0</mysql-connector.version>
+        <flyway.version>11.20.0</flyway.version>
         
         <!-- JSON 处理 -->
-        <fastjson2.version>2.0.57</fastjson2.version>
+        <fastjson2.version>2.0.58</fastjson2.version>
         
         <!-- 模板引擎 -->
         <velocity.version>2.4.1</velocity.version>
