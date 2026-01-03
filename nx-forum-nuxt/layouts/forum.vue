@@ -1,7 +1,7 @@
 <template>
   <el-container class="forum-container">
     <div class="content">
-      <el-header style="padding: 0" class="hidden sm:block">
+      <el-header style="padding: 0" class="hidden sm:block rn-hide">
         <common-header />
       </el-header>
       <div class="common-layout mx-auto sm:mt-2">

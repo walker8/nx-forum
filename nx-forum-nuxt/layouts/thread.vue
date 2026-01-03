@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="padding: 0" class="hidden sm:block">
+    <el-header style="padding: 0" class="hidden sm:block rn-hide">
       <common-header />
     </el-header>
     <el-card v-if="thread.errMsg" class="thread-main" style="margin: 0 auto">

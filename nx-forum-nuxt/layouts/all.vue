@@ -1,7 +1,7 @@
 <template>
   <el-container class="forum-container">
     <div class="content">
-      <el-affix>
+      <el-affix class="rn-hide">
         <common-header type="search" />
       </el-affix>
       <div class="common-layout mx-auto sm:mt-2">
@@ -18,7 +18,7 @@
         </el-container>
       </div>
     </div>
-    <CommonFooter />
+    <CommonFooter class="rn-hide" />
     <CommonTabbar />
   </el-container>
 </template>

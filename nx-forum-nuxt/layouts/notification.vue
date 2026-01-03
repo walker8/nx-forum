@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="padding: 0px">
+    <el-header style="padding: 0px" class="rn-hide">
       <common-header />
     </el-header>
     <div class="common-layout">

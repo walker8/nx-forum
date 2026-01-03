@@ -81,6 +81,9 @@ lerna-debug.log*
 *.sln
 *.sw?
 
+# Other Project
+nx-forum-expo
+
 # Package manager lock files (uncomment if you want to ignore)
 # package-lock.json
 # yarn.lock

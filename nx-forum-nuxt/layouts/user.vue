@@ -1,6 +1,6 @@
 <template>
   <el-container class="forum-user-layout">
-    <el-header class="p-0">
+    <el-header class="p-0 rn-hide">
       <common-header />
     </el-header>
     <div class="h-full mx-auto mt-2.5 w-full sm:w-fit">

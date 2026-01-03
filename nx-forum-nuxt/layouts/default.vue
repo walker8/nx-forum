@@ -1,7 +1,7 @@
 <template>
   <el-container class="my-container">
     <div class="content">
-      <el-header style="padding: 0px">
+      <el-header style="padding: 0px" class="rn-hide">
         <common-header />
       </el-header>
       <div class="common-layout">

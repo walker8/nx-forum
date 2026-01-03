@@ -1,7 +1,7 @@
 <template>
   <div class="search-layout">
     <el-container>
-      <el-affix>
+      <el-affix class="rn-hide">
         <common-header type="search" />
       </el-affix>
       <div class="min-h-[calc(100vh-120px)] p-2.5 px-0 w-full md:w-[720px] mx-auto">
