@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class UserClientInfo {
     private String os;
+    private String platform;
     private String browser;
 }

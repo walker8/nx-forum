@@ -40,13 +40,16 @@
     <!--应用日志-->
     <!--这个logger没有指定appender，它会继承root节点中定义的那些appender-->
     <logger name="com.leyuz.bbs" level="INFO"/>
+    <logger name="com.leyuz.uc" level="INFO"/>
     <!-- 使用 Spring Profile 实现环境隔离 -->
     <springProfile name="dev">
         <logger name="com.leyuz.bbs" level="DEBUG"/>
+        <logger name="com.leyuz.uc" level="DEBUG"/>
     </springProfile>
 
     <springProfile name="test">
         <logger name="com.leyuz.bbs" level="INFO"/>
+        <logger name="com.leyuz.uc" level="INFO"/>
     </springProfile>
 
     <springProfile name="prod">

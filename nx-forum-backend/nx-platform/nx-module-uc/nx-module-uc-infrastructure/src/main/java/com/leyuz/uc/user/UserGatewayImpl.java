@@ -10,7 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
@@ -154,5 +157,61 @@ public class UserGatewayImpl implements UserGateway {
             userPO.setLastActiveDate(LocalDateTime.now());
             userMapper.updateById(userPO);
         }
+    }
+
+    @Override
+    public Long countTotalUsers() {
+        QueryWrapper<UserPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        return userMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public Long countUsersCreatedBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        QueryWrapper<UserPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        queryWrapper.ge("create_time", startDate);
+        queryWrapper.le("create_time", endDate);
+        return userMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public Long countUsersActiveBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        QueryWrapper<UserPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        queryWrapper.ge("last_active_date", startDate);
+        queryWrapper.le("last_active_date", endDate);
+        return userMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public Map<LocalDate, Long> countUsersByDate(LocalDate startDate, LocalDate endDate) {
+        // Convert LocalDate to LocalDateTime for query
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        // Query users created between start and end date
+        QueryWrapper<UserPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        queryWrapper.ge("create_time", startDateTime);
+        queryWrapper.le("create_time", endDateTime);
+        queryWrapper.select("create_time");
+        List<UserPO> users = userMapper.selectList(queryWrapper);
+
+        // Group by date
+        Map<LocalDate, Long> result = new java.util.TreeMap<>();
+        for (UserPO user : users) {
+            LocalDate date = user.getCreateTime().toLocalDate();
+            result.put(date, result.getOrDefault(date, 0L) + 1);
+        }
+
+        // Fill in missing dates with 0
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            result.putIfAbsent(current, 0L);
+            current = current.plusDays(1);
+        }
+
+        return result;
     }
 }

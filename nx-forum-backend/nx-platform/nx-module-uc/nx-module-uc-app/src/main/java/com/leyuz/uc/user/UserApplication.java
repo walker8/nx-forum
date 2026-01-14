@@ -26,7 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -279,6 +282,59 @@ public class UserApplication {
                 .operationStatus(status)
                 .build();
         eventPublisher.publishEvent(loginEvent);
+    }
+
+    /**
+     * Get user statistics overview
+     *
+     * @return UserStatsOverviewVO containing total users, today's new users, and today's active users
+     */
+    public UserStatsOverviewVO getUserStatsOverview() {
+        // Get total users
+        Long totalUsers = userGateway.countTotalUsers();
+
+        // Get today's date range
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+
+        // Get today's new users (users created today)
+        Long todayNewUsers = userGateway.countUsersCreatedBetween(startOfDay, endOfDay);
+
+        // Get today's active users (users who logged in today)
+        Long todayActiveUsers = userGateway.countUsersActiveBetween(startOfDay, endOfDay);
+
+        return UserStatsOverviewVO.builder()
+                .totalUsers(totalUsers)
+                .todayNewUsers(todayNewUsers)
+                .todayActiveUsers(todayActiveUsers)
+                .build();
+    }
+
+    /**
+     * Get user registration trend for the last N days
+     *
+     * @param days Number of days to look back (default: 30)
+     * @return UserRegistrationTrendVO containing dates and registration counts
+     */
+    public UserRegistrationTrendVO getUserRegistrationTrend(int days) {
+        // Calculate date range
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(days - 1); // days - 1 to include today
+
+        // Get user counts by date
+        Map<LocalDate, Long> countsByDate = userGateway.countUsersByDate(startDate, endDate);
+
+        // Build result
+        List<LocalDate> dates = new ArrayList<>(countsByDate.keySet());
+        List<Integer> newUsersCounts = countsByDate.values().stream()
+                .map(Long::intValue)
+                .toList();
+
+        return UserRegistrationTrendVO.builder()
+                .dates(dates)
+                .newUsersCounts(newUsersCounts)
+                .build();
     }
 
 }

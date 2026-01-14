@@ -117,6 +117,14 @@ public class HeaderUtils {
         return "";
     }
 
+    public static String getAppVersion() {
+        RequestHeader requestHeader = HTTP_REQUEST_CONTEXT.get();
+        if (requestHeader != null) {
+            return requestHeader.getAppVersion();
+        }
+        return "";
+    }
+
     public static void remove() {
         HTTP_REQUEST_CONTEXT.remove();
     }

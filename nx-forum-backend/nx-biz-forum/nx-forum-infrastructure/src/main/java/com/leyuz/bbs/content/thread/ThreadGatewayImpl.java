@@ -287,4 +287,22 @@ public class ThreadGatewayImpl implements ThreadGateway {
                 .updateTime(threadPO.getUpdateTime())
                 .build();
     }
+
+    @Override
+    public Long countTotalThreads() {
+        QueryWrapper<ThreadPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        queryWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        return threadMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        QueryWrapper<ThreadPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        queryWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        queryWrapper.ge("create_time", startDate);
+        queryWrapper.le("create_time", endDate);
+        return threadMapper.selectCount(queryWrapper);
+    }
 }

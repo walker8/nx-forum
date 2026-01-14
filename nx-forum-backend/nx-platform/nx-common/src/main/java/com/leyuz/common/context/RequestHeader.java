@@ -40,4 +40,8 @@ public class RequestHeader {
      * 域名（带schema）
      */
     private String domain;
+    /**
+     * app版本
+     */
+    private String appVersion;
 }

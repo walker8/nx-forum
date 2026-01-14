@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.leyuz.bbs.common.constant.CommonConst.IMAGE_STRING_SEPARATOR;
@@ -370,5 +371,43 @@ public class CommentGatewayImpl implements CommentGateway {
                 .createTime(commentReplyPO.getCreateTime())
                 .updateTime(commentReplyPO.getUpdateTime())
                 .build();
+    }
+
+    @Override
+    public Long countTotalComments() {
+        // Count top-level comments
+        QueryWrapper<CommentPO> commentWrapper = new QueryWrapper<>();
+        commentWrapper.eq("is_deleted", false);
+        commentWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        long commentCount = commentMapper.selectCount(commentWrapper);
+
+        // Count nested replies (楼中楼)
+        QueryWrapper<CommentReplyPO> replyWrapper = new QueryWrapper<>();
+        replyWrapper.eq("is_deleted", false);
+        replyWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        long replyCount = commentReplyMapper.selectCount(replyWrapper);
+
+        return commentCount + replyCount;
+    }
+
+    @Override
+    public Long countCommentsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        // Count top-level comments in date range
+        QueryWrapper<CommentPO> commentWrapper = new QueryWrapper<>();
+        commentWrapper.eq("is_deleted", false);
+        commentWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        commentWrapper.ge("create_time", startDate);
+        commentWrapper.le("create_time", endDate);
+        long commentCount = commentMapper.selectCount(commentWrapper);
+
+        // Count nested replies in date range
+        QueryWrapper<CommentReplyPO> replyWrapper = new QueryWrapper<>();
+        replyWrapper.eq("is_deleted", false);
+        replyWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        replyWrapper.ge("create_time", startDate);
+        replyWrapper.le("create_time", endDate);
+        long replyCount = commentReplyMapper.selectCount(replyWrapper);
+
+        return commentCount + replyCount;
     }
 }

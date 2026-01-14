@@ -10,10 +10,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Optional;
 
 /**
@@ -22,19 +24,38 @@ import java.util.Optional;
  * @author Walker
  * @since 2024/4/4
  */
+@Slf4j
 public class RequestHeaderFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // DEBUG: Log all headers received
+        if (log.isDebugEnabled()) {
+            log.debug("=== Request Headers Debug ===");
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                String headerValue = request.getHeader(headerName);
+                // Truncate long values for readability
+                String displayValue = headerValue != null && headerValue.length() > 50
+                        ? headerValue.substring(0, 50) + "..."
+                        : headerValue;
+                log.debug("Header: {} = {}", headerName, displayValue);
+            }
+        }
+
         RequestHeader requestHeader = new RequestHeader();
         requestHeader.setIp(getClientIP(request));
         requestHeader.setUserId(0L);
         requestHeader.setUserAgent(CharSequenceUtil.sub(request.getHeader("User-Agent"), 0, 255));
         requestHeader.setReferer(request.getHeader("referer"));
-        requestHeader.setDeviceId(request.getHeader("X-Device-Id"));
+        // Extract deviceId with debug logging and null safety
+        String deviceId = request.getHeader("X-Device-Id");
+        requestHeader.setDeviceId(deviceId != null ? deviceId : "");
         requestHeader.setToken(Optional.ofNullable(getCookieValue(request, "x_token")).orElse(request.getHeader("X-Token")));
         requestHeader.setAccessToken(Optional.ofNullable(getCookieValue(request, "accessToken")).orElse(request.getHeader(HttpHeaders.AUTHORIZATION)));
         requestHeader.setDomain(getDomain(request));
+        requestHeader.setAppVersion(request.getHeader("X-App-Version"));
         HeaderUtils.setHeader(requestHeader);
         filterChain.doFilter(request, response);
     }

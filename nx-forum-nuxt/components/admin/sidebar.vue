@@ -60,6 +60,12 @@
               <span>自定义页面</span>
             </template>
           </el-menu-item>
+          <el-menu-item index="1-7" @click="handleMenuClick('/admin/statistics')" v-if="hasPermission('admin:system:basic')">
+            <el-icon>
+              <Icon name="tabler:chart-line" />
+            </el-icon>
+            <span>数据统计</span>
+          </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2" v-if="hasPermission('admin:thread', forumId)">
           <template #title>
@@ -196,6 +202,7 @@ const routeIndexMap: Record<string, string> = {
   '/admin/audit': '1-4',
   '/admin/image': '1-6',
   '/admin/custom-page': '1-5',
+  '/admin/statistics': '1-7',
   '/admin/thread': '2-0',
   '/admin/comment': '2-1',
   '/admin/reply': '2-2',

@@ -28,7 +28,13 @@ public class UserAgentUtils {
             return userClientInfo;
         }
         if (!UNKNOWN.equalsIgnoreCase(agent.getPlatform().getName())) {
-            userClientInfo.setOs(agent.getPlatform().getName() + " " + agent.getOsVersion());
+            userClientInfo.setPlatform(agent.getPlatform().getName());
+            userClientInfo.setOs(agent.getOs().getName() + " " + agent.getOsVersion());
+        } else if (userAgent.toLowerCase().contains("ios")) {
+            userClientInfo.setPlatform("iPhone");
+            userClientInfo.setOs("iOS");
+        } else {
+            userClientInfo.setPlatform(agent.getPlatform().getName());
         }
         if (!UNKNOWN.equalsIgnoreCase(agent.getBrowser().getName())) {
             userClientInfo.setBrowser(agent.getBrowser().getName());

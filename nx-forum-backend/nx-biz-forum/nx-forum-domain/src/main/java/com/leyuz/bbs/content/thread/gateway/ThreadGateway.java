@@ -4,6 +4,8 @@ import com.leyuz.bbs.content.thread.ThreadE;
 import com.leyuz.bbs.content.thread.ThreadPropertyE;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyV;
 
+import java.time.LocalDateTime;
+
 public interface ThreadGateway {
     void save(ThreadE threadE);
 
@@ -61,4 +63,14 @@ public interface ThreadGateway {
     void incrementLikeCount(Long targetId, int delta);
 
     void incrementCollectionCount(Long threadId, int delta);
+
+    /**
+     * Count total threads (approved, not deleted)
+     */
+    Long countTotalThreads();
+
+    /**
+     * Count threads created between start and end date
+     */
+    Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

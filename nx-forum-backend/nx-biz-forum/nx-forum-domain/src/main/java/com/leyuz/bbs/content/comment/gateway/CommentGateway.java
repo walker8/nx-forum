@@ -5,6 +5,8 @@ import com.leyuz.bbs.content.comment.CommentE;
 import com.leyuz.bbs.content.comment.CommentReplyE;
 import com.leyuz.common.mybatis.CustomPage;
 
+import java.time.LocalDateTime;
+
 public interface CommentGateway {
 
     void saveComment(CommentE commentE);
@@ -76,4 +78,14 @@ public interface CommentGateway {
     void incrementLikeCount(Long targetId, int delta);
 
     void incrementReplyLikeCount(Long targetId, int delta);
+
+    /**
+     * Count total comments (approved, not deleted)
+     */
+    Long countTotalComments();
+
+    /**
+     * Count comments created between start and end date
+     */
+    Long countCommentsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate);
 }
