@@ -298,3 +298,24 @@ interface ReportQuery extends PagingQuery {
   reporterId?: number
   handlerId?: number
 }
+
+// ========== 设备相关类型 ==========
+
+/**
+ * 设备信息接口
+ * 用于存储设备 ID 和生成信息
+ */
+export interface DeviceInfo {
+  /** 设备唯一标识符 */
+  deviceId: string
+  /** 生成时间戳 */
+  generatedAt: number
+  /** 指纹数据摘要 (用于调试,不存储完整特征) */
+  fingerprintData: string
+}
+
+/**
+ * 设备 ID 类型别名
+ * 用于类型安全和代码可读性
+ */
+export type DeviceId = string

@@ -1,4 +1,6 @@
 import type { _AsyncData } from '#app/composables/asyncData'
+import { getClientDeviceId } from '~/composables/useDevice'
+
 const baseUrl = '/nx-forum'
 
 // 指定后端返回的基本数据类型
@@ -16,7 +18,14 @@ const fetch = async (url: string, options?: any): Promise<any> => {
   const reqUrl = baseUrl + url
   let headers = {}
   if (import.meta.server) {
+    // 服务端: 传递请求头 (包括 cookie)
     headers = useRequestHeaders()
+  } else {
+    // 客户端: 注入设备 ID
+    const deviceId = getClientDeviceId()
+    if (deviceId) {
+      headers = { 'X-Device-Id': deviceId }
+    }
   }
   return new Promise((resolve, reject) => {
     const nuxtApp = useNuxtApp()
