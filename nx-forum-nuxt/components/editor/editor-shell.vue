@@ -237,6 +237,7 @@
 
   <Teleport to="body">
     <div v-if="slashState.open" class="slash-overlay"
+      :class="{ 'slash-overlay-top': slashState.placement === 'top' }"
       :style="{ top: `${slashState.coords.y}px`, left: `${slashState.coords.x}px` }" ref="slashPanelRef">
       <input ref="slashInputRef" v-model="slashState.search" type="text" class="slash-search" placeholder="搜索命令" />
       <div class="slash-list">
@@ -455,7 +456,8 @@ const slashState = reactive({
   index: 0,
 
   coords: { x: 0, y: 0 },
-  props: null as any
+  props: null as any,
+  placement: 'bottom' as 'top' | 'bottom' // 记录菜单位置
 })
 
 const slashPanelRef = ref<HTMLElement | null>(null)
@@ -838,10 +840,20 @@ const SlashCommandExtension = Extension.create({
             onStart: (props) => {
               const rect = props.clientRect?.()
               if (rect) {
+                // 估算菜单高度：搜索框(40px) + 列表(280px) + padding(24px) ≈ 344px
+                const menuHeight = 344
+                const viewportHeight = window.innerHeight
+                const spaceBelow = viewportHeight - rect.bottom
+                const spaceAbove = rect.top
+
+                // 如果下方空间不足，且上方空间更多，则显示在上方
+                const showAbove = spaceBelow < menuHeight && spaceAbove > spaceBelow
+
                 slashState.coords = {
                   x: rect.left,
-                  y: rect.bottom + 8
+                  y: showAbove ? rect.top - menuHeight - 8 : rect.bottom + 8
                 }
+                slashState.placement = showAbove ? 'top' : 'bottom'
               }
               slashState.search = props.query || ''
               slashState.index = 0
@@ -854,10 +866,20 @@ const SlashCommandExtension = Extension.create({
             onUpdate: (props) => {
               const rect = props.clientRect?.()
               if (rect) {
+                // 估算菜单高度：搜索框(40px) + 列表(280px) + padding(24px) ≈ 344px
+                const menuHeight = 344
+                const viewportHeight = window.innerHeight
+                const spaceBelow = viewportHeight - rect.bottom
+                const spaceAbove = rect.top
+
+                // 如果下方空间不足，且上方空间更多，则显示在上方
+                const showAbove = spaceBelow < menuHeight && spaceAbove > spaceBelow
+
                 slashState.coords = {
                   x: rect.left,
-                  y: rect.bottom + 8
+                  y: showAbove ? rect.top - menuHeight - 8 : rect.bottom + 8
                 }
+                slashState.placement = showAbove ? 'top' : 'bottom'
               }
               slashState.search = props.query || ''
             },
