@@ -204,6 +204,51 @@
           </div>
         </BubbleMenu>
 
+        <!-- 链接气泡菜单 -->
+        <BubbleMenu
+          v-if="editor"
+          class="link-bubble-menu"
+          :editor="editor"
+          :tippyOptions="{ duration: 150 }"
+          :shouldShow="shouldShowLinkBubbleMenu"
+        >
+          <div class="bubble-inner">
+            <button
+              class="bubble-btn"
+              data-tooltip="访问链接"
+              aria-label="访问链接"
+              @click="handleVisitLink"
+            >
+              <Icon name="tabler:external-link" />
+            </button>
+            <button
+              class="bubble-btn"
+              data-tooltip="编辑链接"
+              aria-label="编辑链接"
+              @click="handleEditLinkFromBubble"
+            >
+              <Icon name="tabler:edit" />
+            </button>
+            <div class="bubble-divider" />
+            <button
+              class="bubble-btn"
+              data-tooltip="取消链接"
+              aria-label="取消链接"
+              @click="handleUnlinkFromBubble"
+            >
+              <Icon name="tabler:link-off" />
+            </button>
+            <button
+              class="bubble-btn"
+              data-tooltip="复制链接"
+              aria-label="复制链接"
+              @click="handleCopyLink"
+            >
+              <Icon name="tabler:copy" />
+            </button>
+          </div>
+        </BubbleMenu>
+
         <!-- 表格操作菜单已移至 Teleport 部分，固定在表格上方 -->
 
 
@@ -637,12 +682,41 @@ const shouldShowBubbleMenu = ({ editor, state, from, to }: any) => {
     return false
   }
 
+  // 如果光标在链接上且无选区，不显示文字菜单（链接菜单优先）
+  if (editor.isActive('link') && state.selection.empty) {
+    return false
+  }
+
   // 默认行为：只有选中文字且非空时显示
   const { doc, selection } = state
   const { empty } = selection
   const isEmptyTextBlock = !doc.textBetween(from, to).length && isTextSelection(selection)
 
   return !empty && !isEmptyTextBlock && editor.isEditable
+}
+
+const shouldShowLinkBubbleMenu = ({ editor, state, from, to }: any) => {
+  // 有文本选区时，优先显示文本气泡菜单
+  const { selection } = state
+  if (!selection.empty) {
+    return false
+  }
+
+  // 只在光标位于链接上时显示
+  if (!editor.isActive('link')) {
+    return false
+  }
+
+  // 获取链接属性
+  const linkAttrs = editor.getAttributes('link')
+  if (linkAttrs?.href) {
+    linkBubbleState.href = linkAttrs.href
+    linkBubbleState.position = { from, to }
+    linkBubbleState.text = state.doc.textBetween(from, to)
+    return true
+  }
+
+  return false
 }
 
 const breakpoints = useBreakpoints({
@@ -681,6 +755,14 @@ const linkDialogVisible = ref(false)
 const linkForm = reactive({
   text: '',
   url: ''
+})
+
+// 链接气泡菜单状态
+const linkBubbleState = reactive({
+  visible: false,
+  href: '',
+  text: '',
+  position: { from: 0, to: 0 }
 })
 
 
@@ -975,9 +1057,15 @@ const handleHeadingSelect = (level: number) => {
 const handleLinkInsert = () => {
   if (!editor.value) return
 
-  // 如果已经是链接，则移除链接
+  // 如果光标在链接上，编辑现有链接
   if (editor.value.isActive('link')) {
-    editor.value.chain().focus().unsetLink().run()
+    const linkAttrs = editor.value.getAttributes('link')
+    const { from, to } = editor.value.state.selection
+    const currentText = editor.value.state.doc.textBetween(from, to)
+
+    linkForm.text = currentText
+    linkForm.url = linkAttrs.href
+    linkDialogVisible.value = true
     return
   }
 
@@ -997,28 +1085,78 @@ const handleLinkConfirm = () => {
     return
   }
 
-  // 如果有链接文字且与选中文字不同，则替换文字
-  if (linkForm.text.trim() && linkForm.text !== editor.value.state.doc.textBetween(
-    editor.value.state.selection.from,
-    editor.value.state.selection.to,
-    ''
-  )) {
+  // 检查是否正在编辑现有链接
+  const isEditing = editor.value.isActive('link')
+
+  if (isEditing) {
+    // 更新现有链接的 URL
     editor.value
       .chain()
       .focus()
-      .insertContent(linkForm.text)
       .setLink({ href: linkForm.url.trim(), target: '_blank' })
       .run()
   } else {
-    // 否则只添加链接
-    editor.value
-      .chain()
-      .focus()
-      .setLink({ href: linkForm.url.trim(), target: '_blank' })
-      .run()
+    // 插入新链接
+    if (linkForm.text.trim() && linkForm.text !== editor.value.state.doc.textBetween(
+      editor.value.state.selection.from,
+      editor.value.state.selection.to,
+      ''
+    )) {
+      editor.value
+        .chain()
+        .focus()
+        .insertContent(linkForm.text)
+        .setLink({ href: linkForm.url.trim(), target: '_blank' })
+        .run()
+    } else {
+      editor.value
+        .chain()
+        .focus()
+        .setLink({ href: linkForm.url.trim(), target: '_blank' })
+        .run()
+    }
   }
 
   linkDialogVisible.value = false
+}
+
+// 访问链接：在新标签页打开
+const handleVisitLink = () => {
+  if (linkBubbleState.href) {
+    window.open(linkBubbleState.href, '_blank', 'noopener,noreferrer')
+  }
+}
+
+// 编辑链接：打开现有对话框
+const handleEditLinkFromBubble = () => {
+  if (!editor.value) return
+
+  // 获取当前链接文本
+  const { from, to } = linkBubbleState.position
+  const currentText = editor.value.state.doc.textBetween(from, to)
+
+  // 填充表单
+  linkForm.text = currentText
+  linkForm.url = linkBubbleState.href
+  linkDialogVisible.value = true
+}
+
+// 取消链接：移除链接标记
+const handleUnlinkFromBubble = () => {
+  if (!editor.value) return
+  editor.value.chain().focus().unsetLink().run()
+}
+
+// 复制链接：复制 URL 到剪���板
+const handleCopyLink = async () => {
+  if (!linkBubbleState.href) return
+
+  try {
+    await navigator.clipboard.writeText(linkBubbleState.href)
+    ElMessage.success('链接已复制')
+  } catch (error) {
+    ElMessage.error('复制失败')
+  }
 }
 
 const handleImageSelect = () => {
@@ -2056,6 +2194,57 @@ const meta = computed(() => props.meta)
     width: 1px;
     background: #e5e7eb;
     margin: 4px 2px;
+  }
+}
+
+// 链接气泡菜单样式
+.link-bubble-menu {
+  .bubble-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  .bubble-btn {
+    border: none;
+    background: transparent;
+    color: #475569;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:hover:not(.active) {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    &.active {
+      background: #dbeafe;
+      color: #2563eb;
+
+      &:hover {
+        background: #bfdbfe;
+        color: #1d4ed8;
+      }
+    }
+  }
+
+  .bubble-divider {
+    width: 1px;
+    background: #e5e7eb;
+    margin: 4px 2px;
+    flex-shrink: 0;
   }
 }
 
