@@ -71,6 +71,7 @@
     "element-plus": "^2.11.7",
     "lowlight": "^3.3.0",
     "marked": "17.0.1",
+    "mermaid": "^10.9.0",
     "prismjs": "^1.30.0",
     "vant": "^4.9.22",
     "vue-echarts": "^8.0.1"

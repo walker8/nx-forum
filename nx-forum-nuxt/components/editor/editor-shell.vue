@@ -333,6 +333,7 @@ import { TableHeader } from '@tiptap/extension-table-header'
 import { TableRow } from '@tiptap/extension-table-row'
 import CodeBlockExtension from './extensions/code-block'
 import Alert from './extensions/alert'
+import MermaidExtension from './extensions/mermaid'
 import Heading from '@tiptap/extension-heading'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
@@ -495,17 +496,35 @@ const markdownToHtml = async (markdown: string) => {
     container.innerHTML = html
 
     const codeNodes = container.querySelectorAll('pre > code')
+    const mermaidBlocks: Array<{ pre: HTMLElement; code: string }> = []
+
     codeNodes.forEach((codeEl) => {
       // 从 class 中提取语言
       const className = codeEl.className || ''
       const match = className.match(/language-(\S+)/)
       const lang = match ? match[1].toLowerCase() : 'plaintext'
-      
-      const resolvedLang = supportedLanguageValues.has(lang) ? lang : 'plaintext'
-      
-      // 确保类名格式统一并添加 Tiptap 所需的 data-language 属性
-      codeEl.className = `language-${resolvedLang}`
-      ;(codeEl as HTMLElement).setAttribute('data-language', resolvedLang)
+
+      // 检测是否为 mermaid 代码块
+      if (lang === 'mermaid') {
+        const pre = codeEl.parentElement as HTMLElement
+        if (pre) {
+          mermaidBlocks.push({ pre, code: codeEl.textContent || '' })
+        }
+      } else {
+        const resolvedLang = supportedLanguageValues.has(lang) ? lang : 'plaintext'
+        // 确保类名格式统一并添加 Tiptap 所需的 data-language 属性
+        codeEl.className = `language-${resolvedLang}`
+        ;(codeEl as HTMLElement).setAttribute('data-language', resolvedLang)
+      }
+    })
+
+    // 将 mermaid 代码块转换为 mermaid 节点
+    mermaidBlocks.forEach(({ pre, code }) => {
+      const mermaidDiv = document.createElement('div')
+      mermaidDiv.setAttribute('data-type', 'mermaid')
+      mermaidDiv.setAttribute('data-code', code)
+      mermaidDiv.setAttribute('data-collapsed', 'false')
+      pre.replaceWith(mermaidDiv)
     })
 
     return container.innerHTML
@@ -747,6 +766,13 @@ const slashCommands = [
     description: '插入红色错误块',
     icon: 'tabler:alert-circle',
     action: (instance: Editor) => instance.chain().focus().setAlert({ type: 'error' }).run()
+  },
+  {
+    id: 'mermaid',
+    label: 'Mermaid图表',
+    description: '插入流程图、时序图等图表',
+    icon: 'tabler:chart-dots',
+    action: () => insertMermaidDiagram()
   }
   // 暂时隐藏附件功能，后端不支持
   // {
@@ -984,6 +1010,11 @@ const handleImageSelect = () => {
   })
 }
 
+const insertMermaidDiagram = () => {
+  if (!editor.value) return
+  editor.value.chain().focus().insertMermaid().run()
+}
+
 // 暂时隐藏视频、音频、附件功能，后端不支持
 // const handleVideoSelect = () => {
 //   attachmentUpload.openFileDialog({
@@ -1148,6 +1179,7 @@ const createEditor = () => {
         languages: supportedCodeLanguages
       }),
       Alert,
+      MermaidExtension,
       Underline,
       Strike,
       Subscript,
