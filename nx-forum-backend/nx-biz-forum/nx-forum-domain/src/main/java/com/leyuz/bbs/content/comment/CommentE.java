@@ -65,8 +65,8 @@ public class CommentE extends BaseComment {
     }
 
     @Builder
-    public CommentE(Long threadId, Long commentId, Integer forumId, String userIp, String userAgent, Integer likes, AuditStatusV auditStatus, String auditReason, String message, LocalDateTime createTime, LocalDateTime updateTime, Long createBy, Long updateBy, DocTypeV docType, Integer replyCount, List<String> images) {
-        super(threadId, commentId, forumId, userIp, userAgent, likes, auditStatus, auditReason, message, createTime, updateTime, createBy, updateBy);
+    public CommentE(Long threadId, Long commentId, Integer forumId, String userIp, String userAgent, String terminalType, String platform, Integer likes, AuditStatusV auditStatus, String auditReason, String message, LocalDateTime createTime, LocalDateTime updateTime, Long createBy, Long updateBy, DocTypeV docType, Integer replyCount, List<String> images) {
+        super(threadId, commentId, forumId, userIp, userAgent, terminalType, platform, likes, auditStatus, auditReason, message, createTime, updateTime, createBy, updateBy);
         this.docType = docType;
         this.replyCount = replyCount;
         this.images = images;

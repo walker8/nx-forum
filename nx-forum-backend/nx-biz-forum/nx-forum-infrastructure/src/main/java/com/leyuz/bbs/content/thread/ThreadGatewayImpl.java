@@ -272,6 +272,8 @@ public class ThreadGatewayImpl implements ThreadGateway {
                 .likes(threadPO.getLikes())
                 .userAgent(threadPO.getUserAgent())
                 .userIp(threadPO.getUserIp())
+                .terminalType(threadPO.getTerminalType())
+                .platform(threadPO.getPlatform())
                 .createBy(threadPO.getCreateBy())
                 .subject(threadPO.getSubject())
                 .views(threadPO.getViews())
@@ -303,6 +305,25 @@ public class ThreadGatewayImpl implements ThreadGateway {
         queryWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
         queryWrapper.ge("create_time", startDate);
         queryWrapper.le("create_time", endDate);
+        return threadMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
+                                          String terminalType, String platform) {
+        QueryWrapper<ThreadPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted", false);
+        queryWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        queryWrapper.ge("create_time", startDate);
+        queryWrapper.le("create_time", endDate);
+
+        if (!"ALL".equals(terminalType)) {
+            queryWrapper.eq("terminal_type", terminalType);
+        }
+        if (!"ALL".equals(platform)) {
+            queryWrapper.eq("platform", platform);
+        }
+
         return threadMapper.selectCount(queryWrapper);
     }
 }

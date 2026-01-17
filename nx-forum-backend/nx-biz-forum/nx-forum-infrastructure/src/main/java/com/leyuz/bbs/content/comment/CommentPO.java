@@ -78,6 +78,16 @@ public class CommentPO extends BaseEntity {
     private String userAgent;
 
     /**
+     * 终端类型（PC/MOBILE/APP）
+     */
+    private String terminalType;
+
+    /**
+     * 平台（Windows/Mac/Android/iPhone等）
+     */
+    private String platform;
+
+    /**
      * 审核原因
      */
     private String auditReason;

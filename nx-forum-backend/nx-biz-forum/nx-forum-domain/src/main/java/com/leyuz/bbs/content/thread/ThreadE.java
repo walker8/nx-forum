@@ -6,8 +6,10 @@ import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
 import com.leyuz.bbs.common.utils.MarkdownUtils;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyV;
+import com.leyuz.common.dto.UserClientInfo;
 import com.leyuz.common.exception.ValidationException;
 import com.leyuz.common.utils.HeaderUtils;
+import com.leyuz.common.utils.UserAgentUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,6 +56,16 @@ public class ThreadE {
      * 客户端useragent
      */
     private String userAgent;
+
+    /**
+     * 终端类型（PC/MOBILE/APP）
+     */
+    private String terminalType;
+
+    /**
+     * 平台（Windows/Mac/Android/iPhone等）
+     */
+    private String platform;
 
     /**
      * 主题名称
@@ -150,6 +162,13 @@ public class ThreadE {
         init();
         userIp = HeaderUtils.getIp();
         userAgent = HeaderUtils.getUserAgent();
+
+        // 简化：直接调用UserAgentUtils获取完整客户端信息
+        String appVersion = HeaderUtils.getAppVersion();
+        UserClientInfo clientInfo = UserAgentUtils.getClientInfo(userAgent, appVersion);
+        terminalType = clientInfo.getTerminalType();
+        platform = clientInfo.getPlatform();
+
         views = 0;
         comments = 0;
         likes = 0;

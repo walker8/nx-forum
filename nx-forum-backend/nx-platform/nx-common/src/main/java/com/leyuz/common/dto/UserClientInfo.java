@@ -10,4 +10,8 @@ public class UserClientInfo {
     private String os;
     private String platform;
     private String browser;
+    /**
+     * 终端类型（PC/MOBILE/APP）
+     */
+    private String terminalType;
 }

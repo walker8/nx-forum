@@ -73,4 +73,16 @@ public interface ThreadGateway {
      * Count threads created between start and end date
      */
     Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    /**
+     * 统计指定时间段内创建的主题数量（按终端和平台）
+     *
+     * @param startDate     开始时间
+     * @param endDate       结束时间
+     * @param terminalType  终端类型（PC/MOBILE/APP/ALL）
+     * @param platform      平台（Windows/Mac/Android/iPhone/ALL等）
+     * @return 主题数量
+     */
+    Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
+                                    String terminalType, String platform);
 }

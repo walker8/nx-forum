@@ -21,8 +21,8 @@ public class CommentReplyE extends BaseComment {
     private Long replyUserId;
 
     @Builder
-    public CommentReplyE(Long threadId, Long commentId, Integer forumId, String userIp, String userAgent, Integer likes, AuditStatusV auditStatus, String auditReason, String message, LocalDateTime createTime, LocalDateTime updateTime, Long createBy, Long updateBy, Long replyId, Long replyUserId) {
-        super(threadId, commentId, forumId, userIp, userAgent, likes, auditStatus, auditReason, message, createTime, updateTime, createBy, updateBy);
+    public CommentReplyE(Long threadId, Long commentId, Integer forumId, String userIp, String userAgent, String terminalType, String platform, Integer likes, AuditStatusV auditStatus, String auditReason, String message, LocalDateTime createTime, LocalDateTime updateTime, Long createBy, Long updateBy, Long replyId, Long replyUserId) {
+        super(threadId, commentId, forumId, userIp, userAgent, terminalType, platform, likes, auditStatus, auditReason, message, createTime, updateTime, createBy, updateBy);
         this.replyId = replyId;
         this.replyUserId = replyUserId;
     }

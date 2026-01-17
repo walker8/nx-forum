@@ -8,9 +8,9 @@ import com.leyuz.bbs.system.stats.dto.StatsOverviewVO;
 import com.leyuz.bbs.system.stats.dto.StatsTrendVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,7 +45,7 @@ public class StatsController {
      */
     @Operation(summary = "获取每日统计数据", description = "根据日期范围和筛选条件获取每日统计数据")
     @GetMapping("/daily")
-    @PermitAll
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:stats')")
     public SingleResponse<List<DailyStatsVO>> getDailyStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -69,7 +69,7 @@ public class StatsController {
      */
     @Operation(summary = "获取统计概览", description = "获取论坛总体统计数据概览")
     @GetMapping("/overview")
-    @PermitAll
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:stats')")
     public SingleResponse<StatsOverviewVO> getOverview() {
         StatsOverviewVO overview = statsApplication.getOverview();
         return SingleResponse.of(overview);
@@ -85,7 +85,7 @@ public class StatsController {
      */
     @Operation(summary = "获取统计趋势", description = "获取最近N天的统计数据趋势，用于图表展示")
     @GetMapping("/trend")
-    @PermitAll
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:stats')")
     public SingleResponse<StatsTrendVO> getTrend(
             @RequestParam(required = false, defaultValue = "30") int days,
             @RequestParam(required = false, defaultValue = "ALL") String terminalType,
@@ -104,7 +104,7 @@ public class StatsController {
      */
     @Operation(summary = "按终端类型统计", description = "按终端类型（PC/MOBILE/APP）分组统计访问数据")
     @GetMapping("/by-terminal")
-    @PermitAll
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:stats')")
     public SingleResponse<Map<String, DailyStatsVO>> getStatsByTerminal(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
@@ -130,7 +130,7 @@ public class StatsController {
      */
     @Operation(summary = "按平台统计", description = "按平台（Windows/Android/iOS/macOS等）分组统计访问数据")
     @GetMapping("/by-platform")
-    @PermitAll
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:stats')")
     public SingleResponse<Map<String, DailyStatsVO>> getStatsByPlatform(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {

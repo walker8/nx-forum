@@ -1,7 +1,9 @@
 package com.leyuz.bbs.content.comment;
 
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
+import com.leyuz.common.dto.UserClientInfo;
 import com.leyuz.common.utils.HeaderUtils;
+import com.leyuz.common.utils.UserAgentUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +34,16 @@ public abstract class BaseComment {
      * 客户端useragent
      */
     private String userAgent;
+
+    /**
+     * 终端类型（PC/MOBILE/APP）
+     */
+    private String terminalType;
+
+    /**
+     * 平台（Windows/Mac/Android/iPhone等）
+     */
+    private String platform;
 
     /**
      * 点赞数
@@ -66,6 +78,12 @@ public abstract class BaseComment {
         checkMessage();
         userIp = HeaderUtils.getIp();
         userAgent = HeaderUtils.getUserAgent();
+
+        // 简化：直接调用UserAgentUtils获取完整客户端信息
+        String appVersion = HeaderUtils.getAppVersion();
+        UserClientInfo clientInfo = UserAgentUtils.getClientInfo(userAgent, appVersion);
+        terminalType = clientInfo.getTerminalType();
+        platform = clientInfo.getPlatform();
     }
 
     protected abstract void checkMessage();

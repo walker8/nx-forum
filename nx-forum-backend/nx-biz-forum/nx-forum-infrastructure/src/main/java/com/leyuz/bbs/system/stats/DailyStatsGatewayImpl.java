@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.leyuz.bbs.content.comment.gateway.CommentGateway;
 import com.leyuz.bbs.content.thread.gateway.ThreadGateway;
+import com.leyuz.bbs.system.access.AccessLogGateway;
 import com.leyuz.bbs.system.stats.dto.DailyStatsVO;
 import com.leyuz.bbs.system.stats.dto.StatsOverviewVO;
 import com.leyuz.bbs.system.stats.dto.StatsTrendVO;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -31,7 +33,7 @@ public class DailyStatsGatewayImpl implements DailyStatsGateway {
     private final DailyStatsMapper dailyStatsMapper;
     private final ThreadGateway threadGateway;
     private final CommentGateway commentGateway;
-    private final HourlyStatsGateway hourlyStatsGateway;
+    private final AccessLogGateway accessLogGateway;
 
     @Override
     public void saveOrUpdate(DailyStatsPO stats) {
@@ -87,10 +89,11 @@ public class DailyStatsGatewayImpl implements DailyStatsGateway {
         wrapper.ge(DailyStatsPO::getStatDate, startDate)
                 .le(DailyStatsPO::getStatDate, endDate);
 
-        if (!"ALL".equals(terminalType)) {
+        // null 或空字符串表示查询所有，否则精确匹配（包括 "ALL"）
+        if (StringUtils.isNotEmpty(terminalType)) {
             wrapper.eq(DailyStatsPO::getTerminalType, terminalType);
         }
-        if (!"ALL".equals(platform)) {
+        if (StringUtils.isNotEmpty(platform)) {
             wrapper.eq(DailyStatsPO::getPlatform, platform);
         }
 
@@ -106,11 +109,10 @@ public class DailyStatsGatewayImpl implements DailyStatsGateway {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(23, 59, 59);
 
-        // Get today's hourly stats for IP counts
-        var hourlyStats = hourlyStatsGateway.getStatsByDate(today);
-        int todayUniqueIps = hourlyStats.stream().mapToInt(HourlyStatsPO::getUniqueIpCount).sum();
-        int todayGuestIps = hourlyStats.stream().mapToInt(HourlyStatsPO::getGuestIpCount).sum();
-        int todayUserIps = hourlyStats.stream().mapToInt(HourlyStatsPO::getUserIpCount).sum();
+        // 实时从 bbs_access_logs 查询今日IP统计数据
+        long todayUniqueIps = accessLogGateway.countUniqueIps(startOfDay, endOfDay, "ALL", "ALL");
+        long todayGuestIps = accessLogGateway.countGuestIps(startOfDay, endOfDay, "ALL", "ALL");
+        long todayUserIps = accessLogGateway.countUserIps(startOfDay, endOfDay, "ALL", "ALL");
 
         // Build overview statistics
         return StatsOverviewVO.builder()
@@ -122,10 +124,10 @@ public class DailyStatsGatewayImpl implements DailyStatsGateway {
                 // Set to 0 for now (will be overwritten in StatsApplication)
                 .totalUsers(0L)
                 .todayNewUsers(0L)
-                // Get IP statistics from hourly stats table
-                .todayUniqueIps(todayUniqueIps)
-                .todayGuestIps(todayGuestIps)
-                .todayUserIps(todayUserIps)
+                // 实时从访问日志表获取IP统计
+                .todayUniqueIps((int) todayUniqueIps)
+                .todayGuestIps((int) todayGuestIps)
+                .todayUserIps((int) todayUserIps)
                 .build();
     }
 
@@ -164,7 +166,7 @@ public class DailyStatsGatewayImpl implements DailyStatsGateway {
 
     @Override
     public Map<String, DailyStatsVO> getStatsByTerminal(LocalDate startDate, LocalDate endDate) {
-        List<DailyStatsPO> allStats = queryByDateRange(startDate, endDate, "ALL", "ALL");
+        List<DailyStatsPO> allStats = queryByDateRange(startDate, endDate, "", "ALL");
 
         // 按终端类型分组聚合
         Map<String, List<DailyStatsPO>> grouped = allStats.stream()
@@ -200,7 +202,7 @@ public class DailyStatsGatewayImpl implements DailyStatsGateway {
 
     @Override
     public Map<String, DailyStatsVO> getStatsByPlatform(LocalDate startDate, LocalDate endDate) {
-        List<DailyStatsPO> allStats = queryByDateRange(startDate, endDate, "ALL", "ALL");
+        List<DailyStatsPO> allStats = queryByDateRange(startDate, endDate, "ALL", "");
 
         // 按平台分组聚合
         Map<String, List<DailyStatsPO>> grouped = allStats.stream()

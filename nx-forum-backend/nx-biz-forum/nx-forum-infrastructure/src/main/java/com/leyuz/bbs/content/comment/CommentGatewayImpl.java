@@ -342,6 +342,8 @@ public class CommentGatewayImpl implements CommentGateway {
                 .replyCount(commentPO.getReplyCount())
                 .userAgent(commentPO.getUserAgent())
                 .userIp(commentPO.getUserIp())
+                .terminalType(commentPO.getTerminalType())
+                .platform(commentPO.getPlatform())
                 .createBy(commentPO.getCreateBy())
                 .message(commentPO.getMessage())
                 .images(images)
@@ -364,6 +366,8 @@ public class CommentGatewayImpl implements CommentGateway {
                 .likes(commentReplyPO.getLikes())
                 .userAgent(commentReplyPO.getUserAgent())
                 .userIp(commentReplyPO.getUserIp())
+                .terminalType(commentReplyPO.getTerminalType())
+                .platform(commentReplyPO.getPlatform())
                 .createBy(commentReplyPO.getCreateBy())
                 .message(commentReplyPO.getMessage())
                 .forumId(commentReplyPO.getForumId())
@@ -408,6 +412,45 @@ public class CommentGatewayImpl implements CommentGateway {
         replyWrapper.le("create_time", endDate);
         long replyCount = commentReplyMapper.selectCount(replyWrapper);
 
+        return commentCount + replyCount;
+    }
+
+    @Override
+    public Long countCommentsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
+                                           String terminalType, String platform) {
+        // Count top-level comments in date range
+        QueryWrapper<CommentPO> commentWrapper = new QueryWrapper<>();
+        commentWrapper.eq("is_deleted", false);
+        commentWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        commentWrapper.ge("create_time", startDate);
+        commentWrapper.le("create_time", endDate);
+
+        if (!"ALL".equals(terminalType)) {
+            commentWrapper.eq("terminal_type", terminalType);
+        }
+        if (!"ALL".equals(platform)) {
+            commentWrapper.eq("platform", platform);
+        }
+
+        long commentCount = commentMapper.selectCount(commentWrapper);
+
+        // Count nested replies in date range
+        QueryWrapper<CommentReplyPO> replyWrapper = new QueryWrapper<>();
+        replyWrapper.eq("is_deleted", false);
+        replyWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
+        replyWrapper.ge("create_time", startDate);
+        replyWrapper.le("create_time", endDate);
+
+        if (!"ALL".equals(terminalType)) {
+            replyWrapper.eq("terminal_type", terminalType);
+        }
+        if (!"ALL".equals(platform)) {
+            replyWrapper.eq("platform", platform);
+        }
+
+        long replyCount = commentReplyMapper.selectCount(replyWrapper);
+
+        // Return sum of comments and replies
         return commentCount + replyCount;
     }
 }

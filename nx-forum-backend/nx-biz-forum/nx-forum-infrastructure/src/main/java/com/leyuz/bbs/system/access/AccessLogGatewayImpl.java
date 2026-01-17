@@ -47,13 +47,16 @@ public class AccessLogGatewayImpl implements AccessLogGateway {
 
     @Override
     public long countGuestIps(LocalDateTime startTime, LocalDateTime endTime,
-                             String terminalType) {
+                             String terminalType, String platform) {
         LambdaQueryWrapper<AccessLogPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.between(AccessLogPO::getAccessTime, startTime, endTime)
             .eq(AccessLogPO::getUserId, 0L);
 
         if (!"ALL".equals(terminalType)) {
             wrapper.eq(AccessLogPO::getTerminalType, terminalType);
+        }
+        if (!"ALL".equals(platform)) {
+            wrapper.eq(AccessLogPO::getPlatform, platform);
         }
 
         List<AccessLogPO> logs = accessLogMapper.selectList(wrapper);
@@ -65,13 +68,16 @@ public class AccessLogGatewayImpl implements AccessLogGateway {
 
     @Override
     public long countUserIps(LocalDateTime startTime, LocalDateTime endTime,
-                            String terminalType) {
+                            String terminalType, String platform) {
         LambdaQueryWrapper<AccessLogPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.between(AccessLogPO::getAccessTime, startTime, endTime)
             .ne(AccessLogPO::getUserId, 0L);
 
         if (!"ALL".equals(terminalType)) {
             wrapper.eq(AccessLogPO::getTerminalType, terminalType);
+        }
+        if (!"ALL".equals(platform)) {
+            wrapper.eq(AccessLogPO::getPlatform, platform);
         }
 
         List<AccessLogPO> logs = accessLogMapper.selectList(wrapper);

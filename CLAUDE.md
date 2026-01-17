@@ -173,6 +173,48 @@ Main config: `nx-forum-nuxt/nuxt.config.ts`
 **Flyway validation error after updates**:
 - Testing version has incompatible migrations. Delete all database tables and restart.
 
+**App Client Integration**:
+
+### User-Agent Format for App Clients
+
+App clients must include the following prefix in their User-Agent:
+
+```
+NXForumApp/<version> (Platform)
+```
+
+**Examples:**
+- Android: `NXForumApp/1.0.0 (Android 12) Dalvik/2.1.0`
+- iOS: `NXForumApp/1.0.0 (iPhone 15 iOS 17) Mobile/15E148`
+
+### Required Headers
+
+App clients **MUST** include the following HTTP headers:
+
+1. **X-App-Version**: App版本号（主要APP检测依据）
+   ```
+   X-App-Version: 1.0.0
+   ```
+
+2. **X-Device-Id**: 设备唯一标识（用于设备去重和统计，不参与终端类型判断）
+   ```
+   X-Device-Id: {unique_device_id}
+   ```
+
+3. **User-Agent**: 包含 `NXForumApp/` 前缀（辅助APP检测）
+   ```
+   User-Agent: NXForumApp/1.0.0 (Android 12) Dalvik/2.1.0
+   ```
+
+### Terminal Type Detection Logic
+
+The system uses a two-tier detection strategy:
+1. **Primary**: X-App-Version header exists → APP
+2. **Secondary**: User-Agent contains `NXForumApp/` → APP
+3. **Default**: Mobile keyword detection → MOBILE, else PC
+
+**Note**: deviceId is NOT used for terminal type detection, only for device deduplication and statistics.
+
 ---
 
 ## Technology Stack

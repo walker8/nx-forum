@@ -1,6 +1,7 @@
 package com.leyuz.bbs.filter;
 
 import com.leyuz.bbs.system.access.AccessLogApplication;
+import com.leyuz.common.utils.HeaderUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +40,15 @@ public class AccessLogFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } finally {
+            // 在主线程从ThreadLocal获取请求头信息，传递给异步方法
+            String ip = HeaderUtils.getIp();
+            String deviceId = HeaderUtils.getDeviceId();
+            Long userId = HeaderUtils.getUserId();
+            String userAgent = HeaderUtils.getUserAgent();
+            String appVersion = HeaderUtils.getAppVersion();
+
             // 异步记录访问日志（传递参数而不是request对象）
-            accessLogApplication.logAccessAsync();
+            accessLogApplication.logAccessAsync(ip, deviceId, userId, userAgent, appVersion);
         }
     }
 

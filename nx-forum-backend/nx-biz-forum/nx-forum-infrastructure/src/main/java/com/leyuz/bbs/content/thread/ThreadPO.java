@@ -50,6 +50,16 @@ public class ThreadPO extends BaseEntity {
     private String userAgent;
 
     /**
+     * 终端类型（PC/MOBILE/APP）
+     */
+    private String terminalType;
+
+    /**
+     * 平台（Windows/Mac/Android/iPhone等）
+     */
+    private String platform;
+
+    /**
      * 主题名称
      */
     private String subject;

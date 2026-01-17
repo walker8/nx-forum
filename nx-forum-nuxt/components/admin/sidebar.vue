@@ -10,32 +10,38 @@
           </el-icon>
           <span>首页</span>
         </el-menu-item>
-        <el-sub-menu index="1" v-if="hasPermission('admin:system')">
+        <el-menu-item index="1" @click="handleMenuClick('/admin/statistics')" v-if="hasPermission('admin:stats')">
+          <el-icon size="16px">
+            <Icon name="tabler:chart-bar" />
+          </el-icon>
+          <span>数据统计</span>
+        </el-menu-item>
+        <el-sub-menu index="2" v-if="hasPermission('admin:system')">
           <template #title>
             <el-icon size="16px">
               <Icon name="tabler:settings" />
             </el-icon>
             <span>系统管理</span>
           </template>
-          <el-menu-item index="1-0" @click="handleMenuClick('/admin/base')" v-if="hasPermission('admin:system:basic')">
+          <el-menu-item index="2-0" @click="handleMenuClick('/admin/base')" v-if="hasPermission('admin:system:basic')">
             <el-icon>
               <Icon name="tabler:settings-filled" />
             </el-icon>
             <span>基本设置</span>
           </el-menu-item>
-          <el-menu-item index="1-1" @click="handleMenuClick('/admin/analytics')" v-if="hasPermission('admin:system:basic')">
+          <el-menu-item index="2-1" @click="handleMenuClick('/admin/analytics')" v-if="hasPermission('admin:system:basic')">
             <el-icon>
               <Icon name="tabler:chart-line" />
             </el-icon>
             <span>统计设置</span>
           </el-menu-item>
-          <el-menu-item index="1-3" @click="handleMenuClick('/admin/forum')" v-if="hasPermission('admin:system:forum')">
+          <el-menu-item index="2-3" @click="handleMenuClick('/admin/forum')" v-if="hasPermission('admin:system:forum')">
             <el-icon>
               <Icon name="tabler:grid-dots" />
             </el-icon>
             <span>版块管理</span>
           </el-menu-item>
-          <el-menu-item index="1-4" @click="handleMenuClick('/admin/audit')" v-if="hasPermission('admin:system:audit')">
+          <el-menu-item index="2-4" @click="handleMenuClick('/admin/audit')" v-if="hasPermission('admin:system:audit')">
             <template #title>
               <el-icon size="16px">
                 <Icon name="tabler:shield-check" />
@@ -43,7 +49,7 @@
               <span>审核设置</span>
             </template>
           </el-menu-item>
-          <el-menu-item index="1-6" @click="handleMenuClick('/admin/image')" v-if="hasPermission('admin:system:image')">
+          <el-menu-item index="2-6" @click="handleMenuClick('/admin/image')" v-if="hasPermission('admin:system:image')">
             <template #title>
               <el-icon size="16px">
                 <Icon name="tabler:photo" />
@@ -51,7 +57,7 @@
               <span>图片管理</span>
             </template>
           </el-menu-item>
-          <el-menu-item index="1-5" @click="handleMenuClick('/admin/custom-page')"
+          <el-menu-item index="2-5" @click="handleMenuClick('/admin/custom-page')"
             v-if="hasPermission('admin:system:page')">
             <template #title>
               <el-icon size="16px">
@@ -60,21 +66,15 @@
               <span>自定义页面</span>
             </template>
           </el-menu-item>
-          <el-menu-item index="1-7" @click="handleMenuClick('/admin/statistics')" v-if="hasPermission('admin:system:basic')">
-            <el-icon>
-              <Icon name="tabler:chart-line" />
-            </el-icon>
-            <span>数据统计</span>
-          </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="2" v-if="hasPermission('admin:thread', forumId)">
+        <el-sub-menu index="3" v-if="hasPermission('admin:thread', forumId)">
           <template #title>
             <el-icon size="16px">
               <Icon name="tabler:article" />
             </el-icon>
             <span>帖子管理</span>
           </template>
-          <el-menu-item index="2-0" @click="
+          <el-menu-item index="3-0" @click="
             handleMenuClick(
               '/admin/thread' + (auditingCount.threadAuditCount > 0 ? '?status=auditing' : '')
             )
@@ -87,7 +87,7 @@
               {{ auditingCount.threadAuditCount }}
             </el-tag>
           </el-menu-item>
-          <el-menu-item index="2-1" @click="
+          <el-menu-item index="3-1" @click="
             handleMenuClick(
               '/admin/comment' + (auditingCount.commentAuditCount > 0 ? '?status=auditing' : '')
             )
@@ -100,7 +100,7 @@
               {{ auditingCount.commentAuditCount }}
             </el-tag>
           </el-menu-item>
-          <el-menu-item index="2-2" @click="
+          <el-menu-item index="3-2" @click="
             handleMenuClick(
               '/admin/reply' + (auditingCount.replyAuditCount > 0 ? '?status=auditing' : '')
             )
@@ -113,7 +113,7 @@
               {{ auditingCount.replyAuditCount }}
             </el-tag>
           </el-menu-item>
-          <el-menu-item index="2-3" @click="
+          <el-menu-item index="3-3" @click="
             handleMenuClick(
               '/admin/report' + (auditingCount.pendingReportCount > 0 ? '?status=pending' : '')
             )
@@ -127,14 +127,14 @@
             </el-tag>
           </el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="3" v-if="hasPermission('admin:user', forumId)">
+        <el-sub-menu index="4" v-if="hasPermission('admin:user', forumId)">
           <template #title>
             <el-icon>
               <Icon name="tabler:users" />
             </el-icon>
             <span>用户管理</span>
           </template>
-          <el-menu-item index="3-1" @click="handleMenuClick('/admin/ban')"
+          <el-menu-item index="4-1" @click="handleMenuClick('/admin/ban')"
             v-if="hasPermission('admin:user:ban', forumId)">
             小黑屋
           </el-menu-item>
@@ -196,18 +196,18 @@ if (!hasPermission('admin:manage', forumId.value)) {
 // 创建路由到index的映射表
 const routeIndexMap: Record<string, string> = {
   '/admin': '0',
-  '/admin/base': '1-0',
-  '/admin/analytics': '1-1',
-  '/admin/forum': '1-3',
-  '/admin/audit': '1-4',
-  '/admin/image': '1-6',
-  '/admin/custom-page': '1-5',
-  '/admin/statistics': '1-7',
-  '/admin/thread': '2-0',
-  '/admin/comment': '2-1',
-  '/admin/reply': '2-2',
-  '/admin/report': '2-3',
-  '/admin/ban': '3-1'
+  '/admin/statistics': '1',
+  '/admin/base': '2-0',
+  '/admin/analytics': '2-1',
+  '/admin/forum': '2-3',
+  '/admin/audit': '2-4',
+  '/admin/image': '2-6',
+  '/admin/custom-page': '2-5',
+  '/admin/thread': '3-0',
+  '/admin/comment': '3-1',
+  '/admin/reply': '3-2',
+  '/admin/report': '3-3',
+  '/admin/ban': '4-1'
 }
 
 // 优化后的计算属性（处理Nuxt3的动态路由）
