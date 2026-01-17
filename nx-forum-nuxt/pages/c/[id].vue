@@ -29,7 +29,7 @@
     </el-card>
     <div class="reply">
       <el-card class="mt-2">
-        <div class="text-xs">{{ comment.replyCount }}条回复</div>
+        <div class="text-sm">{{ comment.replyCount }}条回复</div>
         <comment-replies :comment="comment" :order="CommentOrderV.TIME_DESC" :reply-id="replyId" />
       </el-card>
     </div>
@@ -127,7 +127,7 @@ const clickComment = (element: any, message: string) => {
   }
   @media screen and (max-width: 768px) {
     .el-card {
-      --el-card-padding: 0 10px;
+      --el-card-padding: 10px;
     }
   }
 }

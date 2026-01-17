@@ -19,7 +19,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: '写留言',
+  placeholder: '理性发言，友善互动',
   disabled: false,
   maxlength: 1000
 })

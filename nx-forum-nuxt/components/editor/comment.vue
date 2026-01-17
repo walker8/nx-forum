@@ -188,7 +188,7 @@ const placeHolder = computed(() => {
   if (replyAuthorName) {
     return `回复 ${replyAuthorName}:`
   }
-  return '写留言'
+  return '理性发言，友善互动'
 })
 
 const message = ref('<p></p>')
