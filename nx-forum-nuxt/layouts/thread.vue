@@ -80,6 +80,7 @@ const goHome = () => {
 @media screen and (max-width: 768px) {
   .common-layout {
     width: 100%;
+    margin-top: 0;
   }
   .thread-main {
     width: 100% !important;

@@ -299,8 +299,8 @@ function onReportComment(comment: CommentVO) {
 }
 
 .comment {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .comment-user {

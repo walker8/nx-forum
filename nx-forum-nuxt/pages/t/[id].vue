@@ -39,7 +39,9 @@
   <thread-comment :threadId="thread.threadId" :forumId="thread.forumId" :authorId="thread.author?.authorId || 0"
     :order="thread.commentOrder" :disabled="thread.closed" />
   <common-image-viewer ref="imageViewer" />
-  <el-backtop :bottom="50" />
+  <ClientOnly>
+    <el-backtop :bottom="50" class="desktop-backtop" />
+  </ClientOnly>
 
   <!-- 移动端目录按钮和抽屉 - 仅客户端渲染 -->
   <ClientOnly>
@@ -841,6 +843,13 @@ watch(catalogItems, () => {
     margin-bottom: 0 !important;
     padding: 20px !important;
     border-bottom: 1px solid #f0f0f0 !important;
+  }
+}
+
+/* 移动端隐藏返回顶部按钮 */
+.desktop-backtop {
+  @media screen and (max-width: 768px) {
+    display: none !important;
   }
 }
 </style>
