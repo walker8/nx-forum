@@ -65,7 +65,14 @@
         </div>
         <el-divider style="margin: 0px; margin-top: 8px" />
       </div>
+      <!-- 加载状态提示 - 移动端显示 -->
+      <div v-if="isMobile && disableLoadMore" class="text-center py-2 text-gray-500 text-sm">
+        加载中...
+      </div>
+
+      <!-- 加载更多按钮 - 桌面端显示 -->
       <common-load-more
+        v-if="!isMobile"
         :has-next="forumPostPage.hasNext"
         :disable-load-more="disableLoadMore"
         @load-more="loadMoreThreads"
@@ -79,6 +86,7 @@
 <script setup lang="ts">
 import { ChatDotRound } from '@element-plus/icons-vue'
 import type { Thread } from '~/types/global'
+import { useAutoLoadMore } from '~/composables/useAutoLoadMore'
 
 const props = defineProps({
   disableLoadMore: {
@@ -108,6 +116,16 @@ const emits = defineEmits(['loadMoreThreads'])
 const loadMoreThreads = () => {
   emits('loadMoreThreads')
 }
+
+// 使用自动加载更多 composable
+const useAutoLoadResult = useAutoLoadMore({
+  disabled: computed(() => props.disableLoadMore),
+  hasMore: computed(() => props.forumPostPage.hasNext),
+  onLoad: loadMoreThreads,
+  distance: 200,
+  mobileOnly: true
+})
+const { isMobile } = useAutoLoadResult
 const clickThread = (thread: Thread) => {
   if (thread?.threadId) {
     window.open('/t/' + thread.threadId, '_blank')
