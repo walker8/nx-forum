@@ -8,29 +8,71 @@
       </div>
       <div class="right">
         <el-space wrap>
-          <el-popover placement="bottom" :width="400" trigger="click" :visible="popVisible">
-            <template #reference>
-              <el-button type="primary" @click="togglePop" :disabled="!menus?.length">
-                {{ threadCmd.threadId && threadCmd.threadId > 0 ? '更新' : '发布' }}
-              </el-button>
-            </template>
-            <editor-post @cancel="cancel" />
-          </el-popover>
+          <client-only>
+            <el-button type="primary" @click="openDialog" :disabled="!menus?.length">
+              {{ threadCmd.threadId && threadCmd.threadId > 0 ? '更新' : '发布' }}
+            </el-button>
+
+            <el-dialog
+              v-model="dialogVisible"
+              :title="threadCmd.threadId && threadCmd.threadId > 0 ? '更新帖子' : '发布帖子'"
+              :width="isMobile ? '100%' : '500px'"
+              :fullscreen="isMobile"
+              :class="{ 'mobile-dialog': isMobile }"
+              :top="isMobile ? '0' : '15vh'"
+              :destroy-on-close="true"
+              append-to-body
+            >
+              <editor-post @cancel="closeDialog" />
+            </el-dialog>
+          </client-only>
         </el-space>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { getUserForumMenu } from '~/apis/forum'
+
 const threadCmd = useThreadCmd()
-const popVisible = ref(false)
+const dialogVisible = ref(false)
+const isMobile = ref(false)
 const menus = useUserMenus()
-const cancel = () => {
-  popVisible.value = false
+const isClient = import.meta.client
+
+const openDialog = () => {
+  dialogVisible.value = true
 }
-const togglePop = () => {
-  popVisible.value = !popVisible.value
+
+const closeDialog = () => {
+  dialogVisible.value = false
 }
+
+onMounted(() => {
+  if (isClient) {
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    // Fetch user forum menus to enable the publish button
+    if (!menus?.value || menus.value.length === 0) {
+      getUserForumMenu().then((res) => {
+        menus.value = res.data
+      })
+    }
+  }
+})
+
+onUnmounted(() => {
+  if (isClient) {
+    window.removeEventListener('resize', checkScreenSize)
+  }
+})
+
+function checkScreenSize() {
+  if (isClient) {
+    isMobile.value = window.innerWidth < 768
+  }
+}
+
 const goHome = () => {
   window.open('/', '_self')
 }
@@ -60,5 +102,19 @@ const goHome = () => {
   align-items: center;
   justify-content: flex-end;
   width: 100%;
+}
+
+.mobile-dialog :deep(.el-dialog__header) {
+  display: none;
+}
+
+.mobile-dialog :deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+@media (max-width: 767px) {
+  .mobile-dialog :deep(.el-dialog__body) {
+    padding-bottom: 80px; /* Space for fixed footer buttons */
+  }
 }
 </style>

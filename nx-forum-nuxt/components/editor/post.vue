@@ -154,3 +154,70 @@ onMounted(() => {
   )
 })
 </script>
+
+<style scoped>
+@media (max-width: 767px) {
+  /* Add horizontal padding to the form for better spacing */
+  :deep(.el-form) {
+    padding: 0 16px;
+  }
+
+  /* Make form items with better spacing */
+  .el-form-item {
+    margin-bottom: 16px;
+  }
+
+  /* Adjust label width for mobile - increase to fit "评论排序" */
+  :deep(.el-form-item__label) {
+    width: 85px !important;
+    font-size: 14px;
+    line-height: 32px;
+  }
+
+  /* Make selects full width and proper height */
+  :deep(.el-select) {
+    width: 100% !important;
+  }
+
+  :deep(.el-select .el-input__wrapper) {
+    height: 36px;
+  }
+
+  /* Style the button container for mobile - override inline styles */
+  .el-form-item:last-child :deep(.el-form-item__content) {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: stretch !important;
+    gap: 10px;
+    margin-top: 12px;
+    margin-left: 0 !important;
+  }
+
+  /* Override the inline div wrapper styles */
+  .el-form-item:last-child :deep(.el-form-item__content > div) {
+    justify-content: stretch !important;
+    margin-left: 0 !important;
+    width: 100%;
+    gap: 10px;
+  }
+
+  /* Make buttons compact but still touch-friendly */
+  .el-button {
+    width: 100% !important;
+    margin: 0 !important;
+    height: 40px;
+    font-size: 15px;
+    border-radius: 6px;
+    padding: 0 16px;
+  }
+
+  /* Make forum brief text more readable */
+  .text-sm {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: 6px;
+    padding-left: 2px;
+  }
+}
+</style>
+
