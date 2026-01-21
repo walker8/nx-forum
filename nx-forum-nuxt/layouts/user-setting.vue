@@ -28,7 +28,7 @@
           </div>
         </el-aside>
         <el-main class="forum-main">
-          <div class="hidden-lg-and-up m-header">
+          <div class="hidden-lg-and-up m-header rn-hide">
             <van-tabs v-model:active="userSettings.selected" sticky shrink @click-tab="onClickTab">
               <van-tab
                 v-for="menu in userSettings.settings"

@@ -12,24 +12,23 @@
             <el-button type="primary" @click="openDialog" :disabled="!menus?.length">
               {{ threadCmd.threadId && threadCmd.threadId > 0 ? '更新' : '发布' }}
             </el-button>
-
-            <el-dialog
-              v-model="dialogVisible"
-              :title="threadCmd.threadId && threadCmd.threadId > 0 ? '更新帖子' : '发布帖子'"
-              :width="isMobile ? '100%' : '500px'"
-              :fullscreen="isMobile"
-              :class="{ 'mobile-dialog': isMobile }"
-              :top="isMobile ? '0' : '15vh'"
-              :destroy-on-close="true"
-              append-to-body
-            >
-              <editor-post @cancel="closeDialog" />
-            </el-dialog>
           </client-only>
         </el-space>
       </div>
     </div>
   </div>
+  <el-dialog
+      v-model="dialogVisible"
+      :title="threadCmd.threadId && threadCmd.threadId > 0 ? '更新帖子' : '发布帖子'"
+      :width="isMobile ? '100%' : '500px'"
+      :fullscreen="isMobile"
+      :class="{ 'mobile-dialog': isMobile }"
+      :top="isMobile ? '0' : '15vh'"
+      :destroy-on-close="true"
+      append-to-body
+  >
+    <editor-post @cancel="closeDialog" />
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { getUserForumMenu } from '~/apis/forum'

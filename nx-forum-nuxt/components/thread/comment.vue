@@ -88,7 +88,18 @@
             </client-only>
           </div>
         </div>
-        <common-load-more :has-next="hasNext" :disable-load-more="disableLoadMore" @load-more="loadMoreComments">
+        <!-- 加载状态提示 - 移动端显示 -->
+        <div v-if="isMobile && disableLoadMore" class="text-center py-2 text-gray-500 text-sm">
+          加载中...
+        </div>
+
+        <!-- 加载更多按钮 - 桌面端保留 -->
+        <common-load-more
+          v-if="!isMobile"
+          :has-next="hasNext"
+          :disable-load-more="disableLoadMore"
+          @load-more="loadMoreComments"
+        >
           查看全部 {{ thread.comments }} 条评论
         </common-load-more>
       </el-card>
@@ -105,6 +116,7 @@ import { CommentOrderV } from '~/constant'
 import { toggleLike } from '~/apis/like'
 import { useEmotions } from '~/composables/useEmotions'
 import { useReport } from '~/composables/useReport'
+import { useAutoLoadMore } from '~/composables/useAutoLoadMore'
 
 const props = defineProps({
   threadId: {
@@ -146,6 +158,16 @@ const commentId = computed(() => {
   const id = route.query.commentId
   return id ? Number(id) : undefined
 })
+
+// 使用自动加载更多 composable
+const useAutoLoadResult = useAutoLoadMore({
+  disabled: computed(() => disableLoadMore.value),
+  hasMore: computed(() => hasNext.value),
+  onLoad: loadMoreComments,
+  distance: 200,
+  mobileOnly: false  // 重要：设置为 false，在桌面端和移动端都启用自动加载
+})
+const { isMobile } = useAutoLoadResult
 
 // 滚动到指定评论
 const scrollToComment = () => {
@@ -190,7 +212,7 @@ const initComments = () => {
   }
 }
 initComments()
-const loadMoreComments = () => {
+function loadMoreComments() {
   disableLoadMore.value = true
   queryComments(threadId, commentOrder.value, pageNo, pageSize, commentId.value)
     .then((res) => {
