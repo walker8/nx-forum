@@ -11,6 +11,7 @@ import com.leyuz.common.dto.UserClientInfo;
 import com.leyuz.common.ip.AddressUtils;
 import com.leyuz.common.utils.UserAgentUtils;
 import com.leyuz.uc.user.UserApplication;
+import com.leyuz.uc.user.UserE;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,9 @@ public class ThreadConvert {
             }
             Long authorId = threadPO.getCreateBy();
             threadVO.setAuthorId(authorId);
-            threadVO.setAuthorName(userApplication.getByIdFromCache(authorId).getUserName());
+            UserE author = userApplication.getByIdFromCache(authorId);
+            threadVO.setAuthorName(author.getUserName());
+            threadVO.setAvatarUrl(author.getAvatar());
             ForumPO forum = forumApplication.getForumById(threadPO.getForumId());
             if (forum != null) {
                 // 版块未删除
@@ -54,7 +57,9 @@ public class ThreadConvert {
             threadVO.setProperty(threadPropertyV);
             Long authorId = threadPO.getCreateBy();
             threadVO.setAuthorId(authorId);
-            threadVO.setAuthorName(userApplication.getByIdFromCache(authorId).getUserName());
+            UserE author = userApplication.getByIdFromCache(authorId);
+            threadVO.setAuthorName(author.getUserName());
+            threadVO.setAvatarUrl(author.getAvatar());
             ForumPO forumPO = forumApplication.getForumById(threadPO.getForumId());
             if (forumPO != null) {
                 threadVO.setForumNickName(forumPO.getNickName());
