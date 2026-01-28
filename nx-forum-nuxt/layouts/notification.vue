@@ -30,7 +30,7 @@
             </el-menu>
           </el-aside>
           <el-main class="forum-main">
-            <div class="hidden-lg-and-up m-header">
+            <div class="hidden-lg-and-up m-header rn-hide">
               <van-tabs
                 v-model:active="userNotification.selected"
                 sticky

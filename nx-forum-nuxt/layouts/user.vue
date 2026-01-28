@@ -8,7 +8,7 @@
         <el-empty :description="errorMsg" />
       </div>
       <div v-else>
-        <el-card class="md:mr-0 md:w-[720px] lg:w-full">
+        <el-card class="md:mr-0 md:w-[900px] mb-5 rn-hide">
           <div class="w-full">
             <div class="flex w-full">
               <el-avatar
@@ -50,7 +50,7 @@
             </div>
           </div>
         </el-card>
-        <el-container class="mt-5">
+        <el-container class="max-w-[900px] md:w-[900px]">
           <el-aside width="160px" class="hidden-md-and-down mr-5">
             <div class="w-full border border-gray-200 rounded-md bg-white">
               <div class="flex flex-col">
@@ -77,7 +77,7 @@
               </div>
             </div>
           </el-aside>
-          <el-main class="pt-0 max-w-[720px] md:w-[720px] max-md:w-[calc(100vw-40px)] max-md:p-0">
+          <el-main class="pt-0 max-md:w-[calc(100vw-40px)] max-md:p-0">
             <div class="w-full mb-1.5 hidden-lg-and-up">
               <van-tabs v-model:active="userHome.selected" sticky shrink @click-tab="onClickTab">
                 <van-tab v-for="menu in userHome.tabs" :title="menu.label" :name="menu.value" />
