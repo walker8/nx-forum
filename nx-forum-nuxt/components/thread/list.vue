@@ -60,7 +60,7 @@
               <div style="margin-left: 2px">{{ thread.likes }}</div>
             </div>
             <div class="text-gray-200">|</div>
-            <div>{{ thread.createTime }}</div>
+            <div>{{ formatTimeAgo(thread.createTime) }}</div>
           </div>
         </div>
         <el-divider style="margin: 0px; margin-top: 8px" />
@@ -87,6 +87,7 @@
 import { ChatDotRound } from '@element-plus/icons-vue'
 import type { Thread } from '~/types/global'
 import { useAutoLoadMore } from '~/composables/useAutoLoadMore'
+const { formatTimeAgo } = useTimeFormat()
 
 const props = defineProps({
   disableLoadMore: {
