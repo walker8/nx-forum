@@ -9,7 +9,7 @@
         <div class="author" @click="open(`/user/${thread.author?.authorId}`)">
           <el-link underline="never">{{ thread.author?.authorName ?? 'unkown' }}</el-link>
         </div>
-        <div>发布于 {{ thread.createTime }}</div>
+        <div>发布于 {{ formatDate(thread.createTime) }}</div>
         <div>阅读 {{ thread.views }}</div>
         <ClientOnly>
           <el-link underline="never" :icon="Edit" @click="editThread" v-if="canEdit" />
@@ -22,7 +22,7 @@
       </el-space>
     </div>
     <div v-if="thread.updateAuthor" class="edit-info">
-      本帖最后由 {{ thread.updateAuthor.authorName }} 于 {{ thread.updateTime }} 编辑
+      本帖最后由 {{ thread.updateAuthor.authorName }} 于 {{ formatDate(thread.updateTime) }} 编辑
     </div>
     <el-alert v-if="thread.auditStatus === 1" title="当前帖子正在审核中，仅管理可见" type="warning" :closable="false" />
     <el-alert v-if="thread.auditStatus === 2" title="当前帖子审核不通过，仅管理可见" type="error" :closable="false" />
@@ -181,6 +181,12 @@ const processEmotions = computed(() => {
   return replaceEmotions(thread.value.content)
 })
 
+// 格式化日期，只显示年月日
+const formatDate = (dateTime: string) => {
+  if (!dateTime) return ''
+  return dateTime.split(' ')[0]
+}
+
 // 移动端目录相关
 const showCatalogDrawer = ref(false)
 const catalogItems = ref<Array<{ id: string; text: string; level: number }>>([])
@@ -333,7 +339,8 @@ watch(catalogItems, () => {
   font-size: 14px;
   color: #8a919f;
   line-height: 24px;
-  height: 24px;
+  min-height: 24px;
+  overflow: visible;
 
   .author {
     color: #515767;
@@ -832,6 +839,13 @@ watch(catalogItems, () => {
 
   .el-drawer__body {
     padding: 0;
+  }
+}
+
+// 移动端优化
+@media (max-width: 768px) {
+  .article-info {
+    padding-bottom: 4px; // 在移动端增加底部间距，防止与下方内容重叠
   }
 }
 </style>

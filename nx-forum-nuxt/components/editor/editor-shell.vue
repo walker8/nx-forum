@@ -418,7 +418,8 @@ const supportedCodeLanguages = [
   { label: 'CSS', value: 'css' },
   { label: 'Bash', value: 'bash' },
   { label: 'JSON', value: 'json' },
-  { label: 'XML', value: 'xml' }
+  { label: 'XML', value: 'xml' },
+  { label: 'YAML', value: 'yaml' }
 ]
 const supportedLanguageValues = new Set(supportedCodeLanguages.map((item) => item.value))
 
