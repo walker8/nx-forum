@@ -50,18 +50,16 @@ import { getUserForumMenu } from '~/apis/forum'
 import { createThread, updateThread } from '~/apis/thread'
 
 const threadCmd = useThreadCmd()
-const forumInfo = useForumInfo()
-if (forumInfo?.value.forumId > 0) {
-  threadCmd.value.forumId = forumInfo.value.forumId
-}
 const menus = useUserMenus()
 getUserForumMenu().then((res) => {
   const data = res.data
   menus.value = data
-  if (menus && menus.value.length > 0) {
-    threadCmd.value.forumId =
-      menus.value.find((menu) => menu.forumId === forumInfo.value.forumId)?.forumId ||
-      menus.value[0].forumId
+  // Only set forumId if it's not already set (for new threads)
+  // For editing threads, forumId is already loaded from API
+  if (menus && menus.value.length > 0 && !threadCmd.value.forumId) {
+    threadCmd.value.forumId = menus.value[0].forumId
+  }
+  if (threadCmd.value.forumId) {
     useUserAuth(threadCmd.value.forumId)
   }
 })
