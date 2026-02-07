@@ -41,9 +41,9 @@ public class StatsApplication {
 
     /**
      * 每日凌晨聚合前一天的统计数据
-     * cron: "0 0 2 * * ?" - 每天凌晨2点执行
+     * cron: "0 1 0 * * ?" - 每天凌晨0点1分执行
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 1 0 * * ?")
     @Async("statsAggregationExecutor")
     public void aggregateDailyStats() {
         log.info("开始聚合每日统计数据");
