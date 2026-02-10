@@ -9,6 +9,10 @@ AGENTS.md
 .iflow
 IFLOW.md
 
+### agent ###
+.agents
+.claude
+
 ### eclipse ###
 .apt_generated
 .classpath
