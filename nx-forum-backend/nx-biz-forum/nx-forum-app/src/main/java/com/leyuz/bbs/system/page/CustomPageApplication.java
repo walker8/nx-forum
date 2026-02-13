@@ -4,9 +4,8 @@ import com.alibaba.cola.exception.BizException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyuz.bbs.system.page.converter.CustomPageConverter;
 import com.leyuz.bbs.system.page.dto.CustomPageCmd;
+import com.leyuz.bbs.system.page.dto.CustomPageInfoVO;
 import com.leyuz.bbs.system.page.dto.CustomPageVO;
-import com.leyuz.bbs.system.page.CustomPageMapper;
-import com.leyuz.bbs.system.page.CustomPageContentMapper;
 import com.leyuz.common.mybatis.CustomPage;
 import com.leyuz.common.mybatis.DataBaseUtils;
 import com.leyuz.common.mybatis.PageQuery;
@@ -53,6 +52,21 @@ public class CustomPageApplication {
             throw new BizException("页面不存在");
         }
         return getContentByPageId(customPagePO.getPageId());
+    }
+
+    /**
+     * 获取页面完整信息（包含页面名称和内容），用于前端展示和SEO
+     */
+    public CustomPageInfoVO getPageInfoByPageCode(String pageCode) {
+        CustomPagePO customPagePO = customPageMapper.getByPageCode(pageCode);
+        if (customPagePO == null) {
+            throw new BizException("页面不存在");
+        }
+        CustomPageContentPO contentPO = getContentByPageId(customPagePO.getPageId());
+        CustomPageInfoVO vo = new CustomPageInfoVO();
+        vo.setPageName(customPagePO.getPageName());
+        vo.setContent(contentPO != null ? contentPO.getContent() : null);
+        return vo;
     }
 
     public CustomPage<CustomPageVO> queryPages(PageQuery query) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="nx-editor">
+  <div :class="['nx-editor', { 'nx-editor-full-width': fullWidth }]">
     <!-- 工具栏在最顶部 -->
     <div class="editor-toolbar" v-if="editor" ref="toolbarRef">
       <div class="toolbar-group">
@@ -159,7 +159,7 @@
     <div class="editor-workspace">
       <div class="editor-main">
         <!-- 标题输入 -->
-        <div class="editor-title-wrapper">
+        <div v-if="showTitle" class="editor-title-wrapper">
           <input ref="titleInputRef" v-model="localTitle" class="title-input" maxlength="80" placeholder="请输入标题"
             @keydown.enter="handleTitleEnter" />
         </div>
@@ -442,6 +442,8 @@ const props = withDefaults(
     cover?: string | null
     meta?: EditorMeta
     stickyHeader?: boolean
+    showTitle?: boolean
+    fullWidth?: boolean
   }>(),
   {
     modelValue: '',
@@ -449,7 +451,9 @@ const props = withDefaults(
     placeholder: '开始创作，输入 / 快速插入模块',
     initialContent: '',
     cover: null,
-    stickyHeader: true
+    stickyHeader: true,
+    showTitle: true,
+    fullWidth: false
   }
 )
 
@@ -1507,6 +1511,11 @@ const meta = computed(() => props.meta)
   background-color: #f8f9fa;
   overflow: hidden;
   max-width: 1038px;
+}
+
+.nx-editor-full-width {
+  max-width: 100%;
+  margin: 0;
 }
 
 .editor-toolbar {

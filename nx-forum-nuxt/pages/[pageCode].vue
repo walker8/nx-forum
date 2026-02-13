@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { getPageContent } from '~/apis/custom-page'
+import { getPage } from '~/apis/custom-page'
 
 definePageMeta({
   layout: 'empty'
@@ -13,12 +13,21 @@ definePageMeta({
 const route = useRoute()
 const pageCode = route.params.pageCode
 const pageContent = ref('')
+const pageName = ref('')
 
 if (pageCode) {
-  const res = await getPageContent(String(pageCode))
+  const res = await getPage(String(pageCode))
   // 获取自定义页面成功
   const data = res.data
-  pageContent.value = data
+  pageContent.value = data.content || ''
+  pageName.value = data.pageName || ''
+
+  // 设置 SEO 标题
+  if (pageName.value) {
+    useSeoMeta({
+      title: pageName.value
+    })
+  }
 }
 </script>
 <style lang="scss" scoped>

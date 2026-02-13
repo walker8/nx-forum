@@ -4,12 +4,14 @@
       <el-button @click="handleCancel">取消</el-button>
       <el-button type="primary" :loading="saving" @click="handleSave">保存</el-button>
     </div>
-    <div class="flex-1 bg-white p-5">
+    <div class="flex-1 bg-white">
       <ClientOnly>
         <EditorTiptap
           v-if="mounted && contentLoaded"
           v-model="content"
           :sticky-header="false"
+          :show-title="false"
+          full-width
         />
         <template #fallback>
           <div class="editor-loading">

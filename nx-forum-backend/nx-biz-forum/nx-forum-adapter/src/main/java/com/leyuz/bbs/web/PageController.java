@@ -2,6 +2,7 @@ package com.leyuz.bbs.web;
 
 import com.alibaba.cola.dto.SingleResponse;
 import com.leyuz.bbs.system.page.CustomPageApplication;
+import com.leyuz.bbs.system.page.dto.CustomPageInfoVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
@@ -26,12 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PageController {
     private final CustomPageApplication customPageApplication;
 
-    @Operation(summary = "")
-    @GetMapping("/{pageCode}/content")
+    @Operation(summary = "获取自定义页面信息")
+    @GetMapping("/{pageCode}")
     @PermitAll
-    public SingleResponse getContentByPageCode(@PathVariable String pageCode) {
-        String content = customPageApplication.getContentByPageCode(pageCode).getContent();
-        return SingleResponse.of(content);
+    public SingleResponse getPageInfo(@PathVariable String pageCode) {
+        CustomPageInfoVO pageInfo = customPageApplication.getPageInfoByPageCode(pageCode);
+        return SingleResponse.of(pageInfo);
     }
 
 }
