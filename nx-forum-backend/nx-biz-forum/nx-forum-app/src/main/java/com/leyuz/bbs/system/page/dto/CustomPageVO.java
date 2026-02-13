@@ -23,6 +23,9 @@ public class CustomPageVO {
     @Schema(description = "访问权限 0公开 1登录用户 2指定角色")
     private Integer accessLevel;
 
+    @Schema(description = "布局类型 default默认 simple简洁 empty无布局")
+    private String layout;
+
     @Schema(description = "创建时间")
     private Date createTime;
 

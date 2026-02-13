@@ -25,6 +25,9 @@ public class CustomPageCmd {
     @NotNull(message = "访问权限不能为空")
     private Integer accessLevel;
 
+    @NotBlank(message = "布局类型不能为空")
+    private String layout;
+
     // 验证分组
     public interface UpdateGroup {
     }

@@ -66,6 +66,7 @@ public class CustomPageApplication {
         CustomPageInfoVO vo = new CustomPageInfoVO();
         vo.setPageName(customPagePO.getPageName());
         vo.setContent(contentPO != null ? contentPO.getContent() : null);
+        vo.setLayout(customPagePO.getLayout() != null ? customPagePO.getLayout() : "default");
         return vo;
     }
 
@@ -96,6 +97,7 @@ public class CustomPageApplication {
         pagePO.setPageName(cmd.getPageName());
         pagePO.setPageStatus(cmd.getPageStatus());
         pagePO.setAccessLevel(cmd.getAccessLevel());
+        pagePO.setLayout(cmd.getLayout());
         customPageMapper.updatePage(pagePO);
     }
 }

@@ -6,6 +6,7 @@ export type PageCmd = {
     pageCode: string
     accessLevel: number
     pageStatus: number
+    layout: string
 }
 
 export type PageQuery = {
@@ -23,6 +24,7 @@ export type PageVO = {
     pageCode: string
     accessLevel: number
     pageStatus: number
+    layout: string
     createTime: string
     updateTime: string
 }
@@ -30,6 +32,7 @@ export type PageVO = {
 export type PageInfoVO = {
     pageName: string
     content: string
+    layout: string
 }
 
 // 分页查询自定义页面

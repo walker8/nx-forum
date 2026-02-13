@@ -15,6 +15,11 @@
       <el-table :data="tableData" v-loading="loading">
         <el-table-column prop="pageName" label="页面名称" />
         <el-table-column prop="pageCode" label="页面编码" />
+        <el-table-column prop="layout" label="布局" width="100">
+          <template #default="{ row }">
+            <el-tag>{{ layoutMap[row.layout]?.label || row.layout }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="accessLevel" label="访问权限" width="120">
           <template #default="{ row }">
             <el-tag :type="accessLevelMap[row.accessLevel]?.type">
@@ -79,6 +84,24 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="布局" prop="layout">
+          <el-select v-model="formData.layout" class="w-full">
+            <el-option
+              v-for="(item, key) in layoutMap"
+              :key="key"
+              :label="item.label"
+              :value="key"
+            >
+              <span style="float: left">{{ item.label }}</span>
+              <span
+                v-if="item.description"
+                style="float: right; color: var(--el-text-color-secondary); font-size: 12px;"
+              >
+                {{ item.description }}
+              </span>
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="状态" prop="pageStatus">
           <el-switch v-model="formData.pageStatus" :active-value="0" :inactive-value="1" />
         </el-form-item>
@@ -117,12 +140,28 @@ const accessLevelMap: AccessLevelMap = {
   1: { label: '登录可见', type: 'warning' }
 } as const
 
+interface LayoutItem {
+  label: string
+  description?: string
+}
+
+interface LayoutMap {
+  [key: string]: LayoutItem
+}
+
+const layoutMap: LayoutMap = {
+  default: { label: '默认布局', description: '标准布局，包含头部和内容区域' },
+  simple: { label: '简洁布局', description: '简洁布局，仅显示内容区域' },
+  empty: { label: '无布局', description: '纯内容布局，无任何装饰元素' }
+}
+
 interface PageItem {
   pageId: number
   pageName: string
   pageCode: string
   accessLevel: 0 | 1 | 2
   pageStatus: number
+  layout: string
 }
 
 const tableData = ref<PageItem[]>([])
@@ -138,13 +177,15 @@ interface PageCmd {
   pageCode: string
   accessLevel: number
   pageStatus: number
+  layout: string
 }
 
 const formData = reactive<PageCmd>({
   pageName: '',
   pageCode: '',
   accessLevel: 0,
-  pageStatus: 0
+  pageStatus: 0,
+  layout: 'default'
 })
 
 const rules = {
@@ -193,7 +234,8 @@ const handleCreate = () => {
     pageName: '',
     pageCode: '',
     accessLevel: 0,
-    pageStatus: 0
+    pageStatus: 0,
+    layout: 'default'
   })
   dialogVisible.value = true
 }
@@ -205,7 +247,8 @@ const handleEdit = (row: PageItem) => {
     pageName: row.pageName,
     pageCode: row.pageCode,
     accessLevel: row.accessLevel,
-    pageStatus: row.pageStatus
+    pageStatus: row.pageStatus,
+    layout: row.layout || 'default'
   })
   dialogVisible.value = true
 }

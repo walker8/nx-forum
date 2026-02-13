@@ -19,4 +19,5 @@ public class CustomPagePO extends BaseEntity {
     private String pageCode;
     private Integer pageStatus;
     private Integer accessLevel;
+    private String layout;
 } 

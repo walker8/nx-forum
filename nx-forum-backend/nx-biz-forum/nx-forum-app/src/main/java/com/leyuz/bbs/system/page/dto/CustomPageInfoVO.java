@@ -15,4 +15,7 @@ public class CustomPageInfoVO {
 
     @Schema(description = "页面内容")
     private String content;
+
+    @Schema(description = "布局类型 default默认 simple简洁 empty无布局")
+    private String layout;
 }
