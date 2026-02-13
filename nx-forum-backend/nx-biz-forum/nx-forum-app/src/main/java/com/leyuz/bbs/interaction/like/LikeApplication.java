@@ -6,14 +6,13 @@ import com.google.common.collect.Table;
 import com.leyuz.bbs.content.comment.CommentE;
 import com.leyuz.bbs.content.comment.CommentReplyE;
 import com.leyuz.bbs.content.comment.gateway.CommentGateway;
-import com.leyuz.bbs.content.thread.ThreadE;
-import com.leyuz.bbs.content.thread.gateway.ThreadGateway;
-import com.leyuz.bbs.interaction.like.dto.LikeCmd;
-import com.leyuz.bbs.interaction.like.LikeMapper;
 import com.leyuz.bbs.content.thread.ThreadConvert;
+import com.leyuz.bbs.content.thread.ThreadE;
+import com.leyuz.bbs.content.thread.ThreadMapper;
 import com.leyuz.bbs.content.thread.ThreadPO;
 import com.leyuz.bbs.content.thread.dto.ThreadVO;
-import com.leyuz.bbs.content.thread.ThreadMapper;
+import com.leyuz.bbs.content.thread.gateway.ThreadGateway;
+import com.leyuz.bbs.interaction.like.dto.LikeCmd;
 import com.leyuz.common.exception.ValidationException;
 import com.leyuz.common.mybatis.CustomPage;
 import com.leyuz.common.mybatis.DataBaseUtils;
@@ -73,21 +72,21 @@ public class LikeApplication {
                 if (threadE != null) {
                     return threadE.getThreadId();
                 } else {
-                    throw new ValidationException("目标不存在或已删除");
+                    throw new ValidationException("帖子不存在或已删除");
                 }
             case 1:
                 CommentE comment = commentGateway.getComment(targetId);
                 if (comment != null) {
                     return comment.getThreadId();
                 } else {
-                    throw new ValidationException("目标不存在或已删除");
+                    throw new ValidationException("评论不存在或已删除");
                 }
             case 2:
                 CommentReplyE commentReply = commentGateway.getCommentReply(targetId);
                 if (commentReply != null) {
                     return commentReply.getThreadId();
                 } else {
-                    throw new ValidationException("目标不存在或已删除");
+                    throw new ValidationException("回复不存在或已删除");
                 }
             default:
                 throw new ValidationException("无效的目标类型");

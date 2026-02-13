@@ -152,6 +152,11 @@ public class ThreadE {
 
     private Long updateBy;
 
+    /**
+     * 是否已删除
+     */
+    private Boolean isDeleted;
+
     private Document document;
 
     /**

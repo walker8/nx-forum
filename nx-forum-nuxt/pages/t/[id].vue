@@ -26,6 +26,7 @@
     </div>
     <el-alert v-if="thread.auditStatus === 1" title="当前帖子正在审核中，仅管理可见" type="warning" :closable="false" />
     <el-alert v-if="thread.auditStatus === 2" title="当前帖子审核不通过，仅管理可见" type="error" :closable="false" />
+    <el-alert v-if="thread.deleted" title="当前帖子已删除，仅管理可见" type="error" :closable="false" />
     <div class="article-content" v-html="processEmotions" @click="clickArticle($event)"></div>
 
     <!-- 关闭提示 -->

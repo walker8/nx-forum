@@ -128,4 +128,9 @@ public class ThreadDetailVO {
     private String seoTitle;
 
     private String seoContent;
+
+    /**
+     * 是否已删除（管理员可见）
+     */
+    private Boolean deleted;
 }

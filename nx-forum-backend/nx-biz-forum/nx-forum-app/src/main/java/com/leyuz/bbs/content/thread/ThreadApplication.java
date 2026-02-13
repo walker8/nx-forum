@@ -80,10 +80,10 @@ public class ThreadApplication {
                 .docType(threadCmd.getContentType() != null ? threadCmd.getContentType() : DocTypeV.HTML)
                 .commentOrder(threadCmd.getCommentOrder())
                 .build();
-        
+
         // 设置内容，如果 docType 为 MARKDOWN，会自动转换为 HTML
         threadE.setContent(threadCmd.getContent());
-        
+
         // 下载远程图片到本地（转换后的 HTML 内容）
         threadE.setContent(downloadImages(threadE.getContent()));
 
@@ -126,10 +126,10 @@ public class ThreadApplication {
                 .commentOrder(threadCmd.getCommentOrder())
                 .forumId(threadCmd.getForumId())
                 .build();
-        
+
         // 设置内容，如果 docType 为 MARKDOWN，会自动转换为 HTML
         threadE.setContent(threadCmd.getContent());
-        
+
         // 下载远程图片到本地（转换后的 HTML 内容）
         threadE.setContent(downloadImages(threadE.getContent()));
 
@@ -186,6 +186,18 @@ public class ThreadApplication {
         if (threadE == null) {
             throw new ValidationException("文章不存在或已删除");
         }
+        // 处理已删除帖子
+        if (Boolean.TRUE.equals(threadE.getIsDeleted())) {
+            // 检查用户是否有 admin:thread 权限
+            if (!forumPermissionResolver.hasPermission(threadE.getForumId(), "admin:thread")) {
+                throw new ValidationException("文章不存在或已删除");
+            }
+            // 管理员可以查看已删除帖子
+            threadE.outputForView();
+            ThreadDetailVO threadDetailVO = buildThreadDetailVO(threadE);
+            threadDetailVO.setDeleted(true);
+            return threadDetailVO;
+        }
         if (!threadE.getCreateBy().equals(HeaderUtils.getUserId())) {
             // 自己发表的帖子有权限查看
             forumPermissionResolver.checkPermission(threadE.getForumId(), "thread:view");
@@ -194,6 +206,21 @@ public class ThreadApplication {
             throw new ValidationException("文章审核中，请耐心等待审核通过！");
         }
         threadE.outputForView();
+        ThreadDetailVO threadDetailVO = buildThreadDetailVO(threadE);
+        // 点赞
+        Table<Long, Integer, Boolean> userLikes = likeApplication.getUserLikesByThreadId(threadId);
+        if (userLikes.contains(threadId, LikeTargetType.THREAD.getValue())) {
+            threadDetailVO.setLiked(true);
+        }
+        // 收藏
+        threadDetailVO.setCollected(favoriteApplication.isFavorite(threadId));
+        // 异步更新浏览量
+        updateThreadViewsAsync(threadId);
+
+        return threadDetailVO;
+    }
+
+    private ThreadDetailVO buildThreadDetailVO(ThreadE threadE) {
         ThreadDetailVO threadDetailVO = BeanUtil.toBean(threadE, ThreadDetailVO.class);
         threadDetailVO.setSeoContent(threadE.getBrief());
         threadDetailVO.setSeoTitle(threadE.getSubject() + " - " + forumConfigApplication.getWebsiteBaseInfo().getWebsiteName());
@@ -211,17 +238,6 @@ public class ThreadApplication {
         threadDetailVO.setClosed(property.isClosed());
         threadDetailVO.setDigest(property.isDigest());
         threadDetailVO.setTop(property.isTop());
-
-        // 点赞
-        Table<Long, Integer, Boolean> userLikes = likeApplication.getUserLikesByThreadId(threadId);
-        if (userLikes.contains(threadId, LikeTargetType.THREAD.getValue())) {
-            threadDetailVO.setLiked(true);
-        }
-        // 收藏
-        threadDetailVO.setCollected(favoriteApplication.isFavorite(threadId));
-        // 异步更新浏览量
-        updateThreadViewsAsync(threadId);
-
         return threadDetailVO;
     }
 
@@ -240,6 +256,10 @@ public class ThreadApplication {
     public ThreadDetailVO getThreadForEdit(Long threadId) {
         ThreadDetailVO threadDetailResp = new ThreadDetailVO();
         ThreadE threadE = threadGateway.getThreadDetail(threadId);
+        // 禁止编辑已删除的帖子
+        if (Boolean.TRUE.equals(threadE.getIsDeleted())) {
+            throw new ValidationException("文章不存在或已删除");
+        }
         forumPermissionResolver.checkPermission(threadE.getForumId(), "thread:view");
         if (AuditStatusV.AUDITING.equals(threadE.getAuditStatus()) && !forumPermissionResolver.hasPermission(threadE.getForumId(), "admin:thread")) {
             throw new ValidationException("文章审核中，请等待审核通过再编辑！");

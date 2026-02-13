@@ -102,12 +102,17 @@ public class ThreadGatewayImpl implements ThreadGateway {
 
     @Override
     public ThreadE getThreadDetail(Long threadId) {
-        ThreadE threadE = getThread(threadId);
-        if (threadE != null) {
-            QueryWrapper<ThreadContentPO> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("thread_id", threadId);
-            queryWrapper.eq("is_deleted", false);
-            ThreadContentPO threadContentPO = threadContentMapper.selectOne(queryWrapper);
+        // 直接查询帖子，不过滤已删除状态，由上层处理
+        ThreadPO threadPO = threadMapper.selectById(threadId);
+        if (threadPO == null) {
+            return null;
+        }
+        ThreadE threadE = convert(threadPO);
+        // 获取帖子内容，已删除帖子也能获取内容
+        QueryWrapper<ThreadContentPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("thread_id", threadId);
+        ThreadContentPO threadContentPO = threadContentMapper.selectOne(queryWrapper);
+        if (threadContentPO != null) {
             threadE.setContent(threadContentPO.getContent());
         }
         return threadE;
@@ -287,6 +292,7 @@ public class ThreadGatewayImpl implements ThreadGateway {
                 .updateBy(threadPO.getUpdateBy())
                 .createTime(threadPO.getCreateTime())
                 .updateTime(threadPO.getUpdateTime())
+                .isDeleted(threadPO.getIsDeleted())
                 .build();
     }
 
