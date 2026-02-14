@@ -35,7 +35,7 @@
       </div>
     </template>
 
-    <!-- 无布局：所有 css 样式由用户自定义-->
+    <!-- 无布局：用户自定义内容，由页面组件通过 iframe 处理 -->
     <template v-else>
       <slot />
     </template>
