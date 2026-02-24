@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NX Forum is a modern open-source forum system built with Spring Boot + Nuxt. It uses **COLA (Clean Object-Oriented and Layered Architecture)** framework supporting both DDD and MVC patterns.
+NX Forum is a modern open-source forum system built with Spring Boot + Nuxt. It uses **COLA (Clean Object-Oriented and
+Layered Architecture)** framework supporting both DDD and MVC patterns.
 
 **Important**: This is a **testing version** (not production-ready). Expected official release in 2026.
 **Test Account**: admin/12345678
@@ -24,16 +25,18 @@ Infrastructure Layer (基础层) ← Data persistence
 
 ### DDD vs MVC Pattern Choice
 
-- **Use DDD mode** for complex write scenarios with business rules (e.g., post publishing, comment management, user registration)
-  - Has Domain layer with Entities (*E), Value Objects (*V), Domain Services, Gateway interfaces
-  - Application layer orchestrates domain objects
-  - Infrastructure implements Gateway interfaces
+- **Use DDD mode** for complex write scenarios with business rules (e.g., post publishing, comment management, user
+  registration)
+    - Has Domain layer with Entities (*E), Value Objects (*V), Domain Services, Gateway interfaces
+    - Application layer orchestrates domain objects
+    - Infrastructure implements Gateway interfaces
 
 - **Use MVC mode** for simple CRUD or query scenarios (e.g., config queries, data dictionaries, simple queries)
-  - No Domain layer
-  - Application layer directly calls Infrastructure Mappers
+    - No Domain layer
+    - Application layer directly calls Infrastructure Mappers
 
-**Key Rule**: Module-to-module calls should only go through Application layer, never Domain or Infrastructure layers across modules.
+**Key Rule**: Module-to-module calls should only go through Application layer, never Domain or Infrastructure layers
+across modules.
 
 ---
 
@@ -119,14 +122,14 @@ yarn zip                    # Create deployment package (excludes uploads)
 
 ### Data Objects
 
-| Type | Suffix | Usage |
-|------|--------|-------|
-| Command | `*Cmd` | Write operation parameters (Adapter input) |
-| Query | `*Query` / `*PageQuery` | Query parameters (Adapter input) |
-| View Object | `*VO` | Response to frontend |
-| Domain Entity | `*E` | Domain model (DDD only) |
-| Value Object | `*V` | Immutable domain object (DDD only) |
-| Persistent Object | `*PO` | Database mapping (Infrastructure) |
+| Type              | Suffix                  | Usage                                      |
+|-------------------|-------------------------|--------------------------------------------|
+| Command           | `*Cmd`                  | Write operation parameters (Adapter input) |
+| Query             | `*Query` / `*PageQuery` | Query parameters (Adapter input)           |
+| View Object       | `*VO`                   | Response to frontend                       |
+| Domain Entity     | `*E`                    | Domain model (DDD only)                    |
+| Value Object      | `*V`                    | Immutable domain object (DDD only)         |
+| Persistent Object | `*PO`                   | Database mapping (Infrastructure)          |
 
 ### Classes
 
@@ -146,6 +149,7 @@ yarn zip                    # Create deployment package (excludes uploads)
 Main config: `nx-forum-backend/nx-biz-forum/nx-forum-start/src/main/resources/application.yml`
 
 **Important settings**:
+
 - Database: MySQL 8.0+ (Flyway migrations)
 - Redis: 6.0+ (optional)
 - File upload path: Set to frontend's public directory for local development:
@@ -165,12 +169,14 @@ Main config: `nx-forum-nuxt/nuxt.config.ts`
 ## Common Issues
 
 **H2 and MySQL database switching**:
+
 - Development environment defaults to MySQL (requires MySQL installed and running)
 - For quick startup, switch to H2 embedded database (no installation required)
 - Modify `application.yml`: change `spring.profiles.active` to `dev-h2` or `dev`
 - Note: H2 and MySQL use separate migration scripts, tables auto-initialize on first startup
 
 **Flyway validation error after updates**:
+
 - Testing version has incompatible migrations. Delete all database tables and restart.
 
 **App Client Integration**:
@@ -184,6 +190,7 @@ NXForumApp/<version> (Platform)
 ```
 
 **Examples:**
+
 - Android: `NXForumApp/1.0.0 (Android 12) Dalvik/2.1.0`
 - iOS: `NXForumApp/1.0.0 (iPhone 15 iOS 17) Mobile/15E148`
 
@@ -209,6 +216,7 @@ App clients **MUST** include the following HTTP headers:
 ### Terminal Type Detection Logic
 
 The system uses a two-tier detection strategy:
+
 1. **Primary**: X-App-Version header exists → APP
 2. **Secondary**: User-Agent contains `NXForumApp/` → APP
 3. **Default**: Mobile keyword detection → MOBILE, else PC
@@ -220,6 +228,7 @@ The system uses a two-tier detection strategy:
 ## Technology Stack
 
 ### Backend
+
 - Java 17
 - Spring Boot 3.5.7
 - MyBatis-Plus 3.5.13
@@ -230,6 +239,7 @@ The system uses a two-tier detection strategy:
 - MapStruct Plus 1.4.8
 
 ### Frontend
+
 - Nuxt 4 with TypeScript 5.9
 - Tailwind CSS
 - Element-Plus 2.11 (desktop)
@@ -246,12 +256,79 @@ The system uses a two-tier detection strategy:
 
 2. **Layer separation**: No cross-layer dependencies. Domain layer only depends on Gateway interfaces.
 
-3. **Module communication**: Only through Application layer. Never call other modules' Domain or Infrastructure layers directly.
+3. **Module communication**: Only through Application layer. Never call other modules' Domain or Infrastructure layers
+   directly.
 
-4. **Database**: All POs extend BasePO with audit fields (createTime, updateTime, createBy, updateBy, isDeleted). Use logical deletion.
+4. **Database**: All POs extend BasePO with audit fields (createTime, updateTime, createBy, updateBy, isDeleted). Use
+   logical deletion.
 
 5. **Transactions**: Use `@Transactional` in Application layer, not Controller layer.
 
-6. **Caching**: Use `GenericCache` utility. Prefer local cache (Caffeine), consider distributed cache (Redis) when needed.
+6. **Caching**: Use `GenericCache` utility. Prefer local cache (Caffeine), consider distributed cache (Redis) when
+   needed.
 
-7. **Validation**: Use `ValidationException` for business validation errors (4xx), `BusinessException` for system errors (5xx).
+7. **Validation**: Use `ValidationException` for business validation errors (4xx), `BusinessException` for system
+   errors (5xx).
+
+## Workflow Orchestration
+
+### 1. Plan Node Default
+
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
+- If something goes sideways, STOP and re-plan immediately – don't keep pushing
+- Use plan mode for verification steps, not just building
+- Write detailed specs upfront to reduce ambiguity
+
+### 2. Subagent Strategy
+
+- Use subagents liberally to keep main context window clean
+- Offload research, exploration, and parallel analysis to subagents
+- For complex problems, throw more compute at it via subagents
+- One task per subagent for focused execution
+
+### 3. Self-Improvement Loop
+
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- Write rules for yourself that prevent the same mistake
+- Ruthlessly iterate on these lessons until mistake rate drops
+- Review lessons at session start for relevant project
+
+### 4. Verification Before Done
+
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness
+
+### 5. Demand Elegance (Balanced)
+
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
+- Skip this for simple, obvious fixes – don't over-engineer
+- Challenge your own work before presenting it
+
+### 6. Autonomous Bug Fixing
+
+- When given a bug report: just fix it. Don't ask for hand-holding
+- Point at logs, errors, failing tests – then resolve them
+- Zero context switching required from the user
+- Go fix failing CI tests without being told how
+
+---
+
+## Task Management
+
+1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
+2. **Verify Plan**: Check in before starting implementation
+3. **Track Progress**: Mark items complete as you go
+4. **Explain Changes**: High-level summary at each step
+5. **Document Results**: Add review section to `tasks/todo.md`
+6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+
+---
+
+## Core Principles
+
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
