@@ -59,9 +59,9 @@ export const isChineseIdCard = (str: string) => {
   return reg.test(str)
 }
 
-/** 判断是否为 Email（支持中文邮箱） */
+/** 判断是否为 Email（支持中文邮箱和下划线） */
 export const isEmail = (email: string) => {
-  const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+  const reg = /^[A-Za-z0-9_\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
   return reg.test(email)
 }
 
