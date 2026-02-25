@@ -1,5 +1,5 @@
 <template>
-  <el-card class="thread-list pb-4">
+  <el-card class="thread-list">
     <div v-if="loading" class="pt-5 pl-3 pr-3">
       <el-skeleton :rows="2" animated />
     </div>
@@ -65,21 +65,14 @@
         </div>
         <el-divider style="margin: 0px; margin-top: 8px" />
       </div>
-      <!-- 加载状态提示 - 移动端显示 -->
-      <div v-if="isMobile && disableLoadMore" class="text-center py-2 text-gray-500 text-sm">
+      <!-- 加载状态提示 -->
+      <div v-if="disableLoadMore" class="text-center py-2 text-gray-500 text-sm">
         加载中...
       </div>
-
-      <!-- 加载更多按钮 - 桌面端显示 -->
-      <common-load-more
-        v-if="!isMobile"
-        :has-next="forumPostPage.hasNext"
-        :disable-load-more="disableLoadMore"
-        @load-more="loadMoreThreads"
-        class="mr-4 ml-4 pt-1"
-      >
-        加载更多内容
-      </common-load-more>
+      <!-- 没有更多数据提示 -->
+      <div v-else-if="!forumPostPage.hasNext && forumPostPage.records?.length > 0" class="text-center py-3 text-gray-400 text-sm">
+        已经到底啦~
+      </div>
     </div>
   </el-card>
 </template>
@@ -124,7 +117,7 @@ const useAutoLoadResult = useAutoLoadMore({
   hasMore: computed(() => props.forumPostPage.hasNext),
   onLoad: loadMoreThreads,
   distance: 200,
-  mobileOnly: true
+  mobileOnly: false
 })
 const { isMobile } = useAutoLoadResult
 const clickThread = (thread: Thread) => {
