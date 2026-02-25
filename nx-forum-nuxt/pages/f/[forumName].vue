@@ -8,8 +8,8 @@ definePageMeta({
 const forumInfo = useForumInfo()
 useSeoMeta({
   title: () => `${forumInfo.value.seoTitle}`,
-  ogTitle: forumInfo.value.seoTitle,
-  description: forumInfo.value.seoContent,
-  ogDescription: forumInfo.value.seoContent
+  ogTitle: () => forumInfo.value.seoTitle,
+  description: () => forumInfo.value.seoContent,
+  ogDescription: () => forumInfo.value.seoContent
 })
 </script>

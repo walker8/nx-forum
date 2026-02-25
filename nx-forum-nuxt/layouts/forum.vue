@@ -99,16 +99,34 @@ const queryForumThreads = async (forumName: string, canLoading = false) => {
   }
 }
 
+// 获取当前访问的版块名称
+const currentForumName = route.params.forumName as string
+
 if (forumMenu.value.selctedMenu !== 'all') {
   // 不是从全部版块页面跳转而来的
   try {
     let res = await getForumShowMenu()
     const data = res.data
-    forumMenu.value.selctedMenu = route.params.forumName || data.defaultForumName
+    forumMenu.value.selctedMenu = currentForumName || data.defaultForumName
     forumMenu.value.menus = data.records
     res = await getForumInfoByName(forumMenu.value.selctedMenu)
     forumInfo.value = res.data
     await queryForumThreads(forumMenu.value.selctedMenu)
+  } catch (e) {
+    forumPostPage.value.errMsg = String(e)
+    if (import.meta.client) {
+      setTimeout(() => {
+        goLoginPage(forumInfo.value.forumId)
+      }, 200)
+    }
+  }
+} else if (currentForumName) {
+  // 从全部版块页面跳转而来，需要加载当前版块信息和帖子列表
+  try {
+    forumMenu.value.selctedMenu = currentForumName
+    const res = await getForumInfoByName(currentForumName)
+    forumInfo.value = res.data
+    await queryForumThreads(currentForumName)
   } catch (e) {
     forumPostPage.value.errMsg = String(e)
     if (import.meta.client) {
@@ -129,6 +147,10 @@ const onClickTab = ({ name }: { name: string }) => {
 watch(
   () => route.params.forumName,
   useDebounceFn((to) => {
+    // Only proceed if we're still on a forum page
+    if (!route.path.startsWith('/f/')) {
+      return
+    }
     let forumName = ''
     if (to) {
       forumName = String(to)

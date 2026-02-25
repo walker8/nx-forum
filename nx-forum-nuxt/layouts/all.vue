@@ -27,6 +27,13 @@ import { getForumShowMenu } from '~/apis/forum'
 const forumPostPage = useForumPostPage()
 const forumMenu = useForumMenu()
 forumMenu.value.selctedMenu = 'all'
+
+// Reset forum-specific state to prevent stale data
+forumPostPage.value.records = []
+forumPostPage.value.total = 0
+forumPostPage.value.current = 0
+forumPostPage.value.hasNext = false
+
 if (forumMenu.value.menus?.length <= 0) {
   try {
     let res = await getForumShowMenu()
