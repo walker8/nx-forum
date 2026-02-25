@@ -288,7 +288,8 @@ public class ThreadApplication {
             threadPOPage = forumThreadQueryStrategy.query(threadQuery);
         }
 
-        return DataBaseUtils.createCustomPage(threadPOPage, threadConvert::convertThreadPO2VO);
+        return DataBaseUtils.createCustomPage(threadPOPage,
+                threadPO -> threadConvert.convertThreadPO2VO(threadPO, threadQuery.getOrderBy()));
     }
 
     public CustomPage<AdminThreadVO> queryThreadsByAdmin(ThreadQuery threadQuery) {

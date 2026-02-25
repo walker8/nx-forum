@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -48,6 +50,29 @@ public class ThreadConvert {
 
     public ThreadVO convertThreadPO2VO(ThreadPO threadPO) {
         return convertThreadPO2VO(threadPO, true);
+    }
+
+    public ThreadVO convertThreadPO2VO(ThreadPO threadPO, String orderBy) {
+        ThreadVO threadVO = convertThreadPO2VO(threadPO, true);
+        if (threadVO != null) {
+            // 根据排序方式计算显示时间
+            if ("last_comment_time".equals(orderBy)) {
+                // 取 createTime、updateTime、lastCommentTime 中的最大值
+                LocalDateTime displayTime = threadVO.getCreateTime();
+                if (threadVO.getUpdateTime() != null && threadVO.getUpdateTime().isAfter(displayTime)) {
+                    displayTime = threadVO.getUpdateTime();
+                }
+                // 需要从 threadPO 获取 lastCommentTime
+                if (threadPO.getLastCommentTime() != null && threadPO.getLastCommentTime().isAfter(displayTime)) {
+                    displayTime = threadPO.getLastCommentTime();
+                }
+                threadVO.setDisplayTime(displayTime);
+            } else {
+                // 默认使用 createTime
+                threadVO.setDisplayTime(threadVO.getCreateTime());
+            }
+        }
+        return threadVO;
     }
 
     public AdminThreadVO convertThreadPO2AdminVO(ThreadPO threadPO) {

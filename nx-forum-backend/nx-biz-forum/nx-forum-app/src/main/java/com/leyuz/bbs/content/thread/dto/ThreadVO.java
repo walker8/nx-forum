@@ -68,6 +68,12 @@ public class ThreadVO extends DTO {
     private LocalDateTime createTime;
 
     /**
+     * 显示时间（根据排序方式计算）
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime displayTime;
+
+    /**
      * 更新者
      */
     private Long updateAuthorId;

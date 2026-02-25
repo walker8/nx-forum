@@ -60,7 +60,7 @@
               <div style="margin-left: 2px">{{ thread.likes }}</div>
             </div>
             <div class="text-gray-200">|</div>
-            <div>{{ formatTimeAgo(thread.createTime) }}</div>
+            <div>{{ formatTimeAgo(thread.displayTime || thread.createTime) }}</div>
           </div>
         </div>
         <el-divider style="margin: 0px; margin-top: 8px" />

@@ -56,7 +56,7 @@
                 {{ thread.author?.authorName }}
               </div>
               <div class="text-gray-200">|</div>
-              <div>{{ thread.createTime }}</div>
+              <div>{{ thread.displayTime || thread.createTime }}</div>
             </div>
           </div>
         </div>

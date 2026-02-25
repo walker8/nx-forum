@@ -55,6 +55,7 @@ export interface Thread {
   seoTitle: string
   seoContent: string
   brief?: string
+  displayTime?: string
   errMsg: undefined | string
 }
 

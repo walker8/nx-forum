@@ -58,6 +58,8 @@ public class FollowThreadQueryStrategy extends AbstractThreadQueryStrategy {
             return new Page<>(threadQuery.getPageNo(), threadQuery.getPageSize());
         }
 
+        // 关注按创建时间倒序排
+        threadQuery.setOrderBy("create_time");
         // 查询这些作者发布的帖子
         return threadMapper.queryThreadsByUserIds(followingUserIds, threadQuery.getPageNo(), threadQuery.getPageSize());
     }
