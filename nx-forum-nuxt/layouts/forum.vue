@@ -34,7 +34,6 @@
         </el-container>
       </div>
     </div>
-    <CommonFooter />
     <CommonTabbar />
   </el-container>
 </template>
