@@ -288,8 +288,15 @@ public class ThreadApplication {
             threadPOPage = forumThreadQueryStrategy.query(threadQuery);
         }
 
-        return DataBaseUtils.createCustomPage(threadPOPage,
+        CustomPage<ThreadVO> result = DataBaseUtils.createCustomPage(threadPOPage,
                 threadPO -> threadConvert.convertThreadPO2VO(threadPO, threadQuery.getOrderBy()));
+
+        // 执行插件扩展，获取额外的主题并合并
+        List<ThreadVO> enhancedList = threadPluginManager.executeEnhanceThreadList(
+                result.getRecords(), threadQuery);
+        result.setRecords(enhancedList);
+
+        return result;
     }
 
     public CustomPage<AdminThreadVO> queryThreadsByAdmin(ThreadQuery threadQuery) {

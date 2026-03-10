@@ -1,13 +1,14 @@
 package com.leyuz.bbs.content.thread.plugin;
 
 import com.leyuz.bbs.content.thread.ThreadE;
+import com.leyuz.bbs.content.thread.dto.ThreadQuery;
+import com.leyuz.bbs.content.thread.dto.ThreadVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 主题插件管理器
@@ -64,6 +65,47 @@ public class ThreadPluginManager {
                 log.error("执行插件[{}]的beforeUpdate方法时发生异常", plugin.getClass().getSimpleName(), e);
             }
         }
+        return result;
+    }
+
+    /**
+     * 执行所有插件的getAdditionalThreads方法，收集额外的主题并合并到现有列表
+     *
+     * @param existingThreads 现有主题列表
+     * @param query           查询条件
+     * @return 合并后的主题列表（现有主题 + 额外主题，自动去重）
+     */
+    public List<ThreadVO> executeEnhanceThreadList(List<ThreadVO> existingThreads, ThreadQuery query) {
+        if (plugins.isEmpty()) {
+            return existingThreads;
+        }
+
+        // 收集已存在的threadId用于去重
+        Set<Long> existingIds = existingThreads.stream()
+                .map(ThreadVO::getThreadId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        List<ThreadVO> additionalThreads = new ArrayList<>();
+        for (ThreadPlugin plugin : plugins) {
+            try {
+                List<ThreadVO> pluginThreads = plugin.getAdditionalThreads(query);
+                if (pluginThreads != null) {
+                    for (ThreadVO thread : pluginThreads) {
+                        if (thread.getThreadId() != null && !existingIds.contains(thread.getThreadId())) {
+                            existingIds.add(thread.getThreadId());
+                            additionalThreads.add(thread);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("执行插件[{}]的getAdditionalThreads方法时发生异常", plugin.getClass().getSimpleName(), e);
+            }
+        }
+
+        // 合并：现有主题 + 额外主题
+        List<ThreadVO> result = new ArrayList<>(existingThreads);
+        result.addAll(additionalThreads);
         return result;
     }
 } 

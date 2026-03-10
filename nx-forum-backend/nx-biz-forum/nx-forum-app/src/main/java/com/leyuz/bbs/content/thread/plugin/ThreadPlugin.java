@@ -1,6 +1,11 @@
 package com.leyuz.bbs.content.thread.plugin;
 
 import com.leyuz.bbs.content.thread.ThreadE;
+import com.leyuz.bbs.content.thread.dto.ThreadQuery;
+import com.leyuz.bbs.content.thread.dto.ThreadVO;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 主题插件接口
@@ -34,5 +39,17 @@ public interface ThreadPlugin {
      */
     default int getOrder() {
         return 0;
+    }
+
+    /**
+     * 在查询主题列表时获取额外的主题
+     * 允许二次开发者在主题列表中动态插入/新增主题
+     * 注意：返回的主题将添加到列表末尾，系统会自动过滤重复的threadId
+     *
+     * @param query 查询条件
+     * @return 额外的主题列表，默认返回空列表
+     */
+    default List<ThreadVO> getAdditionalThreads(ThreadQuery query) {
+        return Collections.emptyList();
     }
 } 
