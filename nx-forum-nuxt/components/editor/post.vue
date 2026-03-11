@@ -6,12 +6,20 @@
         v-model="threadCmd.forumId"
         placeholder="请选择版块"
         :disabled="!menus?.length || (threadCmd.threadId !== undefined && threadCmd.threadId > 0)"
+        @change="handleForumChange"
       >
         <el-option v-for="menu in menus" :label="menu.nickName" :value="menu.forumId" />
       </el-select>
       <el-text v-else>-</el-text>
       <div class="text-sm pt-1 text-gray-400" v-if="forumShortBrief">
         {{ forumShortBrief }}
+      </div>
+      <!-- 禁止发布提示信息 -->
+      <div v-if="submitDisabled && threadCmd.forumId && !threadCmd.threadId" class="disable-tip">
+        <div class="disable-tip-content">
+          <el-icon><WarningFilled /></el-icon>
+          <span>{{ disableReason }}</span>
+        </div>
       </div>
     </el-form-item>
     <el-form-item label="评论排序">
@@ -46,6 +54,7 @@
 
 <script lang="ts" setup>
 import { ElMessage } from 'element-plus'
+import { WarningFilled } from '@element-plus/icons-vue'
 import { getUserForumMenu } from '~/apis/forum'
 import { createThread, updateThread } from '~/apis/thread'
 
@@ -82,6 +91,24 @@ const submitDisabled = computed(() => {
     return !hasPermission('thread:new', threadCmd.value.forumId)
   }
 })
+
+// 禁止发布/更新的原因提示
+const disableReason = computed(() => {
+  if (!threadCmd.value.forumId) {
+    return '请先选择版块'
+  }
+  if (threadCmd.value.threadId) {
+    return '您没有编辑此帖子的权限'
+  }
+  return '您没有在该版块发布帖子的权限'
+})
+
+// 版块变更时重新获取权限
+const handleForumChange = () => {
+  if (threadCmd.value.forumId) {
+    useUserAuth(threadCmd.value.forumId)
+  }
+}
 const getMenuNameById = (forumId: number) => {
   const menu = menus.value.find((menu) => menu.forumId === forumId)
   return menu ? menu.name : ''
@@ -143,17 +170,17 @@ const onSubmit = () => {
   }
 }
 const { hasPermission } = useUserAuth(threadCmd.value.forumId)
-onMounted(() => {
-  watch(
-    () => threadCmd.value.forumId,
-    () => {
-      useUserAuth(threadCmd.value.forumId)
-    }
-  )
-})
 </script>
 
 <style scoped>
+.disable-tip-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e6a23c;
+  font-size: 13px;
+  width: 100%;
+}
 @media (max-width: 767px) {
   /* Add horizontal padding to the form for better spacing */
   :deep(.el-form) {
