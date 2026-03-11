@@ -101,7 +101,7 @@ const queryForumThreads = async (forumName: string, canLoading = false) => {
 // 获取当前访问的版块名称
 const currentForumName = route.params.forumName as string
 
-if (forumMenu.value.selctedMenu !== 'all') {
+if (forumMenu.value.selctedMenu !== 'forums' && forumMenu.value.menus?.length <= 0) {
   // 不是从全部版块页面跳转而来的
   try {
     let res = await getForumShowMenu()
@@ -137,8 +137,8 @@ if (forumMenu.value.selctedMenu !== 'all') {
 }
 
 const onClickTab = ({ name }: { name: string }) => {
-  if (name === 'all') {
-    navigateTo('/all')
+  if (name === 'forums') {
+    navigateTo('/forums')
   } else {
     navigateTo(`/f/${name}`)
   }

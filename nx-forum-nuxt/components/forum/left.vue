@@ -26,8 +26,8 @@
 <script setup>
 const forumMenu = useForumMenu()
 const goForum = (path) => {
-  if (path === 'all') {
-    navigateTo('/all')
+  if (path === 'forums') {
+    navigateTo('/forums')
   } else {
     navigateTo(`/f/${path}`)
   }

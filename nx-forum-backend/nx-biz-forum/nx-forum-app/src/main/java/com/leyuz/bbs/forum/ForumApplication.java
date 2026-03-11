@@ -156,12 +156,12 @@ public class ForumApplication {
             ForumPO forumPO = forumMapper.getByForumId(forumConfigApplication.getDefaultForumId());
             forumMenuVO.setDefaultForumName(forumPO.getName());
             forumMenuVO.setRecords(Optional.ofNullable(forumPOList).orElse(new ArrayList<>()).stream().map(this::convertToForumMenuItemVO).collect(Collectors.toList()));
-            ForumMenuItemVO allForumMenuItemVO = new ForumMenuItemVO();
-            allForumMenuItemVO.setForumId(0);
-            allForumMenuItemVO.setName("all");
-            allForumMenuItemVO.setNickName("全部版块");
-            allForumMenuItemVO.setIconName("tabler:category");
-            forumMenuVO.getRecords().add(allForumMenuItemVO);
+            ForumMenuItemVO forumsMenuItemVO = new ForumMenuItemVO();
+            forumsMenuItemVO.setForumId(0);
+            forumsMenuItemVO.setName("forums");
+            forumsMenuItemVO.setNickName("全部版块");
+            forumsMenuItemVO.setIconName("tabler:category");
+            forumMenuVO.getRecords().add(forumsMenuItemVO);
             return forumMenuVO;
         });
     }
@@ -188,7 +188,7 @@ public class ForumApplication {
             List<ForumPO> forumPOList = forumMapper.getAllForum();
             List<ForumMenuItemVO> result = new ArrayList<>();
             ForumMenuItemVO archiveForum = null;
-            
+
             for (ForumPO forumPO : Optional.ofNullable(forumPOList).orElse(new ArrayList<>())) {
                 // 只包含用户创建的版块和归档版块（id=6）
                 if (!forumPO.getIsSystem() || forumPO.getForumId() == 6) {
@@ -201,12 +201,12 @@ public class ForumApplication {
                     }
                 }
             }
-            
+
             // 将归档版块放在最后
             if (archiveForum != null) {
                 result.add(archiveForum);
             }
-            
+
             return result;
         });
     }

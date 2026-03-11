@@ -6,7 +6,7 @@
         <van-tabbar-item name="home" icon="home-o">
           首页
         </van-tabbar-item>
-        <van-tabbar-item name="all" icon="list-switching">
+        <van-tabbar-item name="forums" icon="list-switching">
           版块
         </van-tabbar-item>
         <van-tabbar-item name="notification" icon="envelop-o" :badge="userNotification.totalCount || ''">
@@ -26,8 +26,8 @@ const userNotification = useUserNotificationCount()
 const change = (name: string) => {
   if (name === 'home') {
     navigateTo('/')
-  } else if (name === 'all') {
-    navigateTo('/all')
+  } else if (name === 'forums') {
+    navigateTo('/forums')
   } else if (name === 'notification') {
     navigateTo('/notification')
   } else if (name === 'user') {
@@ -35,8 +35,8 @@ const change = (name: string) => {
   }
 }
 onMounted(() => {
-  if (window.location.pathname.indexOf('/all') > -1) {
-    active.value = 'all'
+  if (window.location.pathname.indexOf('/forums') > -1) {
+    active.value = 'forums'
   } else if (window.location.pathname.indexOf('/notification') > -1) {
     active.value = 'notification'
   } else if (window.location.pathname.indexOf('/user') > -1) {

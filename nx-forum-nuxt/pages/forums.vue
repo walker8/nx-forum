@@ -36,7 +36,7 @@
 import { getUserForumList } from '@/apis/forum'
 
 definePageMeta({
-  layout: 'all'
+  layout: 'forums'
 })
 
 const forums = ref([])

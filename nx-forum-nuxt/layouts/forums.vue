@@ -26,7 +26,7 @@
 import { getForumShowMenu } from '~/apis/forum'
 const forumPostPage = useForumPostPage()
 const forumMenu = useForumMenu()
-forumMenu.value.selctedMenu = 'all'
+forumMenu.value.selctedMenu = 'forums'
 
 // Reset forum-specific state to prevent stale data
 forumPostPage.value.records = []
