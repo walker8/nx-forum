@@ -93,7 +93,7 @@
           </el-table-column>
           <el-table-column prop="auditReason" label="审核原因" align="center" min-width="150"
             v-if="auditStatus === AuditStatus.AUDITING" />
-          <el-table-column prop="client" label="客户端信息" align="center" min-width="210">
+          <el-table-column prop="client" label="客户端信息" align="center" min-width="220">
             <template #default="scope">
               <el-space wrap>
                 <el-tag type="primary" v-if="scope.row.browser">{{ scope.row.browser }}</el-tag>

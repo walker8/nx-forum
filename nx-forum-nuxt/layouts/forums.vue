@@ -1,9 +1,9 @@
 <template>
   <el-container class="forum-container">
     <div class="content">
-      <el-affix class="rn-hide">
-        <common-header type="search" />
-      </el-affix>
+      <el-header style="padding: 0" class="hidden sm:block rn-hide">
+        <common-header />
+      </el-header>
       <div class="common-layout mx-auto sm:mt-2">
         <el-container>
           <el-aside width="200px" class="hidden-md-and-down" v-if="forumMenu.menus?.length > 0">

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="container mx-auto">
     <div v-if="forums.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div
         v-for="forum in forums"
