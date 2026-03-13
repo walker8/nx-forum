@@ -60,8 +60,8 @@
             <el-tag :type="getTargetTypeTag(row.targetType)">{{ getTargetType(row.targetType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="reporterName" label="举报人" width="120" />
-        <el-table-column prop="reportType" label="举报原因" width="120">
+        <el-table-column prop="reporterName" label="举报人" width="140" />
+        <el-table-column prop="reportType" label="举报原因" width="140">
           <template #default="{ row }">
             {{ getReportType(row.reportType) }}
           </template>
@@ -75,8 +75,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="handlerName" label="处理人" width="120" />
-        <el-table-column prop="handleReason" label="处理说明" />
+        <el-table-column prop="handlerName" label="处理人" width="140" />
+        <el-table-column prop="handleReason" label="处理说明" width="200" />
         <el-table-column prop="updateTime" label="处理时间" width="180" />
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">

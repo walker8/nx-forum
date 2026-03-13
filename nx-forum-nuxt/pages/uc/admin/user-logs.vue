@@ -72,7 +72,7 @@
               </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column prop="client" label="客户端信息" align="center" min-width="200">
+          <el-table-column prop="client" label="客户端信息" align="center" min-width="210">
             <template #default="scope">
               <el-space wrap>
                 <el-tag type="primary" v-if="scope.row.browser">{{ scope.row.browser }}</el-tag>

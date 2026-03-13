@@ -145,12 +145,12 @@
               <el-text class="mx-1">{{ scope.row.forumNickName }}</el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="authorName" label="作者" align="center" width="120">
+          <el-table-column prop="authorName" label="作者" align="center" width="140">
             <template #default="scope">
               <el-text class="mx-1">{{ scope.row.authorName }}</el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="client" label="客户端信息" align="center" min-width="200">
+          <el-table-column prop="client" label="客户端信息" align="center" min-width="210">
             <template #default="scope">
               <el-space wrap>
                 <el-tag type="primary" v-if="scope.row.browser">{{ scope.row.browser }}</el-tag>
@@ -160,8 +160,16 @@
           </el-table-column>
           <el-table-column prop="auditReason" label="审核原因" align="center" min-width="150"
             v-if="auditStatus === AuditStatus.AUDITING" />
-          <el-table-column prop="createTime" label="创建时间" align="center" width="150" />
-          <el-table-column prop="updateTime" label="更新时间" align="center" width="150" />
+          <el-table-column prop="createTime" label="创建时间" align="center" width="150">
+            <template #default="scope">
+              {{ formatDateTime(scope.row.createTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="updateTime" label="更新时间" align="center" width="150">
+            <template #default="scope">
+              {{ formatDateTime(scope.row.updateTime) }}
+            </template>
+          </el-table-column>
           <el-table-column fixed="right" label="操作" width="180" align="center">
             <template #default="scope">
               <el-button-group v-if="deleted">
@@ -255,6 +263,18 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 
 // 用于跟踪当前请求，防止竞态条件
 let currentRequestId = 0
+
+// 格式化时间：yyyy-MM-dd HH:mm（不显示秒）
+const formatDateTime = (time: string): string => {
+  if (!time) return ''
+  const date = new Date(time)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}`
+}
 
 // 初始化 auditStatus 和 deleted
 const auditStatus = ref<AuditStatus | null>(null)
