@@ -15,7 +15,7 @@
         {{ forumShortBrief }}
       </div>
       <!-- 禁止发布提示信息 -->
-      <div v-if="submitDisabled && threadCmd.forumId && !threadCmd.threadId" class="disable-tip">
+      <div v-if="submitDisabled && threadCmd.forumId && !threadCmd.threadId && disableReason" class="disable-tip">
         <div class="disable-tip-content">
           <el-icon><WarningFilled /></el-icon>
           <span>{{ disableReason }}</span>
@@ -60,7 +60,10 @@ import { createThread, updateThread } from '~/apis/thread'
 
 const threadCmd = useThreadCmd()
 const menus = useUserMenus()
-getUserForumMenu().then((res) => {
+
+// 加载版块菜单和权限
+const loadMenusAndPermissions = async () => {
+  const res = await getUserForumMenu()
   const data = res.data
   menus.value = data
   // Only set forumId if it's not already set (for new threads)
@@ -68,47 +71,80 @@ getUserForumMenu().then((res) => {
   if (menus && menus.value.length > 0 && !threadCmd.value.forumId) {
     threadCmd.value.forumId = menus.value[0].forumId
   }
+  // 等待权限加载完成
   if (threadCmd.value.forumId) {
-    useUserAuth(threadCmd.value.forumId)
+    const { authPromise } = useUserAuth(threadCmd.value.forumId)
+    await authPromise
   }
-})
+}
+
+loadMenusAndPermissions()
+
 const forumShortBrief = computed(() => {
   return menus?.value.find((menu) => menu.forumId === threadCmd.value.forumId)?.shortBrief || ''
 })
 // 添加提交状态变量
 const isSubmitting = ref(false)
 
-// 提交按钮禁用状态
+// 提交按钮禁用状态 - 使用 useUserAuth composable 确保响应式更新
 const submitDisabled = computed(() => {
   if (isSubmitting.value) {
     return true
   }
+  const forumId = threadCmd.value.forumId
+  // 没有 forumId 时，不妨用按钮（让用户尝试提交，后端会检查权限）
+  if (!forumId) {
+    return false
+  }
+
+  // 每次都调用 useUserAuth 获取当前 forumId 的响应式状态
+  const { hasPermission, isLoading } = useUserAuth(forumId)
+
+  // 如果权限正在加载中，暂时不禁用按钮
+  if (isLoading.value) {
+    return false
+  }
+
   if (threadCmd.value.threadId) {
     // 编辑
-    return !hasPermission('thread:edit', threadCmd.value.forumId)
+    return !hasPermission('thread:edit', forumId)
   } else {
     // 发帖
-    return !hasPermission('thread:new', threadCmd.value.forumId)
+    return !hasPermission('thread:new', forumId)
   }
 })
 
 // 禁止发布/更新的原因提示
 const disableReason = computed(() => {
-  if (!threadCmd.value.forumId) {
+  const forumId = threadCmd.value.forumId
+  if (!forumId) {
     return '请先选择版块'
   }
-  if (threadCmd.value.threadId) {
-    return '您没有编辑此帖子的权限'
+
+  // 每次都调用 useUserAuth 获取当前 forumId 的响应式状态
+  const { hasPermission, isLoading } = useUserAuth(forumId)
+
+  // 如果权限正在加载中，显示加载提示
+  if (isLoading.value) {
+    return '正在检查权限...'
   }
-  return '您没有在该版块发布帖子的权限'
+
+  if (threadCmd.value.threadId) {
+    return hasPermission('thread:edit', forumId) ? '' : '您没有编辑此帖子的权限'
+  } else {
+    return hasPermission('thread:new', forumId) ? '' : '您没有在该版块发布帖子的权限'
+  }
 })
 
-// 版块变更时重新获取权限
-const handleForumChange = () => {
+// 版块变更时重新获取权限，并等待权限加载完成后再更新按钮状态
+const handleForumChange = async () => {
   if (threadCmd.value.forumId) {
-    useUserAuth(threadCmd.value.forumId)
+    // 使用 useUserAuth 触发权限加载（会自动去重）
+    const { authPromise } = useUserAuth(threadCmd.value.forumId)
+    await authPromise
   }
 }
+
 const getMenuNameById = (forumId: number) => {
   const menu = menus.value.find((menu) => menu.forumId === forumId)
   return menu ? menu.name : ''
@@ -169,7 +205,6 @@ const onSubmit = () => {
       })
   }
 }
-const { hasPermission } = useUserAuth(threadCmd.value.forumId)
 </script>
 
 <style scoped>
