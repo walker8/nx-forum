@@ -294,6 +294,9 @@ const updateActiveHeading = () => {
   }
 }
 
+// Fold block event listener cleanup
+const foldBlockCleanups = ref<Array<() => void>>([])
+
 // 初始化折叠面板
 const initFoldBlocks = () => {
   const content = document.querySelector('.article-content')
@@ -316,10 +319,7 @@ const initFoldBlocks = () => {
 
     // 创建内容区
     const contentWrapper = document.createElement('div')
-    contentWrapper.className = 'fold-block-content'
-    if (collapsed) {
-      contentWrapper.style.display = 'none'
-    }
+    contentWrapper.className = 'fold-block-content' + (collapsed ? ' is-collapsed' : '')
 
     // 移动原始内容到内容区
     const originalContent = block.innerHTML
@@ -328,24 +328,35 @@ const initFoldBlocks = () => {
     block.appendChild(contentWrapper)
     contentWrapper.innerHTML = originalContent
 
-    // 添加点击事件
+    // 添加点击事件并保存清理函数
     const toggleBtn = header.querySelector('.fold-toggle-btn') as HTMLElement
-    toggleBtn?.addEventListener('click', () => {
-      const isHidden = contentWrapper.style.display === 'none'
-      contentWrapper.style.display = isHidden ? 'block' : 'none'
+    const handleClick = () => {
+      const isHidden = contentWrapper.classList.contains('is-collapsed')
+      contentWrapper.classList.toggle('is-collapsed')
+      // 同时更新data-collapsed属性以匹配CSS选择器
+      block.setAttribute('data-collapsed', isHidden ? 'false' : 'true')
       const icon = header.querySelector('.fold-icon')
       if (icon) {
         icon.textContent = isHidden ? '▼' : '▶'
       }
+    }
+    toggleBtn?.addEventListener('click', handleClick)
+
+    // 保存清理函数
+    foldBlockCleanups.value.push(() => {
+      toggleBtn?.removeEventListener('click', handleClick)
     })
   })
 }
 
 // 辅助函数：转义 HTML
 const escapeHtml = (text: string): string => {
-  const div = document.createElement('div')
-  div.textContent = text
-  return div.innerHTML
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 // 添加滚动监听
@@ -374,10 +385,13 @@ onMounted(() => {
   }
 })
 
-// 移除滚动监听
+// 移除滚动监听和折叠面板事件
 onUnmounted(() => {
   if (import.meta.client) {
     window.removeEventListener('scroll', updateActiveHeading)
+    // Clean up fold block event listeners
+    foldBlockCleanups.value.forEach(cleanup => cleanup())
+    foldBlockCleanups.value = []
   }
 })
 
@@ -948,6 +962,12 @@ watch(catalogItems, () => {
       }
     }
   }
+}
+
+/* Fold block - 初始状态基础样式 */
+:deep(div[data-type="fold"][data-collapsed="true"] > .fold-block-content),
+:deep(.fold-block-content.is-collapsed) {
+  display: none !important;
 }
 
 /* 移动端抽屉样式优化 */
