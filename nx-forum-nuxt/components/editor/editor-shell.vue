@@ -380,6 +380,7 @@ import { TableRow } from '@tiptap/extension-table-row'
 import CodeBlockExtension from './extensions/code-block'
 import Alert from './extensions/alert'
 import MermaidExtension from './extensions/mermaid'
+import FoldExtension from './extensions/fold'
 import Heading from '@tiptap/extension-heading'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
@@ -862,6 +863,13 @@ const slashCommands = [
     description: '插入流程图、时序图等图表',
     icon: 'tabler:chart-dots',
     action: () => insertMermaidDiagram()
+  },
+  {
+    id: 'fold',
+    label: '折叠面板',
+    description: '插入可折叠的内容块',
+    icon: 'tabler:fold',
+    action: (instance: Editor) => instance.chain().focus().setFold({ title: '点击展开' }).run()
   }
   // 暂时隐藏附件功能，后端不支持
   // {
@@ -1345,6 +1353,7 @@ const createEditor = () => {
       }),
       Alert,
       MermaidExtension,
+      FoldExtension,
       Underline,
       Strike,
       Subscript,

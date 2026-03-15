@@ -157,6 +157,11 @@ const hasMermaidDiagram = computed(() => {
   return /<div[^>]*data-type="mermaid"[\s\S]*?<\/div>/i.test(thread.value.content)
 })
 
+// Fold block support
+const hasFoldBlock = computed(() => {
+  return /<div[^>]*data-type="fold"[\s\S]*?<\/div>/i.test(thread.value.content)
+})
+
 const editThread = () => {
   navigateTo({
     path: '/editor/t/' + thread.value.threadId
@@ -289,6 +294,60 @@ const updateActiveHeading = () => {
   }
 }
 
+// 初始化折叠面板
+const initFoldBlocks = () => {
+  const content = document.querySelector('.article-content')
+  if (!content) return
+
+  const foldBlocks = content.querySelectorAll<HTMLElement>('div[data-type="fold"]')
+  foldBlocks.forEach((block) => {
+    const collapsed = block.getAttribute('data-collapsed') === 'true'
+    const title = block.getAttribute('data-title') || '点击展开'
+
+    // 创建折叠面板头部
+    const header = document.createElement('div')
+    header.className = 'fold-block-header'
+    header.innerHTML = `
+      <button class="fold-toggle-btn">
+        <span class="fold-icon">${collapsed ? '▶' : '▼'}</span>
+        <span class="fold-title">${escapeHtml(title)}</span>
+      </button>
+    `
+
+    // 创建内容区
+    const contentWrapper = document.createElement('div')
+    contentWrapper.className = 'fold-block-content'
+    if (collapsed) {
+      contentWrapper.style.display = 'none'
+    }
+
+    // 移动原始内容到内容区
+    const originalContent = block.innerHTML
+    block.innerHTML = ''
+    block.appendChild(header)
+    block.appendChild(contentWrapper)
+    contentWrapper.innerHTML = originalContent
+
+    // 添加点击事件
+    const toggleBtn = header.querySelector('.fold-toggle-btn') as HTMLElement
+    toggleBtn?.addEventListener('click', () => {
+      const isHidden = contentWrapper.style.display === 'none'
+      contentWrapper.style.display = isHidden ? 'block' : 'none'
+      const icon = header.querySelector('.fold-icon')
+      if (icon) {
+        icon.textContent = isHidden ? '▼' : '▶'
+      }
+    })
+  })
+}
+
+// 辅助函数：转义 HTML
+const escapeHtml = (text: string): string => {
+  const div = document.createElement('div')
+  div.textContent = text
+  return div.innerHTML
+}
+
 // 添加滚动监听
 onMounted(() => {
   if (import.meta.client) {
@@ -303,6 +362,13 @@ onMounted(() => {
         if (content) {
           renderMermaidDiagrams(content)
         }
+      })
+    }
+
+    // Initialize fold blocks
+    if (hasFoldBlock.value) {
+      nextTick(() => {
+        initFoldBlocks()
       })
     }
   }
@@ -820,6 +886,66 @@ watch(catalogItems, () => {
 
     .mermaid-render-container {
       padding: 12px;
+    }
+  }
+}
+
+/* Fold block styles */
+:deep(.fold-block) {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  margin: 1rem 0;
+  overflow: hidden;
+
+  .fold-block-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    user-select: none;
+
+    .fold-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: #334155;
+      font-size: 0.875rem;
+
+      .fold-icon {
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+
+      .fold-title {
+        font-weight: 500;
+      }
+
+      &:hover {
+        color: #1e80ff;
+      }
+    }
+  }
+
+  .fold-block-content {
+    padding: 0.75rem;
+    background-color: #ffffff;
+
+    p {
+      margin: 0.5em 0;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 }
