@@ -81,8 +81,8 @@ public class ThreadApplication {
                 .commentOrder(threadCmd.getCommentOrder())
                 .build();
 
-        // 设置内容，如果 docType 为 MARKDOWN，会自动转换为 HTML
-        threadE.setContent(threadCmd.getContent());
+        // 设置内容，如果 docType 为非 HTML，会自动转换为 HTML
+        threadE.setContent(threadCmd.getContent(), threadCmd.getImages());
 
         // 下载远程图片到本地（转换后的 HTML 内容）
         threadE.setContent(downloadImages(threadE.getContent()));
@@ -127,8 +127,8 @@ public class ThreadApplication {
                 .forumId(threadCmd.getForumId())
                 .build();
 
-        // 设置内容，如果 docType 为 MARKDOWN，会自动转换为 HTML
-        threadE.setContent(threadCmd.getContent());
+        // 设置内容，如果 docType 为非 HTML，会自动转换为 HTML
+        threadE.setContent(threadCmd.getContent(), threadCmd.getImages());
 
         // 下载远程图片到本地（转换后的 HTML 内容）
         threadE.setContent(downloadImages(threadE.getContent()));

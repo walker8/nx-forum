@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serial;
+import java.util.List;
 
 @Schema(description = "帖子内容")
 @Data
@@ -23,4 +24,9 @@ public class ThreadCmd extends Command {
      * 默认回帖排序方式 0 时间正序 1 时间倒序 2 热门排序
      */
     private CommentOrderV commentOrder;
+
+    /**
+     * 图片URL列表
+     */
+    private List<String> images;
 }

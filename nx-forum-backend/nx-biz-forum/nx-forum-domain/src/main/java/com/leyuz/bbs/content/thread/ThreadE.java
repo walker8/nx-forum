@@ -4,6 +4,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
 import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
+import com.leyuz.bbs.common.utils.HtmlUtils;
 import com.leyuz.bbs.common.utils.MarkdownUtils;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyV;
 import com.leyuz.common.dto.UserClientInfo;
@@ -210,10 +211,41 @@ public class ThreadE {
     }
 
     public void setContent(String content) {
-        // 如果 docType 为 MARKDOWN，先将 markdown 转换为 HTML
+        setContent(content, null);
+    }
+
+    /**
+     * 设置内容（支持 images）
+     *
+     * @param content 文本内容
+     * @param images  图片URL列表
+     */
+    public void setContent(String content, List<String> images) {
+        // 1. 处理 docType = TEXT 的情况，转换为 HTML
+        if (docType == DocTypeV.TEXT) {
+            if (StringUtils.isNotEmpty(content)) {
+                content = HtmlUtils.convertToSafeHtml(content, true);
+            }
+            // 2. 处理 images，追加 <img> 标签
+            if (images != null && !images.isEmpty()) {
+                StringBuilder imgTags = new StringBuilder();
+                // 添加换行分隔图片与文字
+                if (StringUtils.isNotEmpty(content)) {
+                    imgTags.append("<br>");
+                }
+                for (String imgUrl : images) {
+                    imgTags.append("<img src=\"").append(imgUrl).append("\" />");
+                }
+                content = content + imgTags;
+            }
+            docType = DocTypeV.HTML;
+        }
+
+        // 3. 如果是 MARKDOWN，进行转换（TEXT 已经在步骤1转换过了）
         if (docType == DocTypeV.MARKDOWN && StringUtils.isNotEmpty(content)) {
             content = MarkdownUtils.convertMarkdownToHtml(content);
         }
+
         this.content = content;
     }
 
