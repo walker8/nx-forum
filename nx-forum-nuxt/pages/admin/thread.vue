@@ -150,12 +150,14 @@
               <el-text class="mx-1">{{ scope.row.authorName }}</el-text>
             </template>
           </el-table-column>
-          <el-table-column prop="client" label="客户端信息" align="center" min-width="220">
+          <el-table-column prop="client" label="客户端信息" align="center" min-width="180">
             <template #default="scope">
-              <el-space wrap>
-                <el-tag type="primary" v-if="scope.row.browser">{{ scope.row.browser }}</el-tag>
-                <el-tag type="success" v-if="scope.row.os">{{ scope.row.os }}</el-tag>
-              </el-space>
+              <el-tooltip class="box-item" effect="dark" :content="scope.row.userAgent" placement="top-start">
+                <el-space wrap>
+                  <el-tag type="warning" v-if="scope.row.terminalType">{{ scope.row.terminalType }}</el-tag>
+                  <el-tag type="info" v-if="scope.row.platform">{{ scope.row.platform }}</el-tag>
+                </el-space>
+              </el-tooltip>
             </template>
           </el-table-column>
           <el-table-column prop="auditReason" label="审核原因" align="center" min-width="150"

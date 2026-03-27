@@ -93,6 +93,9 @@ public class ThreadConvert {
             UserClientInfo clientInfo = UserAgentUtils.getClientInfo(threadPO.getUserAgent());
             threadVO.setOs(clientInfo.getOs());
             threadVO.setBrowser(clientInfo.getBrowser());
+            threadVO.setTerminalType(threadPO.getTerminalType());
+            threadVO.setPlatform(threadPO.getPlatform());
+            threadVO.setUserAgent(threadPO.getUserAgent());
             return threadVO;
         }
         return null;

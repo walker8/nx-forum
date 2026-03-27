@@ -36,4 +36,7 @@ public class AdminCommentReplyVO {
     private String location;
     private String browser;
     private String os;
+    private String terminalType;
+    private String platform;
+    private String userAgent;
 }

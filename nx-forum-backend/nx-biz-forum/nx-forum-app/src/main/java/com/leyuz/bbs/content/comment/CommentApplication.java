@@ -255,6 +255,9 @@ public class CommentApplication {
         UserClientInfo clientInfo = UserAgentUtils.getClientInfo(commentPO.getUserAgent());
         commentVO.setOs(clientInfo.getOs());
         commentVO.setBrowser(clientInfo.getBrowser());
+        commentVO.setTerminalType(clientInfo.getTerminalType());
+        commentVO.setPlatform(clientInfo.getPlatform());
+        commentVO.setUserAgent(commentPO.getUserAgent());
         return commentVO;
     }
 
@@ -271,6 +274,9 @@ public class CommentApplication {
         UserClientInfo clientInfo = UserAgentUtils.getClientInfo(commentReplyPO.getUserAgent());
         commentReplyVO.setOs(clientInfo.getOs());
         commentReplyVO.setBrowser(clientInfo.getBrowser());
+        commentReplyVO.setTerminalType(clientInfo.getTerminalType());
+        commentReplyVO.setPlatform(clientInfo.getPlatform());
+        commentReplyVO.setUserAgent(commentReplyPO.getUserAgent());
         return commentReplyVO;
     }
 
