@@ -114,7 +114,8 @@ div:focus {
 }
 .article-content,
 .comment-reply,
-.comment-content {
+.comment-content,
+.message {
   a:not([href='']) {
     color: #1e80ff;
     position: relative;
@@ -129,6 +130,42 @@ div:focus {
       background-size: contain;
       margin-left: 4px;
       vertical-align: middle;
+    }
+  }
+
+  .image-gallery {
+    display: grid;
+    gap: 6px;
+    padding-top: 5px;
+    grid-template-columns: repeat(3, 1fr);
+
+    img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    &[data-count='1'] {
+      grid-template-columns: 1fr;
+
+      img {
+        max-width: 300px;
+        aspect-ratio: auto;
+      }
+    }
+
+    &[data-count='2'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &[data-count='4'] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media screen and (max-width: 768px) {
+      gap: 4px;
     }
   }
 }

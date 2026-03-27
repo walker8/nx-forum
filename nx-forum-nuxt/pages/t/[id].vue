@@ -748,6 +748,15 @@ watch(catalogItems, () => {
       }
     }
   }
+
+  :deep(.image-gallery) {
+    margin: 12px 0;
+    padding-top: 0;
+
+    @media (max-width: 768px) {
+      margin: 8px 0;
+    }
+  }
 }
 
 :deep(img:not(.emotion-img)) {

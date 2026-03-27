@@ -278,6 +278,9 @@ public class ThreadE {
                 imgElement.attr("originalSrc", sourceUrl);
             }
 
+            // 对连续图片进行分组，包裹在 gallery 容器中
+            wrapConsecutiveImages();
+
             content = document.body().toString();
         }
     }
@@ -302,6 +305,90 @@ public class ThreadE {
         if (StringUtils.isNotEmpty(content) && document == null) {
             document = Jsoup.parse(content);
         }
+    }
+
+    /**
+     * 将连续的图片元素包裹在 gallery 容器中，生成九宫格布局
+     * <p>仅对2张及以上连续图片进行包裹，单张图片保持原样</p>
+     */
+    private void wrapConsecutiveImages() {
+        if (document == null) {
+            return;
+        }
+        Element body = document.body();
+        List<Element> children = new ArrayList<>(body.children());
+
+        List<List<Element>> groups = new ArrayList<>();
+        List<Element> allBrsToRemove = new ArrayList<>();
+        List<Element> currentGroup = null;
+        List<Element> brsInGroup = null;
+
+        for (Element child : children) {
+            if (isImageElement(child)) {
+                if (currentGroup == null) {
+                    currentGroup = new ArrayList<>();
+                    brsInGroup = new ArrayList<>();
+                }
+                currentGroup.add(child);
+            } else if (isIgnorableSeparator(child)) {
+                if (currentGroup != null) {
+                    brsInGroup.add(child);
+                }
+            } else {
+                if (currentGroup != null) {
+                    if (currentGroup.size() >= 2) {
+                        groups.add(currentGroup);
+                        allBrsToRemove.addAll(brsInGroup);
+                    }
+                    currentGroup = null;
+                    brsInGroup = null;
+                }
+            }
+        }
+        if (currentGroup != null && currentGroup.size() >= 2) {
+            groups.add(currentGroup);
+            allBrsToRemove.addAll(brsInGroup);
+        }
+
+        allBrsToRemove.forEach(Element::remove);
+
+        for (List<Element> group : groups) {
+            Element gallery = document.createElement("div");
+            gallery.attr("class", "image-gallery");
+            gallery.attr("data-count", String.valueOf(group.size()));
+            group.get(0).before(gallery);
+            for (Element elem : group) {
+                gallery.appendChild(elem);
+            }
+        }
+    }
+
+    /**
+     * 判断元素是否为图片元素（img 标签或仅含一个 img 的 p 标签）
+     */
+    private boolean isImageElement(Element element) {
+        if (element.tagName().equals("img")) {
+            return true;
+        }
+        if (element.tagName().equals("p")) {
+            Elements imgs = element.getElementsByTag("img");
+            return imgs.size() == 1 && element.ownText().trim().isEmpty();
+        }
+        return false;
+    }
+
+    /**
+     * 判断元素是否为可忽略的分隔符（br 或空 p 标签），这些元素不中断图片分组
+     */
+    private boolean isIgnorableSeparator(Element element) {
+        if (element.tagName().equals("br")) {
+            return true;
+        }
+        if (element.tagName().equals("p") && element.text().trim().isEmpty()
+                && element.getElementsByTag("img").isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     private void initLink() {

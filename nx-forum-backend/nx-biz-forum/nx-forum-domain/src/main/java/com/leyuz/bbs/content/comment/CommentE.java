@@ -59,7 +59,7 @@ public class CommentE extends BaseComment {
                 String thumbImage = image;
                 imagesHtml.append("<img src=\"" + thumbImage + "\" originalsrc=\"" + image + "\" />");
             }
-            html = html + "<div class=\"gallery\">" + imagesHtml + "</div>";
+            html = html + "<div class=\"image-gallery\" data-count=\"" + images.size() + "\">" + imagesHtml + "</div>";
         }
         return html;
     }

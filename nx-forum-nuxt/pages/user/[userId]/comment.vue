@@ -100,21 +100,6 @@ const loadMoreComments = () => {
   overflow-wrap: break-word;
   font-size: 15px;
   line-height: 20px;
-  :deep(.gallery) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-top: 5px;
-    img {
-      width: 32%; /* 图片宽度自适应容器 */
-      max-width: 300px; /* 设置最大宽度限制 */
-      object-fit: cover; /* 保持宽高比，裁剪图片以填充容器 */
-      height: auto; /* 高度自适应 */
-    }
-    @media screen and (max-width: 768px) {
-      gap: 6px;
-    }
-  }
 }
 .message {
   display: -webkit-box;
