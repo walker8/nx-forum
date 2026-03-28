@@ -38,7 +38,7 @@ public class VerifyCodeService {
                 variables.put("userName", "注册用户");
                 mailApplication.sendTemplateEmail(MailApplication.MailTemplateType.VERIFY_CODE, email, variables);
                 break;
-            case LOGIN, CHANGE_EMAIL:
+            case LOGIN, CHANGE_EMAIL, CHANGE_PASSWORD:
                 variables.put("userName", userName);
                 mailApplication.sendTemplateEmail(MailApplication.MailTemplateType.VERIFY_CODE, email, variables);
                 break;

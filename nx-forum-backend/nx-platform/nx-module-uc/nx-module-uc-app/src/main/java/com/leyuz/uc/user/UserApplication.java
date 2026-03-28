@@ -10,6 +10,7 @@ import com.leyuz.common.mybatis.DataBaseUtils;
 import com.leyuz.common.mybatis.PageQuery;
 import com.leyuz.common.utils.HeaderUtils;
 import com.leyuz.module.cache.GenericCache;
+import com.leyuz.uc.auth.token.TokenGateway;
 import com.leyuz.uc.config.RegisterConfigApplication;
 import com.leyuz.uc.log.dto.LogTypeV;
 import com.leyuz.uc.log.dto.OperationStatusV;
@@ -22,17 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 用户应用服务
@@ -50,6 +48,8 @@ public class UserApplication {
     private final UserMapper userMapper;
     private final RegisterConfigApplication registerConfigApplication;
     private final ApplicationEventPublisher eventPublisher;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenGateway tokenGateway;
 
     private static final List<String> orderByColumns = Arrays.asList("user_id", "create_time", "update_time", "last_active_date");
 
@@ -126,6 +126,42 @@ public class UserApplication {
             userDomainService.update(newUserE);
             publishUserInfoUpdateEvent(oldUserE, newUserE);
         }
+    }
+
+    /**
+     * 修改密码（旧密码验证方式）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void changePassword(ChangePasswordCmd cmd) {
+        Long userId = HeaderUtils.getUserId();
+        if (userId == null || userId <= 0) {
+            throw new ValidationException("请先登录");
+        }
+
+        UserE userE = userGateway.getById(userId);
+        if (userE == null) {
+            throw new ValidationException("用户不存在");
+        }
+
+        // 验证旧密码
+        if (StringUtils.isBlank(cmd.getOldPassword()) || !passwordEncoder.matches(cmd.getOldPassword(), userE.getPassword())) {
+            throw new ValidationException("当前密码错误");
+        }
+
+        // 验证新密码复杂度
+        registerConfigApplication.validatePassword(cmd.getNewPassword());
+
+        // 更新密码
+        UserE updateUserE = UserE.builder()
+                .userId(userId)
+                .password(cmd.getNewPassword())
+                .build();
+        userIdCache.remove(userId);
+        userDomainService.update(updateUserE);
+        // 使所有token失效，强制重新登录
+        tokenGateway.deleteByUserId(userId);
+
+        publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "用户修改密码（旧密码验证方式）", OperationStatusV.SUCCESS.getCode());
     }
 
     private void publishUserInfoUpdateEvent(UserE oldUserE, UserE newUserE) {

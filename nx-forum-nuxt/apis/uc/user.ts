@@ -133,3 +133,18 @@ export const verifyCurrentEmail = (data: VerifyCurrentEmailCmd) => {
 export const changeToNewEmail = (data: ChangeToNewEmailCmd) => {
   return Http.post('/v1/uc/verify-code/current-user/email/change', data)
 }
+
+// 修改密码（旧密码方式）
+export const changePassword = (data: { oldPassword: string; newPassword: string }) => {
+  return Http.put('/v1/uc/users/current/password', data)
+}
+
+// 验证码方式修改密码（已登录用户）
+export const changePasswordByCode = (data: { code: string; newPassword: string }) => {
+  return Http.post('/v1/uc/verify-code/current-user/change-password', data)
+}
+
+// 发送密码修改验证码到当前用户邮箱
+export const sendChangePasswordEmailCode = () => {
+  return Http.post('/v1/uc/verify-code/email?type=change_password&target=current')
+}

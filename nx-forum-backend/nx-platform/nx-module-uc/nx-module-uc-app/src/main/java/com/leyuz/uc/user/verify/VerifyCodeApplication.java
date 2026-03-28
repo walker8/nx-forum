@@ -9,18 +9,24 @@ import org.springframework.transaction.annotation.Transactional;
 import com.leyuz.common.exception.ValidationException;
 import com.leyuz.common.utils.HeaderUtils;
 import com.leyuz.module.cache.GenericCache;
+import com.leyuz.uc.auth.token.TokenGateway;
 import com.leyuz.uc.config.LoginConfigApplication;
 import com.leyuz.uc.config.RegisterConfigApplication;
-import com.leyuz.uc.auth.token.TokenGateway;
+import com.leyuz.uc.log.dto.LogTypeV;
+import com.leyuz.uc.log.dto.OperationStatusV;
 import com.leyuz.uc.user.UserE;
 import com.leyuz.uc.user.dataobject.AccountTypeV;
+import com.leyuz.uc.user.event.UserLoginEvent;
 import com.leyuz.uc.user.gateway.UserGateway;
 import com.leyuz.uc.user.service.UserDomainService;
+import com.leyuz.uc.user.verify.dto.ChangePasswordByCodeCmd;
 import com.leyuz.uc.user.verify.dto.ChangeToNewEmailCmd;
 import com.leyuz.uc.user.dto.UserResp;
 import com.leyuz.uc.user.auth.dto.VerifyCodeLoginDTO;
 import com.leyuz.uc.user.verify.dto.VerifyCurrentEmailCmd;
 import com.leyuz.uc.user.verify.dto.VerifyType;
+
+import org.springframework.context.ApplicationEventPublisher;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +52,7 @@ public class VerifyCodeApplication {
     private final TokenGateway tokenGateway;
     private final GenericCache<Long, UserE> userIdCache;
     private final GenericCache<Long, String> emailChangeStepCache;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 发送邮箱验证码
@@ -71,6 +78,12 @@ public class VerifyCodeApplication {
         // 处理换绑邮箱场景
         if (VerifyType.CHANGE_EMAIL.equals(verifyType)) {
             handleChangeEmailVerifyCode(email, target);
+            return;
+        }
+
+        // 处理修改密码场景
+        if (VerifyType.CHANGE_PASSWORD.equals(verifyType)) {
+            handleChangePasswordVerifyCode();
             return;
         }
 
@@ -299,13 +312,72 @@ public class VerifyCodeApplication {
         emailChangeStepCache.remove(userId);
     }
 
+    /**
+     * 处理修改密码验证码发送逻辑
+     */
+    private void handleChangePasswordVerifyCode() {
+        Long userId = HeaderUtils.getUserId();
+        if (userId == null || userId <= 0) {
+            throw new ValidationException("请先登录再进行此操作！");
+        }
+        UserE currentUser = getByIdFromCache(userId);
+        String currentEmail = currentUser.getEmail();
+        if (StringUtils.isBlank(currentEmail)) {
+            throw new ValidationException("当前用户未绑定邮箱，无法使用验证码修改密码");
+        }
+        verifyCodeService.sendEmailVerifyCode(currentEmail, currentUser.getUserName(), VerifyType.CHANGE_PASSWORD);
+    }
+
+    /**
+     * 通过验证码修改密码（已登录用户）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void changePasswordByVerifyCode(ChangePasswordByCodeCmd cmd) {
+        Long userId = HeaderUtils.getUserId();
+        if (userId == null || userId <= 0) {
+            throw new ValidationException("请先登录");
+        }
+
+        UserE userE = getByIdFromCache(userId);
+        if (userE == null) {
+            throw new ValidationException("用户不存在");
+        }
+
+        String email = userE.getEmail();
+        if (StringUtils.isBlank(email)) {
+            throw new ValidationException("当前用户未绑定邮箱");
+        }
+
+        // 验证验证码
+        verifyCodeService.verifyCode(email, cmd.getCode(), AccountTypeV.EMAIL, VerifyType.CHANGE_PASSWORD);
+
+        // 验证新密码复杂度
+        registerConfigApplication.validatePassword(cmd.getNewPassword());
+
+        // 更新密码
+        UserE updateUserE = UserE.builder()
+                .userId(userId)
+                .password(cmd.getNewPassword())
+                .build();
+        userDomainService.update(updateUserE);
+
+        // 清除缓存
+        userIdCache.remove(userId);
+        verifyCodeService.deleteCache(email, AccountTypeV.EMAIL, VerifyType.CHANGE_PASSWORD);
+
+        // 使所有token失效，强制重新登录
+        tokenGateway.deleteByUserId(userId);
+
+        publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "用户修改密码（验证码方式）", OperationStatusV.SUCCESS.getCode());
+    }
+
     private void checkPhoneVerifyCodeEnabled(VerifyType verifyType) {
         switch (verifyType) {
             case REGISTER -> registerConfigApplication.validateSmsRegisterEnabled();
             case LOGIN -> loginConfigApplication.validatePhoneCodeLoginEnabled();
             case RESET_PASSWORD -> loginConfigApplication.validatePhoneResetPasswordEnabled();
-            case CHANGE_EMAIL -> {
-                // 邮箱换绑功能默认启用，无需额外配置检查
+            case CHANGE_EMAIL, CHANGE_PASSWORD -> {
+                // 默认启用，无需额外配置检查
             }
         }
     }
@@ -315,8 +387,8 @@ public class VerifyCodeApplication {
             case REGISTER -> registerConfigApplication.validateEmailRegisterEnabled();
             case LOGIN -> loginConfigApplication.validateEmailCodeLoginEnabled();
             case RESET_PASSWORD -> loginConfigApplication.validateEmailResetPasswordEnabled();
-            case CHANGE_EMAIL -> {
-                // 邮箱换绑功能默认启用，无需额外配置检查
+            case CHANGE_EMAIL, CHANGE_PASSWORD -> {
+                // 默认启用，无需额外配置检查
             }
         }
     }
@@ -367,5 +439,17 @@ public class VerifyCodeApplication {
         tokenGateway.saveToken(userResp.getUserId(), token);
         userResp.setToken(token);
         return userResp;
+    }
+
+    private void publishLogEvent(int logType, String message, int status) {
+        UserLoginEvent loginEvent = UserLoginEvent.builder()
+                .userId(HeaderUtils.getUserId())
+                .logType(logType)
+                .logContent(message)
+                .ipAddress(HeaderUtils.getIp())
+                .userAgent(HeaderUtils.getUserAgent())
+                .operationStatus(status)
+                .build();
+        eventPublisher.publishEvent(loginEvent);
     }
 }

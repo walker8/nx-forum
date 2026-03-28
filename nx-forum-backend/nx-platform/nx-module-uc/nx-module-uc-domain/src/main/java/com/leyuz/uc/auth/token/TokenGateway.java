@@ -8,4 +8,6 @@ public interface TokenGateway {
     boolean deleteByToken(String token);
 
     boolean deleteByDeviceId(String deviceId, Long userId);
+
+    void deleteByUserId(Long userId);
 }

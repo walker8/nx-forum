@@ -27,12 +27,19 @@
       :current-email="account.email"
       @success="handleEmailChangeSuccess"
     />
+
+    <!-- 密码修改弹窗 -->
+    <ChangePasswordDialog
+      ref="changePasswordDialogRef"
+      :masked-email="account.email"
+    />
   </el-card>
 </template>
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 import { getCurrentUserAccount } from '~/apis/uc/user'
 import ChangeEmailDialog from '~/components/uc/change-email-dialog.vue'
+import ChangePasswordDialog from '~/components/uc/change-password-dialog.vue'
 
 definePageMeta({
   layout: 'user-setting'
@@ -44,6 +51,7 @@ useSeoMeta({
 
 // Refs
 const changeEmailDialogRef = ref()
+const changePasswordDialogRef = ref()
 
 // Reactive data
 const account = reactive({
@@ -76,11 +84,10 @@ const changeEmail = () => {
 }
 
 const changePassword = () => {
-  ElMessage.warning('暂不支持')
+  changePasswordDialogRef.value?.showDialog()
 }
 
 const handleEmailChangeSuccess = () => {
-  // 重新加载账号信息以更新显示的邮箱
   loadAccountInfo()
 }
 </script>

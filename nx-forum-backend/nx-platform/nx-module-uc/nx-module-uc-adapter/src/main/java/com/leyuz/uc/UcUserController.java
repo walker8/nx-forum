@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.cola.dto.SingleResponse;
 import com.leyuz.uc.user.auth.AuthApplication;
 import com.leyuz.uc.user.UserApplication;
+import com.leyuz.uc.user.dto.ChangePasswordCmd;
 import com.leyuz.uc.user.dto.UserAccountVO;
 import com.leyuz.uc.user.dto.UserCmd;
 import com.leyuz.uc.user.dto.UserVO;
@@ -78,6 +79,13 @@ public class UcUserController {
     public SingleResponse getCurrentUserAccount() {
         UserAccountVO userVO = userApplication.getUserAccount();
         return SingleResponse.of(userVO);
+    }
+
+    @Operation(summary = "修改密码（旧密码验证）")
+    @PutMapping("/current/password")
+    public SingleResponse changePassword(@RequestBody ChangePasswordCmd cmd) {
+        userApplication.changePassword(cmd);
+        return SingleResponse.buildSuccess();
     }
 
     @Operation(summary = "检查用户名是否被禁止")

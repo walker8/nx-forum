@@ -14,6 +14,7 @@ import com.leyuz.ratelimit.annotation.LimitType;
 import com.leyuz.ratelimit.annotation.RateLimitRule;
 import com.leyuz.ratelimit.annotation.RateLimiter;
 import com.leyuz.uc.user.verify.VerifyCodeApplication;
+import com.leyuz.uc.user.verify.dto.ChangePasswordByCodeCmd;
 import com.leyuz.uc.user.verify.dto.ChangeToNewEmailCmd;
 import com.leyuz.uc.user.verify.dto.ResetPasswordDTO;
 import com.leyuz.uc.user.dto.UserResp;
@@ -133,5 +134,12 @@ public class UcVerifyCodeController {
     public SingleResponse changeToNewEmail(@Valid @RequestBody ChangeToNewEmailCmd cmd) {
         verifyCodeApplication.changeToNewEmail(cmd);
         return SingleResponse.of("邮箱换绑成功");
+    }
+
+    @Operation(summary = "验证码修改密码（已登录用户）")
+    @PostMapping("/current-user/change-password")
+    public SingleResponse changePasswordByVerifyCode(@Valid @RequestBody ChangePasswordByCodeCmd cmd) {
+        verifyCodeApplication.changePasswordByVerifyCode(cmd);
+        return SingleResponse.of("密码修改成功");
     }
 }

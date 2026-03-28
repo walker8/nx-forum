@@ -66,4 +66,15 @@ public class TokenGatewayImpl implements TokenGateway {
         userLoginTokenPO.setIsDeleted(true);
         return userLoginTokenMapper.update(userLoginTokenPO, queryWrapper) > 0;
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        QueryWrapper<UserLoginTokenPO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("create_by", userId);
+        queryWrapper.eq("is_deleted", false);
+        UserLoginTokenPO userLoginTokenPO = new UserLoginTokenPO();
+        BaseEntityUtils.setUpdateBaseEntity(userLoginTokenPO);
+        userLoginTokenPO.setIsDeleted(true);
+        userLoginTokenMapper.update(userLoginTokenPO, queryWrapper);
+    }
 }
