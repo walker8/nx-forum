@@ -14,6 +14,7 @@ import com.leyuz.uc.auth.token.TokenGateway;
 import com.leyuz.uc.config.RegisterConfigApplication;
 import com.leyuz.uc.log.dto.LogTypeV;
 import com.leyuz.uc.log.dto.OperationStatusV;
+import com.leyuz.uc.user.auth.PasswordChangeFailureService;
 import com.leyuz.uc.user.dto.*;
 import com.leyuz.uc.user.event.UserLoginEvent;
 import com.leyuz.uc.user.gateway.UserGateway;
@@ -50,6 +51,7 @@ public class UserApplication {
     private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
     private final TokenGateway tokenGateway;
+    private final PasswordChangeFailureService passwordChangeFailureService;
 
     private static final List<String> orderByColumns = Arrays.asList("user_id", "create_time", "update_time", "last_active_date");
 
@@ -138,14 +140,24 @@ public class UserApplication {
             throw new ValidationException("请先登录");
         }
 
+        if (passwordChangeFailureService.isLocked(userId)) {
+            throw new ValidationException(PasswordChangeFailureService.LOCK_MESSAGE);
+        }
+
         UserE userE = userGateway.getById(userId);
         if (userE == null) {
             throw new ValidationException("用户不存在");
         }
 
-        // 验证旧密码
         if (StringUtils.isBlank(cmd.getOldPassword()) || !passwordEncoder.matches(cmd.getOldPassword(), userE.getPassword())) {
-            throw new ValidationException("当前密码错误");
+            int failCount = passwordChangeFailureService.recordFailure(userId);
+            if (failCount >= PasswordChangeFailureService.MAX_FAILURE_COUNT) {
+                publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "用户修改密码失败次数过多，已被锁定30分钟", OperationStatusV.FAILURE.getCode());
+                throw new ValidationException(PasswordChangeFailureService.LOCK_MESSAGE);
+            }
+            int remaining = PasswordChangeFailureService.MAX_FAILURE_COUNT - failCount;
+            publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "用户修改密码失败（旧密码错误），剩余" + remaining + "次机会", OperationStatusV.FAILURE.getCode());
+            throw new ValidationException("当前密码错误，您还有" + remaining + "次机会");
         }
 
         // 验证新密码复杂度
@@ -160,6 +172,7 @@ public class UserApplication {
         userDomainService.update(updateUserE);
         // 使所有token失效，强制重新登录
         tokenGateway.deleteByUserId(userId);
+        passwordChangeFailureService.clearFailure(userId);
 
         publishLogEvent(LogTypeV.INFO_UPDATE.getCode(), "用户修改密码（旧密码验证方式）", OperationStatusV.SUCCESS.getCode());
     }

@@ -19,6 +19,7 @@ public class CacheConfig {
 
     public static final String LOGIN_FAIL_COUNT_CACHE = "login:failCount";
     public static final String LOGIN_LOCK_CACHE = "login:lock";
+    public static final String PASSWORD_CHANGE_FAIL_COUNT_CACHE = "password:change:failCount";
 
     @Bean
     public GenericCache<String, Integer> loginFailCountCache(CacheService cacheService) {
@@ -28,6 +29,11 @@ public class CacheConfig {
     @Bean
     public GenericCache<String, Boolean> loginLockCache(CacheService cacheService) {
         return new GenericCache<>(cacheService, stats, LOGIN_LOCK_CACHE, 30 * 60L, CacheType.REMOTE);
+    }
+
+    @Bean
+    public GenericCache<String, Integer> passwordChangeFailCountCache(CacheService cacheService) {
+        return new GenericCache<>(cacheService, stats, PASSWORD_CHANGE_FAIL_COUNT_CACHE, 30 * 60L, CacheType.REMOTE);
     }
 
     @Bean
