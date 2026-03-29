@@ -55,7 +55,7 @@
         <velocity.version>2.4.1</velocity.version>
 
         <!-- 其他工具库 -->
-        <ip2region.version>2.7.0</ip2region.version>
+        <ip2region.version>3.3.6</ip2region.version>
         <jsoup.version>1.22.1</jsoup.version>
         <thumbnailator.version>0.4.21</thumbnailator.version>
         <encoder.version>1.3.1</encoder.version>

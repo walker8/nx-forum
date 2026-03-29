@@ -58,6 +58,12 @@ mybatis-plus:
   # 指定sql映射文件
   mapper-locations: classpath*:mapper/*.xml
 
+# ip2region 配置
+nx:
+  ip:
+    # 是否仅支持 IPv4 查询（true: 仅加载 IPv4 xdb 到内存；false: 同时加载 IPv4 和 IPv6）
+    only-v4: true
+
 # springdoc配置： https://springdoc.org/properties.html
 springdoc:
   api-docs:

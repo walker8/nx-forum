@@ -4,9 +4,15 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.ObjectUtil;
 import com.leyuz.common.exception.ServiceException;
-import org.lionsoul.ip2region.xdb.Searcher;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.lionsoul.ip2region.service.Config;
+import org.lionsoul.ip2region.service.Ip2Region;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.InputStream;
 
 /**
  * 根据ip地址定位工具类，离线方式
@@ -14,60 +20,118 @@ import java.io.File;
  *
  * @author lishuyan
  */
+@Component
 public class RegionUtils {
 
-    private static final Searcher SEARCHER;
+    private static Ip2Region IP2REGION;
 
-    static {
-        String fileName = "/ip2region.xdb";
-        File existFile = FileUtil.file(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + fileName);
-        if (!FileUtil.exist(existFile)) {
-            ClassPathResource fileStream = new ClassPathResource(fileName);
-            if (ObjectUtil.isEmpty(fileStream.getStream())) {
-                throw new ServiceException("RegionUtils初始化失败，原因：IP地址库数据不存在！");
+    @Value("${nx.ip.only-v4:false}")
+    private boolean onlyV4;
+
+    private static String loadXdbFile(String fileName, String desc) {
+        File destFile = FileUtil.file(FileUtil.getTmpDir() + FileUtil.FILE_SEPARATOR + fileName);
+        ClassPathResource resource = new ClassPathResource(fileName);
+        try (InputStream stream = resource.getStream()) {
+            if (ObjectUtil.isEmpty(stream)) {
+                throw new ServiceException("RegionUtils初始化失败，原因：" + desc + " IP地址库数据不存在！");
             }
-            FileUtil.writeFromStream(fileStream.getStream(), existFile);
-        }
-
-        String dbPath = existFile.getPath();
-
-        // 1、从 dbPath 加载整个 xdb 到内存。
-        byte[] cBuff;
-        try {
-            cBuff = Searcher.loadContentFromFile(dbPath);
+            FileUtil.writeFromStream(stream, destFile);
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
-            throw new ServiceException("RegionUtils初始化失败，原因：从ip2region.xdb文件加载内容失败！" + e.getMessage());
+            throw new ServiceException("RegionUtils初始化失败，原因：" + desc + " IP地址库加载异常！" + e.getMessage());
         }
-        // 2、使用上述的 cBuff 创建一个完全基于内存的查询对象。
+        return destFile.getPath();
+    }
+
+    private static String cleanRegionPart(String part) {
+        if (part == null || "0".equals(part)) {
+            return "";
+        }
+        return part;
+    }
+
+    @PostConstruct
+    public void init() {
+        String v4DbPath = loadXdbFile("/ip2region_v4.xdb", "IPv4");
+
+        Config v4Config;
         try {
-            SEARCHER = Searcher.newWithBuffer(cBuff);
+            v4Config = Config.custom()
+                .setCachePolicy(Config.BufferCache)
+                .setXdbPath(v4DbPath)
+                .asV4();
+        } catch (Exception e) {
+            throw new ServiceException("RegionUtils初始化失败，原因：IPv4配置创建失败！" + e.getMessage());
+        }
+
+        if (onlyV4) {
+            try {
+                IP2REGION = Ip2Region.create(v4Config, null);
+            } catch (Exception e) {
+                throw new ServiceException("RegionUtils初始化失败，原因：" + e.getMessage());
+            }
+            return;
+        }
+
+        String v6DbPath = loadXdbFile("/ip2region_v6.xdb", "IPv6");
+
+        Config v6Config;
+        try {
+            v6Config = Config.custom()
+                .setCachePolicy(Config.BufferCache)
+                .setXdbPath(v6DbPath)
+                .asV6();
+        } catch (Exception e) {
+            throw new ServiceException("RegionUtils初始化失败，原因：IPv6配置创建失败！" + e.getMessage());
+        }
+
+        try {
+            IP2REGION = Ip2Region.create(v4Config, v6Config);
         } catch (Exception e) {
             throw new ServiceException("RegionUtils初始化失败，原因：" + e.getMessage());
         }
     }
 
+    @PreDestroy
+    public void destroy() {
+        if (IP2REGION != null) {
+            try {
+                IP2REGION.close();
+            } catch (Exception e) {
+                // 忽略关闭异常
+            }
+        }
+    }
+
     /**
-     * 根据IP地址离线获取城市
+     * 根据IP地址离线获取城市（同时支持 IPv4 和 IPv6）
+     * <p>
+     * ip2region 3.x 输出格式：Country|Province|City|ISP|CountryCode
      */
     public static Address getAddress(String ip) {
         Address address = new Address();
+        if (ip == null) {
+            address.setCountry("未知");
+            return address;
+        }
         try {
             ip = ip.trim();
-            // 3、执行查询
-            // 国家|区域|省份|城市|ISP
-            String region = SEARCHER.search(ip);
-            String[] regions = region.split("\\|");
+            String region = IP2REGION.search(ip);
+            if (region == null || region.isEmpty()) {
+                address.setCountry("未知");
+                return address;
+            }
+            String[] regions = region.split("\\|", 5);
             if (regions.length >= 5) {
-                address.setCountry(regions[0].replace("0", ""));
-                address.setDistrict(regions[1].replace("0", ""));
-                address.setRegion(regions[2].replace("0", ""));
-                address.setCity(regions[3].replace("0", ""));
-                address.setIsp(regions[4].replace("0", ""));
+                address.setCountry(cleanRegionPart(regions[0]));
+                address.setRegion(cleanRegionPart(regions[1]));
+                address.setCity(cleanRegionPart(regions[2]));
+                address.setIsp(cleanRegionPart(regions[3]));
             } else {
                 address.setCountry("未知");
             }
         } catch (Exception e) {
-            //log.error("IP地址离线获取城市异常 {}", ip);
             address.setCountry("未知");
         }
         return address;

@@ -38,7 +38,7 @@ public class AddressUtils {
     }
 
     /**
-     * 根据ip获取城市
+     * 根据ip获取城市（支持 IPv4 和 IPv6）
      *
      * @param ip ip地址
      * @return 返回地址
@@ -52,9 +52,6 @@ public class AddressUtils {
         if (NetUtil.isInnerIP(ip)) {
             return "内网IP";
         }
-        if (!isIPv4(ip)) {
-            return UNKNOWN;
-        }
         Address address = RegionUtils.getAddress(ip);
         if (StringUtils.isNotBlank(address.getCity())) {
             return address.getRegion() + address.getCity();
@@ -65,12 +62,4 @@ public class AddressUtils {
         return address.getCountry();
     }
 
-    public static boolean isIPv4(String ip) {
-        if (StringUtils.isBlank(ip)) {
-            return false;
-        }
-        // 正则表达式匹配 IPv4 地址
-        String regex = "^((25[0-5]|2[0-4]\\d|1\\d{2}|\\d{1,2})\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|\\d{1,2})$";
-        return ip.matches(regex);
-    }
 }
