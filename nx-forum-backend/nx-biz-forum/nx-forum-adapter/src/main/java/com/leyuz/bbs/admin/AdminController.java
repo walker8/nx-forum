@@ -4,6 +4,8 @@ import com.alibaba.cola.dto.SingleResponse;
 import com.leyuz.bbs.content.comment.CommentApplication;
 import com.leyuz.bbs.content.thread.ThreadApplication;
 import com.leyuz.bbs.interaction.report.ReportApplication;
+import com.leyuz.bbs.system.dashboard.DashboardApplication;
+import com.leyuz.bbs.system.dashboard.dto.DashboardOverviewVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.Map;
 @RequestMapping("/v1/admin")
 public class AdminController {
 
+    private final DashboardApplication dashboardApplication;
 
     private final ThreadApplication threadApplication;
 
@@ -52,6 +55,13 @@ public class AdminController {
         map.put("pendingReportCount", pendingReportCount);
         map.put("totalAuditCount", threadAuditCount + commentAuditCount + replyAuditCount + pendingReportCount);
         return SingleResponse.of(map);
+    }
+
+    @Operation(summary = "获取首页概览数据")
+    @GetMapping("/dashboard/overview")
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:manage')")
+    public SingleResponse<DashboardOverviewVO> getOverview() {
+        return SingleResponse.of(dashboardApplication.getOverview());
     }
 
 }

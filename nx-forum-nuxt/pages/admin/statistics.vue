@@ -3,6 +3,7 @@ import type {EChartsOption} from 'echarts'
 import type {DailyStatsVO, StatsOverviewVO, StatsTrendVO} from '~/apis/statistics'
 import {getStatsByPlatform, getStatsByTerminal, getStatsOverview, getStatsTrend} from '~/apis/statistics'
 import {getUserStatsOverview} from '~/apis/uc/statistics'
+import {formatNumber} from '~/utils'
 import {computed, onMounted, onUnmounted, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {ChatDotRound, Connection, DataLine, RefreshRight, User} from '@element-plus/icons-vue'
@@ -336,13 +337,6 @@ const handleTimeRangeChange = (range: TimeRange) => {
 const handleRefresh = () => {
   fetchData(false)
   ElMessage.success('数据已刷新')
-}
-
-// Format large numbers
-const formatNumber = (num: number): string => {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
-  return String(num)
 }
 
 // ============================================

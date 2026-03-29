@@ -13,6 +13,19 @@ export const getCssVariableValue = (cssVariableName: string) => {
   return cssVariableValue
 }
 
+export const formatBytes = (bytes: number): string => {
+  if (bytes === 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+}
+
+export const formatNumber = (num: number): string => {
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+  return String(num)
+}
+
 /** 用 JS 设置全局 CSS 变量 */
 export const setCssVariableValue = (cssVariableName: string, cssVariableValue: string) => {
   try {

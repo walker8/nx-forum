@@ -15,6 +15,7 @@ import {
   getUserStatsOverview,
   getUserRegistrationTrend
 } from '~/apis/uc/statistics'
+import {formatNumber} from '~/utils'
 
 definePageMeta({
   layout: 'uc'
@@ -134,13 +135,6 @@ const fetchData = async (showLoading = true) => {
 const handleRefresh = () => {
   fetchData(false)
   ElMessage.success('数据已刷新')
-}
-
-// Format large numbers
-const formatNumber = (num: number): string => {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
-  return String(num)
 }
 
 // ============================================
