@@ -159,7 +159,7 @@ const hasMermaidDiagram = computed(() => {
 
 // Fold block support
 const hasFoldBlock = computed(() => {
-  return /<div[^>]*data-type="fold"[\s\S]*?<\/div>/i.test(thread.value.content)
+  return /data-type="fold"/.test(thread.value.content)
 })
 
 const editThread = () => {
@@ -182,12 +182,14 @@ const clickArticle = (element: any) => {
   imageViewer.value.showImage(element, thread.value.content)
 }
 
-// 修改表情处理函数
 const processEmotions = computed(() => {
-  return replaceEmotions(thread.value.content)
+  let html = thread.value.content
+  if (hasFoldBlock.value) {
+    html = transformFoldBlocks(html)
+  }
+  return replaceEmotions(html)
 })
 
-// 格式化日期，只显示年月日
 const formatDate = (dateTime: string) => {
   if (!dateTime) return ''
   return dateTime.split(' ')[0]
@@ -297,59 +299,37 @@ const updateActiveHeading = () => {
 // Fold block event listener cleanup
 const foldBlockCleanups = ref<Array<() => void>>([])
 
-// 初始化折叠面板
+// 初始化折叠面板 - 仅绑定事件，DOM 结构已由 transformFoldBlocks 预渲染
 const initFoldBlocks = () => {
   const content = document.querySelector('.article-content')
   if (!content) return
 
-  const foldBlocks = content.querySelectorAll<HTMLElement>('div[data-type="fold"]')
-  foldBlocks.forEach((block) => {
-    const collapsed = block.getAttribute('data-collapsed') === 'true'
-    const title = block.getAttribute('data-title') || '点击展开'
+  const toggleButtons = content.querySelectorAll<HTMLElement>('.fold-toggle-btn')
+  toggleButtons.forEach((btn) => {
+    const block = btn.closest<HTMLElement>('div[data-type="fold"]')
+    if (!block) return
 
-    // 创建折叠面板头部
-    const header = document.createElement('div')
-    header.className = 'fold-block-header'
-    header.innerHTML = `
-      <button class="fold-toggle-btn">
-        <span class="fold-icon">${collapsed ? '▶' : '▼'}</span>
-        <span class="fold-title">${escapeHtml(title)}</span>
-      </button>
-    `
-
-    // 创建内容区
-    const contentWrapper = document.createElement('div')
-    contentWrapper.className = 'fold-block-content' + (collapsed ? ' is-collapsed' : '')
-
-    // 移动原始内容到内容区
-    const originalContent = block.innerHTML
-    block.innerHTML = ''
-    block.appendChild(header)
-    block.appendChild(contentWrapper)
-    contentWrapper.innerHTML = originalContent
-
-    // 添加点击事件并保存清理函数
-    const toggleBtn = header.querySelector('.fold-toggle-btn') as HTMLElement
     const handleClick = () => {
+      const contentWrapper = block.querySelector<HTMLElement>('.fold-block-content')
+      if (!contentWrapper) return
+
       const isHidden = contentWrapper.classList.contains('is-collapsed')
       contentWrapper.classList.toggle('is-collapsed')
-      // 同时更新data-collapsed属性以匹配CSS选择器
       block.setAttribute('data-collapsed', isHidden ? 'false' : 'true')
-      const icon = header.querySelector('.fold-icon')
+
+      const icon = btn.querySelector('.fold-icon')
       if (icon) {
-        icon.textContent = isHidden ? '▼' : '▶'
+        icon.textContent = isHidden ? '\u25BC' : '\u25B6'
       }
     }
-    toggleBtn?.addEventListener('click', handleClick)
+    btn.addEventListener('click', handleClick)
 
-    // 保存清理函数
     foldBlockCleanups.value.push(() => {
-      toggleBtn?.removeEventListener('click', handleClick)
+      btn.removeEventListener('click', handleClick)
     })
   })
 }
 
-// 辅助函数：转义 HTML
 const escapeHtml = (text: string): string => {
   return text
     .replace(/&/g, '&amp;')
@@ -357,6 +337,77 @@ const escapeHtml = (text: string): string => {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
+}
+
+// SSR 阶段预渲染折叠面板结构，避免 FOUC
+const transformFoldBlocks = (html: string): string => {
+  if (!html || !html.includes('data-type="fold"')) return html
+
+  const results: Array<{ start: number; end: number; replacement: string }> = []
+  const foldStartRegex = /<div\s[^>]*?data-type="fold"[^>]*>/gi
+  let match: RegExpExecArray | null
+
+  while ((match = foldStartRegex.exec(html)) !== null) {
+    const blockStart = match.index
+    const openTag = match[0]
+    const openTagEnd = blockStart + openTag.length
+
+    // 解析属性
+    const collapsedMatch = openTag.match(/data-collapsed="([^"]*)"/)
+    const titleMatch = openTag.match(/data-title="([^"]*)"/)
+    const isCollapsed = collapsedMatch ? collapsedMatch[1] === 'true' : true
+    const title = titleMatch ? titleMatch[1] : '点击展开'
+
+    // 通过跟踪 div 嵌套深度找到匹配的闭合标签
+    const depthRegex = /<\/?div\b/g
+    let depth = 1
+    let blockEndPos = -1
+    let depthMatch: RegExpExecArray | null
+
+    depthRegex.lastIndex = openTagEnd
+    while ((depthMatch = depthRegex.exec(html)) !== null) {
+      if (depthMatch[0].startsWith('</div')) {
+        depth--
+        if (depth === 0) {
+          blockEndPos = depthMatch.index + depthMatch[0].length + 1 // +1 跳过闭合标签的 '>'
+          break
+        }
+      } else {
+        depth++
+      }
+    }
+
+    if (blockEndPos === -1) continue // 无法匹配，跳过
+
+    const innerContent = html.substring(openTagEnd, depthMatch!.index)
+    const arrow = isCollapsed ? '&#9654;' : '&#9660;'
+    const contentClass = isCollapsed
+      ? 'fold-block-content is-collapsed'
+      : 'fold-block-content'
+
+    const replacement =
+      `<div data-type="fold" data-collapsed="${isCollapsed}" data-title="${title}" class="fold-block">` +
+      `<div class="fold-block-header">` +
+      `<button class="fold-toggle-btn">` +
+      `<span class="fold-icon">${arrow}</span>` +
+      `<span class="fold-title">${escapeHtml(title)}</span>` +
+      `</button>` +
+      `</div>` +
+      `<div class="${contentClass}">` +
+      innerContent +
+      `</div>` +
+      `</div>`
+
+    results.push({ start: blockStart, end: blockEndPos, replacement })
+  }
+
+  // 从后向前替换以保持偏移量正确
+  for (let i = results.length - 1; i >= 0; i--) {
+    const { start, end, replacement } = results[i]
+    html = html.substring(0, start) + replacement + html.substring(end)
+  }
+
+  return html
 }
 
 // 添加滚动监听
@@ -977,6 +1028,13 @@ watch(catalogItems, () => {
 :deep(div[data-type="fold"][data-collapsed="true"] > .fold-block-content),
 :deep(.fold-block-content.is-collapsed) {
   display: none !important;
+}
+
+/* 安全网：隐藏未结构化的折叠块内容（边缘情况兜底） */
+:deep(div[data-type="fold"][data-collapsed="true"]:not(:has(.fold-block-content))) {
+  & > *:not(.fold-block-header) {
+    display: none !important;
+  }
 }
 
 /* 移动端抽屉样式优化 */

@@ -13,9 +13,11 @@ const collapsed = computed<boolean>({
   },
 })
 
+const defaultTitle = '点击展开'
+
 const title = computed<string>({
   get: () => {
-    return props.node.attrs.title || '点击展开'
+    return props.node.attrs.title || ''
   },
   set: (title: string) => {
     props.updateAttributes({ title })
@@ -87,6 +89,9 @@ const startEditing = () => {
 
 const finishEditing = () => {
   isEditing.value = false
+  if (!title.value || !title.value.trim()) {
+    props.updateAttributes({ title: defaultTitle })
+  }
 }
 
 const handleTitleKeydown = (e: KeyboardEvent) => {
@@ -116,7 +121,7 @@ const handleTitleKeydown = (e: KeyboardEvent) => {
             @blur="finishEditing"
             @keydown="handleTitleKeydown"
           />
-          <span v-else class="title-text">{{ title }}</span>
+          <span v-else class="title-text">{{ title || defaultTitle }}</span>
         </div>
       </div>
       <div class="right-controls">
