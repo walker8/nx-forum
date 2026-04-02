@@ -110,16 +110,16 @@ export const useUserInfo = () =>
     lastActiveDate: ''
   }))
 
-let fetchPromise: Promise<void> | null = null
 export function useCurrentUser() {
   const user = useUser()
+  const fetchPromise = useState<Promise<void> | null>('currentUserFetchPromise', () => null)
 
   if (import.meta.client && !(user.value.userId && user.value.userId > 0)) {
     // 只在客户端执行代码 并且 userId 没有赋值
     nextTick(() => {
       const token = useCookie('x_token')
-      if (token.value && !fetchPromise) {
-        fetchPromise = getCurrentUser()
+      if (token.value && !fetchPromise.value) {
+        fetchPromise.value = getCurrentUser()
           .then((res) => {
             const data = res.data
             if (!data) {
@@ -130,7 +130,7 @@ export function useCurrentUser() {
             }
           })
           .finally(() => {
-            fetchPromise = null
+            fetchPromise.value = null
           })
       }
     })
@@ -197,8 +197,9 @@ export const useAuthConfig = async () => {
  * @param forumId 版块id
  * @returns
  */
-const permissionFetchPromises = new Map<number, Promise<any>>()
 export const useUserAuth = (forumId: number = 0) => {
+  const permissionFetchPromises = useState<Map<number, Promise<any>>>('permissionFetchPromises', () => new Map())
+
   // 服务端直接返回空实现，避免在 SSR 阶段发起权限接口请求
   if (import.meta.server) {
     const userAuth = useState('userAuth', () => ({
@@ -250,8 +251,8 @@ export const useUserAuth = (forumId: number = 0) => {
       return
     }
 
-    if (permissionFetchPromises.has(forumId)) {
-      await permissionFetchPromises.get(forumId)
+    if (permissionFetchPromises.value.has(forumId)) {
+      await permissionFetchPromises.value.get(forumId)
       return
     }
 
@@ -270,10 +271,10 @@ export const useUserAuth = (forumId: number = 0) => {
       .finally(() => {
         // 设置加载状态为 false
         userAuth.value.loadingStates.value[forumId] = false
-        permissionFetchPromises.delete(forumId)
+        permissionFetchPromises.value.delete(forumId)
       })
 
-    permissionFetchPromises.set(forumId, promise)
+    permissionFetchPromises.value.set(forumId, promise)
     await promise
   }
 
