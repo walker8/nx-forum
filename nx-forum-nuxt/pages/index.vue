@@ -13,8 +13,8 @@ getWebsiteBaseInfo().then((res) => {
 })
 useSeoMeta({
   title: () => website.value?.seoTitle,
-  ogTitle: website.value?.seoTitle,
-  description: website.value?.seoContent,
-  ogDescription: website.value?.seoContent
+  ogTitle: () => website.value?.seoTitle,
+  description: () => website.value?.seoContent,
+  ogDescription: () => website.value?.seoContent
 })
 </script>
