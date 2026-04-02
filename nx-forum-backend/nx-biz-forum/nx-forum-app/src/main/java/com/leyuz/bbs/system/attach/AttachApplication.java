@@ -3,6 +3,7 @@ package com.leyuz.bbs.system.attach;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpDownloader;
@@ -28,6 +29,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.URI;
 import java.util.Optional;
 
 @Service
@@ -151,6 +154,11 @@ public class AttachApplication {
         if (StringUtils.isEmpty(imageUrl) || !imageUrl.startsWith("http")) {
             return "";
         }
+        // SSRF 防护：禁止下载内网地址的图片
+        if (isInternalUrl(imageUrl)) {
+            log.warn("拒绝下载内网地址图片: {}", imageUrl);
+            return "";
+        }
         try {
             // 从URL下载图片为字节数组
             byte[] imageData = HttpDownloader.downloadBytes(imageUrl, 10 * 1000);
@@ -256,6 +264,27 @@ public class AttachApplication {
         if (!exists) {
             // 使用 FileUtil 创建多级目录
             FileUtil.mkdir(dirPath);
+        }
+    }
+
+    /**
+     * 判断 URL 是否指向内网地址（SSRF 防护）
+     */
+    private boolean isInternalUrl(String imageUrl) {
+        try {
+            String host = URI.create(imageUrl).getHost();
+            if (StringUtils.isEmpty(host)) {
+                return true;
+            }
+            InetAddress address = InetAddress.getByName(host);
+            if (address.isLoopbackAddress() || address.isSiteLocalAddress()
+                    || address.isLinkLocalAddress() || address.isAnyLocalAddress()) {
+                return true;
+            }
+            return NetUtil.isInnerIP(address.getHostAddress());
+        } catch (Exception e) {
+            log.warn("解析图片URL失败: {}", imageUrl);
+            return true;
         }
     }
 

@@ -40,6 +40,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 
+import org.owasp.encoder.Encode;
+
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
@@ -416,13 +418,18 @@ public class ThreadApplication {
         Page<ThreadPO> threadPOPage = forumThreadQueryStrategy.queryWithoutTop(threadQuery);
 
         CustomPage<ThreadVO> threadVOCustomPage = DataBaseUtils.createCustomPage(threadPOPage, threadConvert::convertThreadPO2VO);
-        String regex = "(?i)" + Pattern.quote(keyword); // (?i) 表示忽略大小写
+        // 先转义搜索关键词中的 HTML 特殊字符，防止 XSS
+        String escapedKeyword = Encode.forHtml(keyword);
+        String regex = "(?i)" + Pattern.quote(escapedKeyword);
         threadVOCustomPage.getRecords().forEach(threadVO -> {
             if (StringUtils.isNotEmpty(threadVO.getSubject())) {
-                threadVO.setSubject(threadVO.getSubject().replaceAll(regex, "<em>$0</em>"));
+                // 先转义 subject 中的 HTML，再高亮转义后的关键词
+                String safeSubject = Encode.forHtml(threadVO.getSubject());
+                threadVO.setSubject(safeSubject.replaceAll(regex, "<em>$0</em>"));
             }
             if (StringUtils.isNotEmpty(threadVO.getBrief())) {
-                threadVO.setBrief(threadVO.getBrief().replaceAll(regex, "<em>$0</em>"));
+                String safeBrief = Encode.forHtml(threadVO.getBrief());
+                threadVO.setBrief(safeBrief.replaceAll(regex, "<em>$0</em>"));
             }
         });
         return threadVOCustomPage;
