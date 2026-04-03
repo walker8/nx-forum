@@ -270,6 +270,10 @@ The system uses a two-tier detection strategy:
 7. **Validation**: Use `ValidationException` for business validation errors (4xx), `BusinessException` for system
    errors (5xx).
 
+8. **Comments**: Add comments for most lines of code, on separate lines (not inline comments).
+
+9. **JavaDoc**: Required for all classes, methods, and interfaces.
+
 ## Workflow Orchestration
 
 ### 1. Plan Node Default
