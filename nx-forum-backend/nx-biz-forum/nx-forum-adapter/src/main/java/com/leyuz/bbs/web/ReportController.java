@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @Tag(name = "举报管理", description = "用户举报相关接口")
 @RestController
-@RequestMapping("/report")
+@RequestMapping("/v1/report")
 @RequiredArgsConstructor
 public class ReportController {
 

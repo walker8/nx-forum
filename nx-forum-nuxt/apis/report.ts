@@ -6,7 +6,7 @@ import Http from '../utils/request'
  * @returns
  */
 export function createReport(params: CreateReportCommand) {
-  return Http.post('/report/create', params)
+  return Http.post('/v1/report/create', params)
 }
 
 /**
@@ -15,7 +15,7 @@ export function createReport(params: CreateReportCommand) {
  * @returns
  */
 export function queryReports(params: any) {
-  return Http.get('/admin/report/list', params)
+  return Http.get('/v1/admin/report/list', params)
 }
 
 /**
@@ -24,5 +24,5 @@ export function queryReports(params: any) {
  * @returns
  */
 export function handleReport(params: HandleReportCommand & { notice?: boolean }) {
-  return Http.post('/admin/report/handle', params)
+  return Http.post('/v1/admin/report/handle', params)
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "管理后台-举报管理", description = "管理员处理举报相关接口")
 @RestController
-@RequestMapping("/admin/report")
+@RequestMapping("/v1/admin/report")
 @RequiredArgsConstructor
 public class AdminReportController {
 
