@@ -9,6 +9,7 @@ import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import Image from '@tiptap/extension-image'
+import Link from '@tiptap/extension-link'
 import { mergeAttributes } from '@tiptap/core'
 
 interface Props {
@@ -46,6 +47,15 @@ const editor = useEditor({
       strike: false,
       code: false,
       hardBreak: false,
+      link: false,
+    }),
+    Link.configure({
+      openOnClick: false,
+      autolink: true,
+      HTMLAttributes: {
+        rel: 'noopener noreferrer nofollow',
+        target: '_blank',
+      },
     }),
     Placeholder.configure({
       placeholder: props.placeholder,
