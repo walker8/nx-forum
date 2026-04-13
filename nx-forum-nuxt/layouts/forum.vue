@@ -101,7 +101,10 @@ const queryForumThreads = async (forumName: string, canLoading = false) => {
 // 获取当前访问的版块名称
 const currentForumName = route.params.forumName as string
 
-if (forumMenu.value.selctedMenu !== 'forums' && forumMenu.value.menus?.length <= 0) {
+const nuxtApp = useNuxtApp()
+if (import.meta.client && nuxtApp.isHydrating) {
+  // 水合阶段：SSR 数据已通过 useState 传输到客户端，跳过重复请求
+} else if (forumMenu.value.selctedMenu !== 'forums' && forumMenu.value.menus?.length <= 0) {
   // 不是从全部版块页面跳转而来的
   try {
     let res = await getForumShowMenu()
