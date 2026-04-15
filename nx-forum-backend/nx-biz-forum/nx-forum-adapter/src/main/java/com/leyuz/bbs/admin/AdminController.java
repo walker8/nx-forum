@@ -42,7 +42,7 @@ public class AdminController {
 
     @Operation(summary = "查询帖子审核数量")
     @GetMapping("/posts/auditing/count")
-    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:manage')")
+    @PreAuthorize("@forumPermissionResolver.hasPermission(#forumId, 'admin:manage')")
     public SingleResponse getAuditingCount(@RequestParam Integer forumId) {
         Map<String, Long> map = new HashMap<>();
         long threadAuditCount = threadApplication.getAuditingCount(forumId);

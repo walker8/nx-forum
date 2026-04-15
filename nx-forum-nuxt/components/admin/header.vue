@@ -123,7 +123,11 @@ getAuditingCount(forumId.value).then((res) => {
 
 const { user, handleLogout } = useCurrentUser()
 const go = (path: string) => {
-  navigateTo(`${path}`)
+  let fullPath = path
+  if (forumId.value) {
+    fullPath += path.includes('?') ? `&forumId=${forumId.value}` : `?forumId=${forumId.value}`
+  }
+  navigateTo(fullPath)
 }
 const goUserCenterAdmin = () => {
   window.open('/uc/admin', '_blank')
