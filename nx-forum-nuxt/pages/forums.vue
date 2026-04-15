@@ -56,7 +56,7 @@ const goForum = (name: string) => {
 
 const goForumAdmin = (forumId: number) => {
   if (forumId) {
-    window.open(`/admin?forumId=${forumId}`, '_blank')
+    window.open(`/admin/thread?forumId=${forumId}&status=auditing`, '_blank')
   }
 }
 

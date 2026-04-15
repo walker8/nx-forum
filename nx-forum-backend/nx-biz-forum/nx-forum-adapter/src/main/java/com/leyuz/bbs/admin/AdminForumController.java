@@ -5,6 +5,7 @@ import com.leyuz.bbs.forum.ForumApplication;
 import com.leyuz.bbs.forum.ForumPO;
 import com.leyuz.bbs.forum.dto.ForumCmd;
 import com.leyuz.bbs.forum.dto.ForumItemVO;
+import com.leyuz.bbs.forum.dto.ForumMenuItemVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -86,8 +87,7 @@ public class AdminForumController {
 
     @Operation(summary = "获取管理员版块菜单（包含归档版块）")
     @GetMapping("/menu")
-    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:system:forum')")
-    public SingleResponse<List<com.leyuz.bbs.forum.dto.ForumMenuItemVO>> getAdminForumMenu() {
+    public SingleResponse<List<ForumMenuItemVO>> getAdminForumMenu() {
         return SingleResponse.of(forumApplication.getAdminForumMenu());
     }
 }
