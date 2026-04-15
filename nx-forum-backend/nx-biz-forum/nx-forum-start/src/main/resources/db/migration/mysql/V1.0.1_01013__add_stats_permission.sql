@@ -19,7 +19,7 @@ INSERT INTO `uc_permissions` VALUES (
 INSERT INTO `uc_role_permissions` VALUES (
     NULL,                                  -- id (auto-increment)
     'ADMIN',
-    49,                                    -- perm_id for admin:stats
+    'admin:stats',                         -- perms for admin:stats
     1,
     NOW(),
     1,

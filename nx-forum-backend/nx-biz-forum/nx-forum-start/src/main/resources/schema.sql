@@ -501,7 +501,7 @@ DROP TABLE IF EXISTS `uc_role_permissions`;
 CREATE TABLE `uc_role_permissions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `role_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '角色key',
-  `perm_id` bigint unsigned NOT NULL COMMENT '菜单ID',
+  `perms` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '权限标识',
   `create_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '创建者',
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '更新者',

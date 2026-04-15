@@ -21,5 +21,5 @@ public class RolePermissionPO extends BaseEntity {
 
     private String roleKey;
 
-    private Long permId;
+    private String perms;
 } 

@@ -7,7 +7,6 @@ import com.leyuz.common.mybatis.DataBaseUtils;
 import com.leyuz.common.mybatis.PageQuery;
 import com.leyuz.module.cache.GenericCache;
 import com.leyuz.uc.auth.RolePermissionApplication;
-import com.leyuz.uc.auth.permission.PermissionMapper;
 import com.leyuz.uc.auth.role.dataobject.RoleStatusV;
 import com.leyuz.uc.auth.role.dto.*;
 import com.leyuz.uc.auth.role.gateway.RoleGateway;
@@ -27,7 +26,6 @@ public class RoleApplication {
     private final RoleGateway roleGateway;
     private final RoleMapper roleMapper;
     private final RolePermissionApplication rolePermissionApplication;
-    private final PermissionMapper permissionMapper;
     private final GenericCache<String, List<RoleDTO>> roleListCache;
 
     private static final Pattern ROLE_KEY_PATTERN = Pattern.compile("^[a-zA-Z]\\w{0,99}$");
@@ -53,15 +51,12 @@ public class RoleApplication {
 
         RoleDTO roleDTO = convertToDTO(roleE);
 
-        // 获取角色的权限列表
+        // 获取角色的权限标识列表
         List<RolePermissionPO> rolePermissions = rolePermissionApplication.listByRoleKey(roleE.getRoleKey());
         if (!CollectionUtils.isEmpty(rolePermissions)) {
-            List<Long> permIds = rolePermissions.stream()
-                    .map(RolePermissionPO::getPermId)
+            List<String> perms = rolePermissions.stream()
+                    .map(RolePermissionPO::getPerms)
                     .toList();
-
-            // 获取权限标识列表
-            List<String> perms = permissionMapper.listPermsByIds(permIds);
             roleDTO.setPerms(perms);
         }
 

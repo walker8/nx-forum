@@ -22,6 +22,16 @@ public interface RolePermissionMapper extends BaseMapper<RolePermissionPO> {
     List<RolePermissionPO> listByRoleKey(@Param("roleKey") String roleKey);
 
     /**
+     * 根据角色标识查询权限标识列表
+     *
+     * @param roleKey 角色标识
+     * @return 权限标识列表
+     */
+    @Select("SELECT perms FROM uc_role_permissions " +
+            "WHERE role_key = #{roleKey} AND is_deleted = 0")
+    List<String> listPermsByRoleKey(@Param("roleKey") String roleKey);
+
+    /**
      * 逻辑删除角色的所有权限
      *
      * @param roleKey 角色标识

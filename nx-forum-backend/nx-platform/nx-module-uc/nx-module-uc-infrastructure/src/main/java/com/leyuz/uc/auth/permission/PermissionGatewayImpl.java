@@ -1,10 +1,11 @@
 package com.leyuz.uc.auth.permission;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.leyuz.common.utils.BaseEntityUtils;
+import com.leyuz.uc.auth.role.RolePermissionMapper;
 import com.leyuz.uc.auth.permission.dataobject.PermissionStatusV;
 import com.leyuz.uc.auth.permission.dataobject.PermissionTypeV;
 import com.leyuz.uc.auth.permission.gateway.PermissionGateway;
+import com.leyuz.common.utils.BaseEntityUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class PermissionGatewayImpl implements PermissionGateway {
 
     private final PermissionMapper permissionMapper;
+    private final RolePermissionMapper rolePermissionMapper;
 
     @Override
     public Optional<PermissionE> getById(Long permId) {
@@ -102,7 +104,7 @@ public class PermissionGatewayImpl implements PermissionGateway {
 
     @Override
     public List<String> listPermsByRoleKey(String roleKey) {
-        return permissionMapper.selectPermsByRoleKey(roleKey);
+        return rolePermissionMapper.listPermsByRoleKey(roleKey);
     }
 
     @Override

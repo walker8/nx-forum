@@ -3,7 +3,6 @@ package com.leyuz.uc.auth;
 import com.leyuz.common.exception.ValidationException;
 import com.leyuz.common.utils.BaseEntityUtils;
 import com.leyuz.uc.auth.permission.PermissionMapper;
-import com.leyuz.uc.auth.permission.PermissionPO;
 import com.leyuz.uc.auth.role.RolePermissionMapper;
 import com.leyuz.uc.auth.role.RolePermissionPO;
 import com.leyuz.uc.auth.role.dto.RolePermissionCreateCmd;
@@ -25,13 +24,15 @@ public class RolePermissionApplication {
 
     public boolean save(RolePermissionCreateCmd rolePermissionCreateCmd) {
         String perms = rolePermissionCreateCmd.getPerms();
-        RolePermissionPO rolePermissionPO = new RolePermissionPO();
-        rolePermissionPO.setRoleKey(rolePermissionCreateCmd.getRoleKey());
-        PermissionPO permissionPO = permissionMapper.getByPerms(perms);
-        if (permissionPO == null) {
+
+        // 校验权限标识是否存在
+        if (permissionMapper.getByPerms(perms) == null) {
             throw new ValidationException("资源不存在");
         }
-        rolePermissionPO.setPermId(permissionPO.getPermId());
+
+        RolePermissionPO rolePermissionPO = new RolePermissionPO();
+        rolePermissionPO.setRoleKey(rolePermissionCreateCmd.getRoleKey());
+        rolePermissionPO.setPerms(perms);
         BaseEntityUtils.setCreateBaseEntity(rolePermissionPO);
         return rolePermissionMapper.insert(rolePermissionPO) > 0;
     }

@@ -19,7 +19,7 @@ INSERT INTO uc_permissions VALUES (
 INSERT INTO uc_role_permissions VALUES (
     NULL,
     'ADMIN',
-    49,
+    'admin:stats',
     1,
     CURRENT_TIMESTAMP,
     1,
