@@ -108,7 +108,8 @@ const clearNotificationCount = (notificationType: string) => {
   userNotification.value.totalCount =
     userNotification.value.mentionCount +
     userNotification.value.systemCount +
-    userNotification.value.replyCount
+    userNotification.value.replyCount +
+    (userNotification.value.totalAuditCount ?? 0)
 }
 
 const loadMoreNotifications = () => {

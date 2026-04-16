@@ -5,14 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.leyuz.bbs.content.comment.CommentMapper;
-import com.leyuz.bbs.content.comment.CommentReplyMapper;
 import com.leyuz.bbs.common.constant.CommonConst;
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
 import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
-import com.leyuz.bbs.content.comment.CommentE;
-import com.leyuz.bbs.content.comment.CommentReplyE;
 import com.leyuz.bbs.content.comment.gateway.CommentGateway;
 import com.leyuz.common.mybatis.CustomPage;
 import com.leyuz.common.mybatis.DataBaseUtils;
@@ -417,7 +413,7 @@ public class CommentGatewayImpl implements CommentGateway {
 
     @Override
     public Long countCommentsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
-                                           String terminalType, String platform) {
+                                            String terminalType, String platform) {
         // Count top-level comments in date range
         QueryWrapper<CommentPO> commentWrapper = new QueryWrapper<>();
         commentWrapper.eq("is_deleted", false);

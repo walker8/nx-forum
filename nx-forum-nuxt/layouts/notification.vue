@@ -27,6 +27,22 @@
                   {{ userNotificationCount[menu.count] }}
                 </el-tag>
               </el-menu-item>
+              <el-menu-item
+                v-if="userNotificationCount.totalAuditCount !== null"
+                index="admin"
+                @click="goNotificationTabs('admin')"
+              >
+                <span>管理消息</span>
+                <el-tag
+                  type="danger"
+                  effect="dark"
+                  size="small"
+                  class="ml-2"
+                  v-if="userNotificationCount.totalAuditCount > 0"
+                >
+                  {{ userNotificationCount.totalAuditCount }}
+                </el-tag>
+              </el-menu-item>
             </el-menu>
           </el-aside>
           <el-main class="forum-main">
@@ -42,6 +58,12 @@
                   :title="menu.label"
                   :name="menu.value"
                   :dot="userNotificationCount[menu.count] > 0"
+                />
+                <van-tab
+                  v-if="userNotificationCount.totalAuditCount !== null"
+                  title="管理消息"
+                  name="admin"
+                  :dot="userNotificationCount.totalAuditCount > 0"
                 />
               </van-tabs>
             </div>
@@ -63,6 +85,8 @@ const onClickTab = ({ name }) => {
 const goNotificationTabs = (name) => {
   if ('reply' === name) {
     navigateTo(`/notification`)
+  } else if ('admin' === name) {
+    navigateTo(`/admin/thread?status=auditing`)
   } else {
     navigateTo(`/notification/${name}`)
   }

@@ -18,7 +18,7 @@ import com.leyuz.bbs.interaction.report.dto.constant.ReportHandleStatusEnum;
 import com.leyuz.bbs.interaction.report.dto.constant.ReportTargetTypeEnum;
 import com.leyuz.bbs.interaction.report.dto.constant.ReportTypeEnum;
 import com.leyuz.bbs.interaction.report.model.ReportE;
-import com.leyuz.bbs.system.notification.NotificationApplication;
+import com.leyuz.bbs.interaction.report.event.ReportHandledEvent;
 import com.leyuz.common.exception.ValidationException;
 import com.leyuz.common.mybatis.CustomPage;
 import com.leyuz.common.mybatis.DataBaseUtils;
@@ -28,6 +28,7 @@ import com.leyuz.uc.user.UserE;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,7 +44,7 @@ public class ReportApplication {
     private final CommentApplication commentApplication;
     private final UserApplication userApplication;
     private final ForumPermissionResolver forumPermissionResolver;
-    private final NotificationApplication notificationApplication;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void createReport(ReportCreateCmd cmd) {
         // 禁止重复举报校验
@@ -141,37 +142,8 @@ public class ReportApplication {
 
         // 如果需要通知用户
         if (Boolean.TRUE.equals(cmd.getNotifyUser())) {
-            sendNotificationToReporter(report);
+            eventPublisher.publishEvent(new ReportHandledEvent(this, report));
         }
-    }
-
-    /**
-     * 向举报人发送系统通知
-     *
-     * @param report 举报实体
-     */
-    private void sendNotificationToReporter(ReportE report) {
-        String status = report.getHandleStatus() == ReportHandleStatusEnum.APPROVED ? "违规" : "驳回";
-        String subject = "您的举报已处理";
-
-        // 构建通知内容
-        StringBuilder message = new StringBuilder();
-        message.append("您举报的内容已被管理员处理为【").append(status).append("】。<br />");
-
-        // 添加被举报内容摘要
-        if (StringUtils.isNotEmpty(report.getReportedContent())) {
-            message.append("被举报内容: ").append(report.getReportedContent()).append("<br />");
-        }
-
-        // 添加处理说明（如果有）
-        if (report.getHandleStatus() == ReportHandleStatusEnum.REJECTED
-                && StringUtils.isNotEmpty(report.getHandleReason())) {
-            // 驳回原因
-            message.append("处理说明: ").append(report.getHandleReason());
-        }
-
-        // 发送系统通知
-        notificationApplication.sendSystemNotification(report.getCreateBy(), subject, message.toString());
     }
 
     public CustomPage<ReportDTO> queryReports(ReportPageQuery query) {

@@ -94,7 +94,8 @@ export const useUserNotificationCount = () =>
     replyCount: 0,
     systemCount: 0,
     mentionCount: 0,
-    totalCount: 0
+    totalCount: 0,
+    totalAuditCount: null as number | null
   }))
 
 export const useUserMenus = () => useState<ForumMenuItemVO[]>('userMenus', () => [])

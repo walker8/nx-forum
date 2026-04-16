@@ -81,6 +81,18 @@
                         {{ userNotification.systemCount }}
                       </el-tag>
                     </el-dropdown-item>
+                    <el-dropdown-item @click="go('/admin/thread?status=auditing')" v-if="userNotification.totalAuditCount !== null">
+                      管理消息
+                      <el-tag
+                        type="danger"
+                        effect="dark"
+                        size="small"
+                        class="ml-2"
+                        v-if="userNotification.totalAuditCount > 0"
+                      >
+                        {{ userNotification.totalAuditCount }}
+                      </el-tag>
+                    </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -171,7 +183,8 @@ const fetchNotificationCount = async () => {
       mentionCount: data.mentionCount,
       replyCount: data.replyCount,
       systemCount: data.systemCount,
-      totalCount: data.totalCount
+      totalCount: data.totalCount,
+      totalAuditCount: data.totalAuditCount ?? null
     }
   } catch (error) {
     console.error('获取通知数量失败:', error)
@@ -196,7 +209,8 @@ watch(
         mentionCount: 0,
         replyCount: 0,
         systemCount: 0,
-        totalCount: 0
+        totalCount: 0,
+        totalAuditCount: null
       }
     }
   },

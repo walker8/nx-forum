@@ -3,15 +3,22 @@ package com.leyuz.bbs.system.notification;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.leyuz.bbs.auth.ForumPermissionResolver;
 import com.leyuz.bbs.common.utils.HtmlUtils;
 import com.leyuz.bbs.common.utils.TextUtils;
+import com.leyuz.bbs.content.comment.CommentApplication;
 import com.leyuz.bbs.content.comment.CommentE;
 import com.leyuz.bbs.content.comment.CommentReplyE;
 import com.leyuz.bbs.content.comment.gateway.CommentGateway;
+import com.leyuz.bbs.content.thread.ThreadApplication;
 import com.leyuz.bbs.content.thread.ThreadE;
 import com.leyuz.bbs.content.thread.gateway.ThreadGateway;
 import com.leyuz.bbs.forum.ForumApplication;
 import com.leyuz.bbs.forum.ForumPO;
+import com.leyuz.bbs.interaction.report.ReportApplication;
+import com.leyuz.bbs.interaction.report.dto.constant.ReportHandleStatusEnum;
+import com.leyuz.bbs.interaction.report.event.ReportHandledEvent;
+import com.leyuz.bbs.interaction.report.model.ReportE;
 import com.leyuz.bbs.system.notification.dto.NotificationExtra;
 import com.leyuz.bbs.system.notification.dto.NotificationVO;
 import com.leyuz.bbs.system.notification.dto.constant.NotificationStatusV;
@@ -25,13 +32,18 @@ import com.leyuz.common.utils.TimeUtils;
 import com.leyuz.uc.user.UserApplication;
 import com.leyuz.uc.user.UserE;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class NotificationApplication {
     private final NotificationMapper notificationMapper;
@@ -39,6 +51,10 @@ public class NotificationApplication {
     private final CommentGateway commentsGateway;
     private final UserApplication userApplication;
     private final ForumApplication forumApplication;
+    private final ThreadApplication threadApplication;
+    private final CommentApplication commentApplication;
+    private final ReportApplication reportApplication;
+    private final ForumPermissionResolver forumPermissionResolver;
 
     public void sendNotification(NotificationE notificationE) {
         NotificationPO po = entityToPo(notificationE);
@@ -264,7 +280,7 @@ public class NotificationApplication {
 
         for (NotificationPO po : unreadNotifications) {
             NotificationTypeV type = NotificationTypeV.of(po.getNotificationType());
-            switch (type) {
+            switch (Objects.requireNonNull(type)) {
                 case AT:
                     mentionCount++;
                     break;
@@ -280,8 +296,51 @@ public class NotificationApplication {
         map.put("mentionCount", mentionCount);
         map.put("replyCount", replyCount);
         map.put("systemCount", systemCount);
-        map.put("totalCount", mentionCount + replyCount + systemCount);
+
+        // 检查是否有管理员权限，有则返回待审核计数
+        long totalAuditCount = 0L;
+        try {
+            if (forumPermissionResolver.hasPermission("admin:manage")) {
+                long threadAudit = threadApplication.getAuditingCount(null);
+                long commentAudit = commentApplication.getCommentAuditingCount(null);
+                long replyAudit = commentApplication.getReplyAuditingCount(null);
+                long reportPending = reportApplication.getPendingReportCount(null);
+                totalAuditCount = threadAudit + commentAudit + replyAudit + reportPending;
+                map.put("totalAuditCount", totalAuditCount);
+            }
+        } catch (Exception e) {
+            log.error("获取审核数据失败", e);
+        }
+
+        map.put("totalCount", mentionCount + replyCount + systemCount + totalAuditCount);
         return map;
+    }
+
+    /**
+     * 监听举报处理事件，向举报人发送系统通知（事务提交后执行，避免事务回滚但通知已发出）
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onReportHandled(ReportHandledEvent event) {
+        ReportE report = event.getEventData();
+        String status = report.getHandleStatus() == ReportHandleStatusEnum.APPROVED ? "违规" : "驳回";
+        String subject = "您的举报已处理";
+
+        // 构建通知内容
+        StringBuilder message = new StringBuilder();
+        message.append("您举报的内容已被管理员处理为【").append(status).append("】。<br />");
+
+        // 添加被举报内容摘要
+        if (StringUtils.isNotEmpty(report.getReportedContent())) {
+            message.append("被举报内容: ").append(report.getReportedContent()).append("<br />");
+        }
+
+        // 添加处理说明（驳回时）
+        if (report.getHandleStatus() == ReportHandleStatusEnum.REJECTED
+                && StringUtils.isNotEmpty(report.getHandleReason())) {
+            message.append("处理说明: ").append(report.getHandleReason());
+        }
+
+        sendSystemNotification(report.getCreateBy(), subject, message.toString());
     }
 
     public CustomPage<NotificationVO> queryNotifications(String type, int pageNo, int pageSize) {
