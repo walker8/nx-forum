@@ -72,9 +72,8 @@ const fetch = async (url: string, options?: any): Promise<any> => {
           }
           const res = data.value
           if (!res) {
-            // 这里处理错误回调
-            // reject(value)
-            // $router.replace('/reject/' + value.status)
+            reject('服务器返回数据为空')
+            return
           } else if (!res.success) {
             reject(res.errMessage)
           } else {

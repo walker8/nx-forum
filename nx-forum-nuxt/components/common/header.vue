@@ -128,7 +128,6 @@
 </template>
 <script setup lang="ts">
 import { ArrowDown, Search, BellFilled } from '@element-plus/icons-vue'
-import { getNotificationCount } from '~/apis/notification'
 
 const props = defineProps({
   //类型
@@ -174,46 +173,12 @@ const { user, handleLogout } = useCurrentUser()
 const userNotification = useUserNotificationCount()
 const { hasPermission, authPromise } = useUserAuth()
 await authPromise
-// 获取通知数量
-const fetchNotificationCount = async () => {
-  try {
-    const res = await getNotificationCount()
-    const data = res.data
-    userNotification.value = {
-      mentionCount: data.mentionCount,
-      replyCount: data.replyCount,
-      systemCount: data.systemCount,
-      totalCount: data.totalCount,
-      totalAuditCount: data.totalAuditCount ?? null
-    }
-  } catch (error) {
-    console.error('获取通知数量失败:', error)
-  }
-}
+// 初始化通知数量获取
+useInitNotificationCount()
 
 const authConfig = ref()
 onMounted(async () => {
   const res = await useAuthConfig()
   authConfig.value = res.value
 })
-
-// 监听用户ID变化
-watch(
-  () => user.value.userId,
-  (userId) => {
-    if (userId && userId > 0) {
-      fetchNotificationCount()
-    } else {
-      // 用户未登录或登出时，清空通知计数
-      userNotification.value = {
-        mentionCount: 0,
-        replyCount: 0,
-        systemCount: 0,
-        totalCount: 0,
-        totalAuditCount: null
-      }
-    }
-  },
-  { immediate: true }
-)
 </script>

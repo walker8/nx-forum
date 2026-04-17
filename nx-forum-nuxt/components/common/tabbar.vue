@@ -23,6 +23,8 @@
 <script lang="ts" setup>
 const active = ref('home')
 const userNotification = useUserNotificationCount()
+// 确保通知数量被获取（不依赖 header 组件的副作用）
+useInitNotificationCount()
 const change = (name: string) => {
   if (name === 'home') {
     navigateTo('/')
