@@ -28,9 +28,7 @@ const fetch = async (url: string, options?: any): Promise<any> => {
     }
   }
   return new Promise((resolve, reject) => {
-    const nuxtApp = useNuxtApp()
-    const hydrating = import.meta.client && !nuxtApp.isHydrating
-    if (hydrating) {
+    if (import.meta.client) {
       // 客户端访问
       $fetch(reqUrl, {
         ...options,
