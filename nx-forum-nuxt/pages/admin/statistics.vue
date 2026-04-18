@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {EChartsOption} from 'echarts'
+import {useEChartsInit} from '~/composables/useEChartsInit'
 import type {DailyStatsVO, StatsOverviewVO, StatsTrendVO} from '~/apis/statistics'
 import {getStatsByPlatform, getStatsByTerminal, getStatsOverview, getStatsTrend} from '~/apis/statistics'
 import {getUserStatsOverview} from '~/apis/uc/statistics'
@@ -15,6 +16,8 @@ definePageMeta({
 useHead({
   title: '数据统计 - NX Forum'
 })
+
+useEChartsInit()
 
 // ============================================
 // TYPES

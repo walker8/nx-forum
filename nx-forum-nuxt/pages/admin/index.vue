@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {EChartsOption} from 'echarts'
+import {useEChartsInit} from '~/composables/useEChartsInit'
 import type {DashboardOverview} from '~/apis/admin/dashboard'
 import type {Component} from 'vue'
 import {getDashboardOverview} from '~/apis/admin/dashboard'
@@ -22,6 +23,8 @@ definePageMeta({
 useHead({
   title: '管理后台 - NX Forum'
 })
+
+useEChartsInit()
 
 const loading = ref(true)
 const refreshing = ref(false)

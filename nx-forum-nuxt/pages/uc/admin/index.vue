@@ -7,6 +7,7 @@ import {
   RefreshRight
 } from '@element-plus/icons-vue'
 import type { EChartsOption } from 'echarts'
+import { useEChartsInit } from '~/composables/useEChartsInit'
 import type {
   UserStatsOverviewVO,
   UserRegistrationTrendVO
@@ -24,6 +25,8 @@ definePageMeta({
 useHead({
   title: '用户中心管理 - NX Forum'
 })
+
+useEChartsInit()
 
 // ============================================
 // STATE

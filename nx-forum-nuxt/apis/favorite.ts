@@ -11,5 +11,5 @@ export const toggleFavorite = (data: FavoriteCmd) => {
 }
 
 export const queryFavoritesByUserId = (userId: number, query: Query) => {
-  return Http.get(`/v1/users/${userId}/favorites`, { params: query })
+  return Http.get(`/v1/users/${userId}/favorites`, query)
 } 
