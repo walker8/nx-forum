@@ -85,7 +85,6 @@
 <script setup lang="ts">
 import { Edit, Warning, List } from '@element-plus/icons-vue'
 import { useReport } from '~/composables/useReport'
-import { useMermaidRenderer } from '~/composables/useMermaidRenderer'
 
 definePageMeta({
   layout: 'thread'
@@ -418,7 +417,8 @@ onMounted(() => {
 
     // Render Mermaid diagrams
     if (hasMermaidDiagram.value) {
-      nextTick(() => {
+      nextTick(async () => {
+        const { useMermaidRenderer } = await import('~/composables/useMermaidRenderer')
         const { renderMermaidDiagrams } = useMermaidRenderer()
         const content = document.querySelector('.article-content') as HTMLElement
         if (content) {

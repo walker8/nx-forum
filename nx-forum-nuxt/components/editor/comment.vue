@@ -149,7 +149,8 @@ import {uploadImage} from '@/apis/image'
 import {createComment, createCommentReply} from '@/apis/comment'
 import {ElMessage} from 'element-plus'
 import type {Emotion} from '~/composables/useEmotions'
-import CommentEditor from './comment-editor.vue'
+
+const CommentEditor = defineAsyncComponent(() => import('./comment-editor.vue'))
 
 const thread = useThread()
 const {user} = useCurrentUser()
