@@ -217,7 +217,7 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python mysql2h2.py <mysql_sql_file> [output_file]")
         print("\nExample:")
-        print("  python mysql2h2.py V1.0.0_250629__init.sql V1.0.0_250629__init_h2.sql")
+        print("  python mysql2h2.py V1.0.0_260419__init.sql V1.0.0_260419__init_h2.sql")
         sys.exit(1)
 
     input_file = sys.argv[1]
