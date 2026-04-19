@@ -29,7 +29,7 @@
             </el-icon>
             <span>基本设置</span>
           </el-menu-item>
-          <el-menu-item index="2-1" @click="handleMenuClick('/admin/analytics')" v-if="hasPermission('admin:system:basic')">
+          <el-menu-item index="2-1" @click="handleMenuClick('/admin/analytics')" v-if="hasPermission('admin:system:analytics')">
             <el-icon>
               <Icon name="tabler:chart-line" />
             </el-icon>

@@ -34,14 +34,14 @@ public class AdminConfigController {
 
     @Operation(summary = "获取统计配置")
     @GetMapping("/analytics")
-    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:system:basic')")
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:system:analytics')")
     public SingleResponse<AnalyticsConfigDTO> getAnalyticsConfigByAdmin() {
         return SingleResponse.of(forumConfigApplication.getAnalyticsConfigByAdmin());
     }
 
     @Operation(summary = "更新统计配置")
     @PutMapping("/analytics")
-    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:system:basic')")
+    @PreAuthorize("@forumPermissionResolver.hasPermission('admin:system:analytics')")
     public SingleResponse<String> updateAnalyticsConfigByAdmin(@RequestBody AnalyticsConfigDTO config) {
         forumConfigApplication.updateAnalyticsConfig(config);
         return SingleResponse.of("更新成功");

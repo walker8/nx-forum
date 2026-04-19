@@ -752,71 +752,94 @@ INSERT INTO common_configs VALUES (12,'audit_config_black_white_users','{
 }',0,'',1,CURRENT_TIMESTAMP,4,CURRENT_TIMESTAMP,0);
 INSERT INTO common_configs VALUES (13,'audit_config_sensitive_words','{"enableSensitiveWordsAudit":true,"sensitiveWords":[]}',0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 -- ----------------------------
--- uc_permissions 数据
+-- uc_permissions 数据（权限树：按层级排序，ID 连续）
 -- ----------------------------
-INSERT INTO uc_permissions VALUES (3,24,'查看主题',0,'thread:view',3,0,'查看帖子的权限',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (4,24,'编辑帖子',0,'thread:edit',3,2,'编辑帖子的权限',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (7,24,'删除主题',0,'thread:delete',3,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (8,24,'新建主题',0,'thread:new',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (9,25,'新建评论',0,'comment:new',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (10,25,'删除评论',0,'comment:delete',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (11,0,'用户权限',0,'',1,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (12,0,'管理权限',0,'admin:manage',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (14,12,'系统管理',0,'admin:system',2,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (15,14,'基本设置',0,'admin:system:basic',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (16,14,'版块管理',0,'admin:system:forum',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (17,14,'审核设置',0,'admin:system:audit',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (18,12,'帖子管理',0,'admin:thread',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (19,11,'访问论坛',0,'forum:visit',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (20,19,'访问版块',0,'forum:visit:section',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (21,18,'主题查询',0,'admin:thread:search',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (22,18,'评论查询',0,'admin:comment:search',2,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (23,21,'删除主题',0,'admin:thread:delete',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (24,11,'主题管理',0,'',1,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (25,11,'评论管理',0,'',1,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (26,21,'置顶主题',0,'admin:thread:top',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (27,21,'关闭主题',0,'admin:thread:close',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (28,21,'主题精华',0,'admin:thread:digest',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (29,21,'推荐主题',0,'admin:thread:recommend',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (30,21,'转移主题',0,'admin:thread:transfer',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (31,21,'编辑主题',0,'admin:thread:edit',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (32,21,'还原主题',0,'admin:thread:restore',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (33,21,'通过主题',0,'admin:thread:pass',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (34,21,'拒绝主题',0,'admin:thread:reject',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (35,22,'删除评论',0,'admin:comment:delete',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (36,22,'通过评论',0,'admin:comment:pass',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (37,22,'拒绝评论',0,'admin:comment:reject',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (38,22,'还原评论',0,'admin:comment:restore',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (39,19,'访问其他',0,'forum:visit:other',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (40,11,'附件上传',0,'',1,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (41,40,'上传图片',0,'image:upload',3,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (42,40,'上传头像',0,'avatar:upload',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (43,14,'自定义页面',0,'admin:system:page',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (44,14,'图片管理',0,'admin:system:image',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (45,12,'用户管理',0,'admin:user',2,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (46,45,'小黑屋',0,'admin:user:ban',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (47,12,'管理首页',0,'admin:home',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (48,18,'用户举报',0,'admin:user:report',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_permissions VALUES (49,12,'统计数据',0,'admin:stats',2,4,'论坛统计数据查询权限',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- ========== 用户权限树 ==========
+INSERT INTO uc_permissions VALUES (1,0,'用户权限',0,'',1,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 主题管理
+INSERT INTO uc_permissions VALUES (2,1,'主题管理',0,'',1,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (3,2,'查看主题',0,'thread:view',3,0,'查看帖子的权限',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (4,2,'新建主题',0,'thread:new',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (5,2,'编辑帖子',0,'thread:edit',3,2,'编辑帖子的权限',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (6,2,'删除主题',0,'thread:delete',3,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 评论管理
+INSERT INTO uc_permissions VALUES (7,1,'评论管理',0,'',1,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (8,7,'新建评论',0,'comment:new',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (9,7,'删除评论',0,'comment:delete',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 访问论坛
+INSERT INTO uc_permissions VALUES (10,1,'访问论坛',0,'forum:visit',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (11,10,'访问版块',0,'forum:visit:section',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (12,10,'访问其他',0,'forum:visit:other',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 附件上传
+INSERT INTO uc_permissions VALUES (13,1,'附件上传',0,'',1,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (14,13,'上传头像',0,'avatar:upload',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (15,13,'上传图片',0,'image:upload',3,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- ========== 管理权限树 ==========
+INSERT INTO uc_permissions VALUES (16,0,'管理权限',0,'admin:manage',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 管理首页
+INSERT INTO uc_permissions VALUES (17,16,'管理首页',0,'admin:home',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 系统管理
+INSERT INTO uc_permissions VALUES (18,16,'系统管理',0,'admin:system',2,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (19,18,'基本设置',0,'admin:system:basic',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (20,18,'统计设置',0,'admin:system:analytics',2,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (21,18,'版块管理',0,'admin:system:forum',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (22,18,'审核设置',0,'admin:system:audit',2,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (23,18,'自定义页面',0,'admin:system:page',2,4,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (24,18,'图片管理',0,'admin:system:image',2,5,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 帖子管理
+INSERT INTO uc_permissions VALUES (25,16,'帖子管理',0,'admin:thread',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (26,25,'主题查询',0,'admin:thread:search',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (27,26,'删除主题',0,'admin:thread:delete',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (28,26,'置顶主题',0,'admin:thread:top',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (29,26,'关闭主题',0,'admin:thread:close',3,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (30,26,'主题精华',0,'admin:thread:digest',3,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (31,26,'推荐主题',0,'admin:thread:recommend',3,4,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (32,26,'转移主题',0,'admin:thread:transfer',3,5,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (33,26,'编辑主题',0,'admin:thread:edit',3,6,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (34,26,'还原主题',0,'admin:thread:restore',3,7,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (35,26,'通过主题',0,'admin:thread:pass',3,8,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (36,26,'拒绝主题',0,'admin:thread:reject',3,9,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (37,25,'评论查询',0,'admin:comment:search',2,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (38,37,'删除评论',0,'admin:comment:delete',3,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (39,37,'通过评论',0,'admin:comment:pass',3,1,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (40,37,'拒绝评论',0,'admin:comment:reject',3,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (41,37,'还原评论',0,'admin:comment:restore',3,3,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (42,25,'用户举报',0,'admin:user:report',2,2,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 统计数据
+INSERT INTO uc_permissions VALUES (43,16,'统计数据',0,'admin:stats',2,3,'论坛统计数据查询权限',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+-- -- 用户管理
+INSERT INTO uc_permissions VALUES (44,16,'用户管理',0,'admin:user',2,4,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_permissions VALUES (45,44,'小黑屋',0,'admin:user:ban',2,0,'',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
 -- ----------------------------
--- uc_role_permissions 数据（使用 perms 字符串关联）
+-- uc_role_permissions 数据（使用 perms 字符串关联，按角色分组）
 -- ----------------------------
+
+-- 游客权限
 INSERT INTO uc_role_permissions VALUES (1,'GUEST','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (2,'GUEST','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (3,'GUEST','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (4,'GUEST','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (5,'USER','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (6,'USER','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (7,'USER','thread:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (8,'USER','thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (9,'USER','comment:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (10,'USER','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (11,'USER','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (12,'USER','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (13,'MUTED_USER','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (14,'MUTED_USER','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (15,'MUTED_USER','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (16,'MUTED_USER','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- 注册用户权限
+INSERT INTO uc_role_permissions VALUES (5,'USER','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (6,'USER','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (7,'USER','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (8,'USER','thread:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (9,'USER','thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (10,'USER','comment:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (11,'USER','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (12,'USER','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- 禁言用户权限
+INSERT INTO uc_role_permissions VALUES (13,'MUTED_USER','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (14,'MUTED_USER','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (15,'MUTED_USER','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (16,'MUTED_USER','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- 内容创作者权限
 INSERT INTO uc_role_permissions VALUES (17,'CREATOR','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (18,'CREATOR','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (19,'CREATOR','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
@@ -828,6 +851,8 @@ INSERT INTO uc_role_permissions VALUES (24,'CREATOR','comment:new',1,CURRENT_TIM
 INSERT INTO uc_role_permissions VALUES (25,'CREATOR','comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (26,'CREATOR','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (27,'CREATOR','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- 论坛管理员权限（全部权限）
 INSERT INTO uc_role_permissions VALUES (28,'ADMIN','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (29,'ADMIN','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (30,'ADMIN','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
@@ -843,95 +868,101 @@ INSERT INTO uc_role_permissions VALUES (39,'ADMIN','admin:manage',1,CURRENT_TIME
 INSERT INTO uc_role_permissions VALUES (40,'ADMIN','admin:home',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (41,'ADMIN','admin:system',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
 INSERT INTO uc_role_permissions VALUES (42,'ADMIN','admin:system:basic',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (43,'ADMIN','admin:system:forum',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (44,'ADMIN','admin:system:audit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (45,'ADMIN','admin:system:page',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (46,'ADMIN','admin:system:image',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (47,'ADMIN','admin:thread',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (48,'ADMIN','admin:thread:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (49,'ADMIN','admin:thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (50,'ADMIN','admin:thread:top',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (51,'ADMIN','admin:thread:close',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (52,'ADMIN','admin:thread:digest',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (53,'ADMIN','admin:thread:recommend',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (54,'ADMIN','admin:thread:transfer',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (55,'ADMIN','admin:thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (56,'ADMIN','admin:thread:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (57,'ADMIN','admin:thread:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (58,'ADMIN','admin:thread:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (59,'ADMIN','admin:comment:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (60,'ADMIN','admin:comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (61,'ADMIN','admin:comment:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (62,'ADMIN','admin:comment:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (63,'ADMIN','admin:comment:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (64,'ADMIN','admin:user:report',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (65,'ADMIN','admin:user',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (66,'ADMIN','admin:user:ban',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (67,'ADMIN','admin:stats',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (68,'SUPER_MODERATOR','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (69,'SUPER_MODERATOR','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (70,'SUPER_MODERATOR','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (71,'SUPER_MODERATOR','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (72,'SUPER_MODERATOR','thread:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (73,'SUPER_MODERATOR','thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (74,'SUPER_MODERATOR','thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (75,'SUPER_MODERATOR','comment:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (76,'SUPER_MODERATOR','comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (77,'SUPER_MODERATOR','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (78,'SUPER_MODERATOR','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (79,'SUPER_MODERATOR','admin:thread',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (80,'SUPER_MODERATOR','admin:thread:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (81,'SUPER_MODERATOR','admin:thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (82,'SUPER_MODERATOR','admin:thread:top',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (83,'SUPER_MODERATOR','admin:thread:close',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (84,'SUPER_MODERATOR','admin:thread:digest',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (85,'SUPER_MODERATOR','admin:thread:recommend',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (86,'SUPER_MODERATOR','admin:thread:transfer',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (87,'SUPER_MODERATOR','admin:thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (88,'SUPER_MODERATOR','admin:thread:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (89,'SUPER_MODERATOR','admin:thread:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (90,'SUPER_MODERATOR','admin:thread:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (91,'SUPER_MODERATOR','admin:comment:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (92,'SUPER_MODERATOR','admin:comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (93,'SUPER_MODERATOR','admin:comment:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (94,'SUPER_MODERATOR','admin:comment:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (95,'SUPER_MODERATOR','admin:comment:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (96,'SUPER_MODERATOR','admin:user:report',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (97,'SUPER_MODERATOR','admin:user',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (98,'SUPER_MODERATOR','admin:user:ban',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (99,'SUPER_MODERATOR','admin:manage',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (100,'MODERATOR','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (101,'MODERATOR','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (102,'MODERATOR','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (103,'MODERATOR','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (104,'MODERATOR','thread:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (105,'MODERATOR','thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (106,'MODERATOR','thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (107,'MODERATOR','comment:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (108,'MODERATOR','comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (109,'MODERATOR','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (110,'MODERATOR','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (111,'MODERATOR','admin:thread',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (112,'MODERATOR','admin:thread:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (113,'MODERATOR','admin:thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (114,'MODERATOR','admin:thread:top',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (115,'MODERATOR','admin:thread:close',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (116,'MODERATOR','admin:thread:digest',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (117,'MODERATOR','admin:thread:recommend',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (118,'MODERATOR','admin:thread:transfer',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (119,'MODERATOR','admin:thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (120,'MODERATOR','admin:thread:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (121,'MODERATOR','admin:thread:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (122,'MODERATOR','admin:thread:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (123,'MODERATOR','admin:comment:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (124,'MODERATOR','admin:comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (125,'MODERATOR','admin:comment:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (126,'MODERATOR','admin:comment:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (127,'MODERATOR','admin:comment:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (128,'MODERATOR','admin:user:report',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (129,'MODERATOR','admin:user',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (130,'MODERATOR','admin:user:ban',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
-INSERT INTO uc_role_permissions VALUES (131,'MODERATOR','admin:manage',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (43,'ADMIN','admin:system:analytics',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (44,'ADMIN','admin:system:forum',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (45,'ADMIN','admin:system:audit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (46,'ADMIN','admin:system:page',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (47,'ADMIN','admin:system:image',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (48,'ADMIN','admin:thread',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (49,'ADMIN','admin:thread:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (50,'ADMIN','admin:thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (51,'ADMIN','admin:thread:top',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (52,'ADMIN','admin:thread:close',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (53,'ADMIN','admin:thread:digest',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (54,'ADMIN','admin:thread:recommend',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (55,'ADMIN','admin:thread:transfer',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (56,'ADMIN','admin:thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (57,'ADMIN','admin:thread:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (58,'ADMIN','admin:thread:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (59,'ADMIN','admin:thread:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (60,'ADMIN','admin:comment:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (61,'ADMIN','admin:comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (62,'ADMIN','admin:comment:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (63,'ADMIN','admin:comment:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (64,'ADMIN','admin:comment:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (65,'ADMIN','admin:user:report',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (66,'ADMIN','admin:user',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (67,'ADMIN','admin:user:ban',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (68,'ADMIN','admin:stats',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- 超级版主权限
+INSERT INTO uc_role_permissions VALUES (69,'SUPER_MODERATOR','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (70,'SUPER_MODERATOR','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (71,'SUPER_MODERATOR','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (72,'SUPER_MODERATOR','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (73,'SUPER_MODERATOR','thread:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (74,'SUPER_MODERATOR','thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (75,'SUPER_MODERATOR','thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (76,'SUPER_MODERATOR','comment:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (77,'SUPER_MODERATOR','comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (78,'SUPER_MODERATOR','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (79,'SUPER_MODERATOR','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (80,'SUPER_MODERATOR','admin:manage',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (81,'SUPER_MODERATOR','admin:thread',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (82,'SUPER_MODERATOR','admin:thread:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (83,'SUPER_MODERATOR','admin:thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (84,'SUPER_MODERATOR','admin:thread:top',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (85,'SUPER_MODERATOR','admin:thread:close',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (86,'SUPER_MODERATOR','admin:thread:digest',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (87,'SUPER_MODERATOR','admin:thread:recommend',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (88,'SUPER_MODERATOR','admin:thread:transfer',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (89,'SUPER_MODERATOR','admin:thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (90,'SUPER_MODERATOR','admin:thread:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (91,'SUPER_MODERATOR','admin:thread:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (92,'SUPER_MODERATOR','admin:thread:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (93,'SUPER_MODERATOR','admin:comment:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (94,'SUPER_MODERATOR','admin:comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (95,'SUPER_MODERATOR','admin:comment:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (96,'SUPER_MODERATOR','admin:comment:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (97,'SUPER_MODERATOR','admin:comment:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (98,'SUPER_MODERATOR','admin:user:report',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (99,'SUPER_MODERATOR','admin:user',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (100,'SUPER_MODERATOR','admin:user:ban',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
+-- 版主权限
+INSERT INTO uc_role_permissions VALUES (101,'MODERATOR','forum:visit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (102,'MODERATOR','forum:visit:section',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (103,'MODERATOR','forum:visit:other',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (104,'MODERATOR','thread:view',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (105,'MODERATOR','thread:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (106,'MODERATOR','thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (107,'MODERATOR','thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (108,'MODERATOR','comment:new',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (109,'MODERATOR','comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (110,'MODERATOR','avatar:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (111,'MODERATOR','image:upload',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (112,'MODERATOR','admin:manage',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (113,'MODERATOR','admin:thread',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (114,'MODERATOR','admin:thread:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (115,'MODERATOR','admin:thread:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (116,'MODERATOR','admin:thread:top',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (117,'MODERATOR','admin:thread:close',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (118,'MODERATOR','admin:thread:digest',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (119,'MODERATOR','admin:thread:recommend',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (120,'MODERATOR','admin:thread:transfer',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (121,'MODERATOR','admin:thread:edit',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (122,'MODERATOR','admin:thread:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (123,'MODERATOR','admin:thread:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (124,'MODERATOR','admin:thread:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (125,'MODERATOR','admin:comment:search',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (126,'MODERATOR','admin:comment:delete',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (127,'MODERATOR','admin:comment:pass',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (128,'MODERATOR','admin:comment:reject',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (129,'MODERATOR','admin:comment:restore',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (130,'MODERATOR','admin:user:report',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (131,'MODERATOR','admin:user',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+INSERT INTO uc_role_permissions VALUES (132,'MODERATOR','admin:user:ban',1,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,0);
+
 -- ----------------------------
 -- uc_roles 数据
 -- ----------------------------
