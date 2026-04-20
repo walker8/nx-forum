@@ -99,7 +99,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1',
+      viewport: 'width=device-width, initial-scale=1'
     }
   },
 
@@ -149,7 +149,18 @@ export default defineNuxtConfig({
       },
       '/notification/**': {
         ssr: false
-      }
+      },
+      // 已知扫描攻击路径禁止 SSR，避免触发完整渲染周期造成内存泄漏
+      '/actuator/**': { ssr: false },
+      '/v3/**': { ssr: false },
+      '/swagger/**': { ssr: false },
+      '/debug/**': { ssr: false },
+      '/.env/**': { ssr: false },
+      '/.git/**': { ssr: false },
+      '/wp-*.php': { ssr: false },
+      '/xmlrpc.php': { ssr: false },
+      '/health/**': { ssr: false },
+      '/info/**': { ssr: false }
     }
   },
 

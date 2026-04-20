@@ -11,6 +11,7 @@ export interface ResponseConfig {
   errCode: string
   errMessage: string
 }
+
 export interface ValueConfig {
   value: any
 }
@@ -106,6 +107,10 @@ const fetch = async (url: string, options?: any): Promise<any> => {
       // 使用 Nuxt 的 useFetch 而非原生 $fetch，因为:
       // 1. useFetch 会将请求结果自动存入 SSR payload，供客户端 hydration 复用
       // 2. 通过显式 key 参数确保缓存键稳定，不被自动生成的 key 干扰
+      // 单次 SSR 页面渲染通常 1-3 个 useFetch 调用，保留余量设为 10
+      const MAX_PAYLOAD_ENTRIES = 10
+      const CLEANUP_KEEP = 5
+
       useFetch(reqUrl, {
         ...options,
         headers,
@@ -133,6 +138,16 @@ const fetch = async (url: string, options?: any): Promise<any> => {
         })
         .catch((err: any) => {
           reject(err)
+        })
+        // 请求完成后清理 payload.data，避免跨请求累积导致内存泄漏
+        // Nitro 进程级别的 nuxtApp 在请求间共享，useFetch 的结果永不释放
+        .finally(() => {
+          const nuxtApp = useNuxtApp()
+          const payloadData = nuxtApp.payload.data
+          if (payloadData && Object.keys(payloadData).length > MAX_PAYLOAD_ENTRIES) {
+            const keysToRemove = Object.keys(payloadData).slice(0, -CLEANUP_KEEP)
+            keysToRemove.forEach((k) => delete payloadData[k])
+          }
         })
     }
   })
