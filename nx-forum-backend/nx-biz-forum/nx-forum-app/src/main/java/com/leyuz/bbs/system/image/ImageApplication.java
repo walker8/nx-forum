@@ -42,6 +42,7 @@ public class ImageApplication {
             wrapper.eq(ImagePO::getCreateBy, query.getCreateBy());
         }
 
+        wrapper.orderByDesc(ImagePO::getImageId);
         imageMapper.selectPage(page, wrapper);
 
         return DataBaseUtils.createCustomPage(page, po -> toImageVO(poToEntity(po)));
