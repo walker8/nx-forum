@@ -3,15 +3,11 @@ target/
 ### openspec ###
 openspec/
 .cursor/commands/
-AGENTS.md
-
-### iflow  ###
-.iflow
-IFLOW.md
 
 ### agent ###
 .agents
 .claude
+.superpowers
 
 ### eclipse ###
 .apt_generated
