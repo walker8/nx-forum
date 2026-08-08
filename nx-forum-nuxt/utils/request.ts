@@ -104,6 +104,9 @@ const fetch = async (url: string, options?: any): Promise<any> => {
     } else {
       // === 服务端分支 ===
 
+      // 在 Nuxt 上下文内同步获取 nuxtApp，供后续 finally 闭包复用
+      // 避免在延迟回调里调用 useNuxtApp() 触发 NUXT_E1001
+      const nuxtApp = useNuxtApp()
       // 使用 Nuxt 的 useFetch 而非原生 $fetch，因为:
       // 1. useFetch 会将请求结果自动存入 SSR payload，供客户端 hydration 复用
       // 2. 通过显式 key 参数确保缓存键稳定，不被自动生成的 key 干扰
@@ -141,8 +144,8 @@ const fetch = async (url: string, options?: any): Promise<any> => {
         })
         // 请求完成后清理 payload.data，避免跨请求累积导致内存泄漏
         // Nitro 进程级别的 nuxtApp 在请求间共享，useFetch 的结果永不释放
+        // 此处复用外层闭包捕获的 nuxtApp，避免在 finally 里调用 composable
         .finally(() => {
-          const nuxtApp = useNuxtApp()
           const payloadData = nuxtApp.payload.data
           if (payloadData && Object.keys(payloadData).length > MAX_PAYLOAD_ENTRIES) {
             const keysToRemove = Object.keys(payloadData).slice(0, -CLEANUP_KEEP)
