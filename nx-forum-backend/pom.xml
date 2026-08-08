@@ -23,7 +23,7 @@
         <cola.components.version>5.0.0</cola.components.version>
 
         <!-- MyBatis Plus 相关 -->
-        <mybatis-plus-starter.version>3.5.17</mybatis-plus-starter.version>
+        <mybatis-plus-starter.version>3.5.16</mybatis-plus-starter.version>
         <mybatis-spring.version>3.0.5</mybatis-spring.version>
 
         <!-- API 文档相关 -->
