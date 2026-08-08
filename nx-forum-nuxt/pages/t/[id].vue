@@ -10,7 +10,12 @@
           <el-link underline="never">{{ thread.author?.authorName ?? 'unkown' }}</el-link>
         </div>
         <div>发布于 {{ formatDate(thread.createTime) }}</div>
-        <div>阅读 {{ thread.views }}</div>
+        <div class="flex items-center gap-1">
+          <el-icon>
+            <Icon name="tabler:eye" />
+          </el-icon>
+          {{ thread.views }}
+        </div>
         <ClientOnly>
           <el-link underline="never" :icon="Edit" @click="editThread" v-if="canEdit" />
         </ClientOnly>
@@ -409,11 +414,41 @@ const transformFoldBlocks = (html: string): string => {
   return html
 }
 
+// 正文图片加载失败时的默认占位图
+const ARTICLE_IMG_FALLBACK = '/img/404.png'
+// error 事件不冒泡，需在捕获阶段监听容器统一处理
+const handleArticleImgError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  // 表情小图不替换，保持原样
+  if (img.tagName === 'IMG' && !img.classList.contains('emotion-img')) {
+    if (!img.src.endsWith(ARTICLE_IMG_FALLBACK)) {
+      img.src = ARTICLE_IMG_FALLBACK
+    }
+  }
+}
+
+// 修复挂载前就已完成加载且失败的图片（如 SSR 直出后缓存中的 404）
+const fixBrokenArticleImages = (container: Element) => {
+  container.querySelectorAll('img:not(.emotion-img)').forEach((node) => {
+    const img = node as HTMLImageElement
+    if (img.complete && img.naturalWidth === 0) {
+      img.src = ARTICLE_IMG_FALLBACK
+    }
+  })
+}
+
 // 添加滚动监听
 onMounted(() => {
   if (import.meta.client) {
     window.addEventListener('scroll', updateActiveHeading, { passive: true })
     updateActiveHeading()
+
+    // 正文图片加载失败兜底
+    const articleContent = document.querySelector('.article-content')
+    if (articleContent) {
+      articleContent.addEventListener('error', handleArticleImgError, true)
+      fixBrokenArticleImages(articleContent)
+    }
 
     // Render Mermaid diagrams
     if (hasMermaidDiagram.value) {
@@ -440,6 +475,8 @@ onMounted(() => {
 onUnmounted(() => {
   if (import.meta.client) {
     window.removeEventListener('scroll', updateActiveHeading)
+    // 移除正文图片错误监听
+    document.querySelector('.article-content')?.removeEventListener('error', handleArticleImgError, true)
     // Clean up fold block event listeners
     foldBlockCleanups.value.forEach(cleanup => cleanup())
     foldBlockCleanups.value = []

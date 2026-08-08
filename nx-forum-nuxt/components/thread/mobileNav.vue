@@ -1,33 +1,37 @@
 <template>
-  <div
-    class="fixed bottom-0 left-0 w-full z-50 md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_12px_rgba(0,0,0,0.08)]"
-  >
-    <div class="flex justify-around items-center py-1.5">
-      <div
-        class="flex items-center text-[#409eff] cursor-pointer gap-1 px-3 py-1.5 rounded-lg transition-all hover:bg-gray-50 active:scale-95"
-        :class="{ 'text-gray-500': !thread.liked }"
-        @click="handleLike(thread)"
-      >
-        <el-icon :size="20">
-          <Icon name="tabler:thumb-up" />
-        </el-icon>
-        <span>{{ thread.likes }}</span>
-      </div>
-      <div
-        class="flex items-center text-[#409eff] cursor-pointer gap-1 px-3 py-1.5 rounded-lg transition-all hover:bg-gray-50 active:scale-95"
-        :class="{ 'text-gray-500': !thread.collected }"
-        @click="handleFavorite(thread)"
-      >
-        <el-icon :size="20">
-          <Star />
-        </el-icon>
-        <span>{{ thread.collections }}</span>
-      </div>
-      <div class="flex items-center text-gray-500 cursor-pointer gap-1 px-3 py-1.5 rounded-lg transition-all hover:bg-gray-50 active:scale-95" @click="goComments">
-        <el-icon :size="20">
-          <ChatDotRound />
-        </el-icon>
-        <span>{{ thread.comments }}</span>
+  <div class="md:hidden">
+    <!-- 占位元素，避免页面底部内容被固定操作栏遮挡 -->
+    <div class="mobile-nav-spacer"></div>
+    <div
+      class="mobile-nav-bar fixed bottom-0 left-0 w-full z-50 border-t border-gray-200 bg-white/95 backdrop-blur-sm shadow-[0_-4px_12px_rgba(0,0,0,0.08)]"
+    >
+      <div class="flex justify-around items-center py-2">
+        <div
+          class="nav-item"
+          :class="{ 'is-active': thread.liked }"
+          @click="handleLike(thread)"
+        >
+          <el-icon :size="20">
+            <Icon name="tabler:thumb-up" />
+          </el-icon>
+          <span class="nav-count">{{ thread.likes }}</span>
+        </div>
+        <div
+          class="nav-item"
+          :class="{ 'is-active': thread.collected }"
+          @click="handleFavorite(thread)"
+        >
+          <el-icon :size="20">
+            <Star />
+          </el-icon>
+          <span class="nav-count">{{ thread.collections }}</span>
+        </div>
+        <div class="nav-item" @click="goComments">
+          <el-icon :size="20">
+            <ChatDotRound />
+          </el-icon>
+          <span class="nav-count">{{ thread.comments }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -91,3 +95,37 @@ const handleFavorite = async (thread: any) => {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.mobile-nav-spacer {
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+}
+
+.mobile-nav-bar {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  color: #8a919f;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.is-active {
+    color: #1e80ff;
+  }
+}
+
+.nav-count {
+  font-size: 14px;
+}
+</style>

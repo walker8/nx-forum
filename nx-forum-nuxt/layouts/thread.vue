@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="thread-layout">
     <el-header style="padding: 0" class="hidden sm:block rn-hide">
       <common-header />
     </el-header>

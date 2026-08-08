@@ -301,10 +301,12 @@ function onReportComment(comment: CommentVO) {
 <style lang="scss" scoped>
 .comment-item {
   display: flex;
-}
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
 
-.comment-item {
-  margin-top: 10px;
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .card-header {
@@ -355,7 +357,7 @@ function onReportComment(comment: CommentVO) {
   color: rgb(55, 58, 64);
   overflow-wrap: break-word;
   font-size: 15px;
-  line-height: 20px;
+  line-height: 24px;
   /* 允许在单词内换行 */
   word-wrap: break-word;
   /* 单词可以在任意字符间断开 */
@@ -435,12 +437,5 @@ function onReportComment(comment: CommentVO) {
   background-color: rgba(64, 158, 255, 0.1);
   transition: background-color 0.5s ease;
   padding: 5px;
-}
-
-/* 移动端底部导航空间 */
-@media screen and (max-width: 767px) {
-  .comment {
-    margin-bottom: 50px;
-  }
 }
 </style>

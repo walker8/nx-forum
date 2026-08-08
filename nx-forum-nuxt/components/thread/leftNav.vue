@@ -5,8 +5,9 @@
         <el-button
           circle
           size="large"
+          class="rail-btn"
+          :class="{ 'is-active': thread.liked }"
           @click="handleLike(thread)"
-          :type="thread.liked ? 'primary' : ''"
         >
           <el-icon :size="18">
             <Icon name="tabler:thumb-up" />
@@ -21,8 +22,9 @@
         <el-button
           circle
           size="large"
+          class="rail-btn"
+          :class="{ 'is-active': thread.collected }"
           @click="handleFavorite(thread)"
-          :type="thread.collected ? 'primary' : ''"
         >
           <el-icon :size="18">
             <Star />
@@ -30,13 +32,13 @@
         </el-button>
       </el-badge>
       <el-badge :value="thread.comments" class="item" type="info">
-        <el-button circle size="large" @click="goComments">
+        <el-button circle size="large" class="rail-btn" @click="goComments">
           <el-icon :size="18">
             <ChatDotRound />
           </el-icon>
         </el-button>
       </el-badge>
-      <el-button circle size="large" @click="handleReport">
+      <el-button circle size="large" class="rail-btn rail-report" @click="handleReport">
         <el-icon :size="18">
           <WarnTriangleFilled />
         </el-icon>
@@ -66,7 +68,7 @@ const handleReport = () => {
     ElMessage.warning('请先登录再举报')
     return
   }
-  
+
   const currentThread = thread.value
   openReportDialog(currentThread.threadId, 'THREAD', currentThread.forumId)
 }
@@ -113,3 +115,36 @@ const handleFavorite = async (thread: any) => {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.rail-btn {
+  color: #515767;
+  background-color: #fff;
+  border: 1px solid #e4e6eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #409eff;
+    border-color: #409eff;
+    background-color: #fff;
+  }
+
+  &.is-active {
+    color: #fff;
+    background-color: #409eff;
+    border-color: #409eff;
+
+    &:hover {
+      color: #fff;
+      background-color: #66b1ff;
+      border-color: #66b1ff;
+    }
+  }
+}
+
+.rail-report:hover {
+  color: #f56c6c;
+  border-color: #f56c6c;
+}
+</style>

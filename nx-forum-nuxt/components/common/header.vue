@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[55px] bg-white">
+  <div class="h-[55px] bg-white border-b border-solid border-[#e4e6eb]">
     <div class="flex items-center h-[55px] mx-auto max-w-[1200px] px-[10px]">
       <div class="cursor-pointer" @click="goHome">
         <CommonLogo />

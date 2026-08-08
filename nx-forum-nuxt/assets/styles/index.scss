@@ -90,6 +90,16 @@ div:focus {
     padding: 0px;
   }
 }
+
+// 前台页面（首页/详情页）卡片统一圆角，仅桌面端生效（移动端为通栏卡片）
+@media screen and (min-width: 769px) {
+  .forum-container,
+  .thread-layout {
+    .el-card {
+      border-radius: 8px;
+    }
+  }
+}
 .article-hot {
   .rank-num {
     font-size: 14px;

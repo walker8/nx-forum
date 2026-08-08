@@ -57,6 +57,7 @@
 </template>
 
 <script setup lang="ts">
+// 作者信息卡片
 import type { Author } from '~/types/global'
 import { followUser, unfollowUser } from '~/apis/follow'
 import { ElMessage } from 'element-plus'

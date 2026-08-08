@@ -6,7 +6,10 @@
     <el-card v-if="hotPosts.length >= 3" class="article-hot">
       <template #header>
         <div class="card-header flex items-center justify-between">
-          <span>文章榜</span>
+          <span class="flex items-center gap-1.5 font-medium">
+            <Icon name="tabler:flame" class="w-4.5 h-4.5 text-[#f64242]" />
+            文章榜
+          </span>
         </div>
       </template>
       <div class="hot-posts">
@@ -14,7 +17,7 @@
           v-for="(post, index) in hotPosts"
           :key="post.threadId"
           @click="go(`/t/${post.threadId}`)"
-          class="post-item flex items-start py-2 px-3 hover:bg-gray-100 cursor-pointer"
+          class="post-item flex items-start py-2 px-3 mx-1 rounded hover:bg-gray-100 cursor-pointer transition-colors duration-200"
         >
           <span class="rank-num mr-2" :class="{ 'top-3': index < 3 }">{{ index + 1 }}</span>
           <div class="post-title flex-1 text-sm text-gray-700 truncate">
