@@ -13,9 +13,20 @@
             <el-input v-model.trim="searchData.ip" placeholder="请输入IP" />
           </el-form-item>
           <el-form-item prop="forumId" label="版块">
-            <el-select v-model="searchData.forumId" placeholder="请选择版块" style="width: 220px" filterable clearable
-              :disabled="forumId !== undefined && forumId > 0">
-              <el-option v-for="item in forumMenus" :key="item.forumId" :label="item.nickName" :value="item.forumId">
+            <el-select
+              v-model="searchData.forumId"
+              placeholder="请选择版块"
+              style="width: 220px"
+              filterable
+              clearable
+              :disabled="forumId !== undefined && forumId > 0"
+            >
+              <el-option
+                v-for="item in forumMenus"
+                :key="item.forumId"
+                :label="item.nickName"
+                :value="item.forumId"
+              >
                 <span style="float: left">{{ item.nickName }}</span>
                 <span style="float: right; color: var(--el-text-color-secondary); font-size: 13px">
                   {{ item.name }}
@@ -24,8 +35,19 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="propertyType" label="类型">
-            <el-select v-model="searchData.propertyType" placeholder="请选择类型" style="width: 220px" filterable clearable>
-              <el-option v-for="item in propertyTypes" :key="item.value" :label="item.label" :value="item.value" />
+            <el-select
+              v-model="searchData.propertyType"
+              placeholder="请选择类型"
+              style="width: 220px"
+              filterable
+              clearable
+            >
+              <el-option
+                v-for="item in propertyTypes"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           <el-form-item prop="orderBy" label="排序">
@@ -51,52 +73,96 @@
       <div class="toolbar-wrapper">
         <div>
           <el-button-group v-if="deleted">
-            <el-button type="primary" size="default" @click="restoreBatch()"
-              v-if="hasPermission('admin:thread:restore', forumId)">
+            <el-button
+              type="primary"
+              size="default"
+              @click="restoreBatch()"
+              v-if="hasPermission('admin:thread:restore', forumId)"
+            >
               还原
             </el-button>
           </el-button-group>
           <el-button-group v-else-if="auditStatus === AuditStatus.AUDITING">
-            <el-button type="success" size="default" @click="passBatch()"
-              v-if="hasPermission('admin:thread:pass', forumId)">
+            <el-button
+              type="success"
+              size="default"
+              @click="passBatch()"
+              v-if="hasPermission('admin:thread:pass', forumId)"
+            >
               通过
             </el-button>
-            <el-button type="danger" size="default" @click="rejectBatch()"
-              v-if="hasPermission('admin:thread:reject', forumId)">
+            <el-button
+              type="danger"
+              size="default"
+              @click="rejectBatch()"
+              v-if="hasPermission('admin:thread:reject', forumId)"
+            >
               拒绝
             </el-button>
-            <el-button type="info" size="default" @click="transferBatch()"
-              v-if="hasPermission('admin:thread:transfer', forumId)">
+            <el-button
+              type="info"
+              size="default"
+              @click="transferBatch()"
+              v-if="hasPermission('admin:thread:transfer', forumId)"
+            >
               转移
             </el-button>
           </el-button-group>
           <el-button-group v-else>
-            <el-button type="danger" size="default" @click="deleteBatch()"
-              v-if="hasPermission('admin:thread:delete', forumId)">
+            <el-button
+              type="danger"
+              size="default"
+              @click="deleteBatch()"
+              v-if="hasPermission('admin:thread:delete', forumId)"
+            >
               删除
             </el-button>
-            <el-button type="primary" size="default" @click="topBatch()"
-              v-if="hasPermission('admin:thread:top', forumId)">
+            <el-button
+              type="primary"
+              size="default"
+              @click="topBatch()"
+              v-if="hasPermission('admin:thread:top', forumId)"
+            >
               置顶
             </el-button>
-            <el-button type="warning" size="default" @click="closeBatch()"
-              v-if="hasPermission('admin:thread:close', forumId)">
+            <el-button
+              type="warning"
+              size="default"
+              @click="closeBatch()"
+              v-if="hasPermission('admin:thread:close', forumId)"
+            >
               关闭
             </el-button>
-            <el-button type="success" size="default" @click="digestBatch()"
-              v-if="hasPermission('admin:thread:digest', forumId)">
+            <el-button
+              type="success"
+              size="default"
+              @click="digestBatch()"
+              v-if="hasPermission('admin:thread:digest', forumId)"
+            >
               精华
             </el-button>
-            <el-button type="primary" size="default" @click="recommendBatch()"
-              v-if="hasPermission('admin:thread:recommend', forumId)">
+            <el-button
+              type="primary"
+              size="default"
+              @click="recommendBatch()"
+              v-if="hasPermission('admin:thread:recommend', forumId)"
+            >
               推荐
             </el-button>
-            <el-button type="info" size="default" @click="transferBatch()"
-              v-if="hasPermission('admin:thread:transfer', forumId)">
+            <el-button
+              type="info"
+              size="default"
+              @click="transferBatch()"
+              v-if="hasPermission('admin:thread:transfer', forumId)"
+            >
               转移
             </el-button>
-            <el-button type="warning" size="default" @click="archiveBatch()"
-              v-if="hasPermission('admin:thread:transfer', forumId)">
+            <el-button
+              type="warning"
+              size="default"
+              @click="archiveBatch()"
+              v-if="hasPermission('admin:thread:transfer', forumId)"
+            >
               归档
             </el-button>
           </el-button-group>
@@ -104,14 +170,20 @@
         </div>
         <div>
           <el-tooltip content="刷新当前页">
-            <el-button type="primary" :icon="RefreshRight" circle @click="getTableData" size="small" />
+            <el-button
+              type="primary"
+              :icon="RefreshRight"
+              circle
+              @click="getTableData"
+              size="small"
+            />
           </el-tooltip>
         </div>
       </div>
       <div class="table-wrapper">
         <el-table :data="tableData" v-loading="loading" border ref="tableRef">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="subject" label="主题" min-width="550" align="left">
+          <el-table-column prop="subject" label="主题" min-width="450" align="left">
             <template #default="scope">
               <div class="space-x-2">
                 <el-text type="primary" v-if="scope.row.imageCount > 0">
@@ -121,7 +193,11 @@
                 <el-text type="primary" v-if="scope.row.top == 2">全局置顶</el-text>
                 <el-text type="warning" v-if="scope.row.closed">关闭</el-text>
                 <el-text type="success" v-if="scope.row.digest">精华</el-text>
-                <el-text tag="b" class="hover:cursor-pointer" @click="open(`/t/${scope.row.threadId}`)">
+                <el-text
+                  tag="b"
+                  class="hover:cursor-pointer"
+                  @click="open(`/t/${scope.row.threadId}`)"
+                >
                   {{ scope.row.subject ? scope.row.subject : '无主题' }}
                 </el-text>
                 <el-text size="small">
@@ -135,7 +211,12 @@
           </el-table-column>
           <el-table-column prop="userIp" label="发帖地址" align="center" width="120">
             <template #default="scope">
-              <el-tooltip class="box-item" effect="dark" :content="scope.row.userIp" placement="top-start">
+              <el-tooltip
+                class="box-item"
+                effect="dark"
+                :content="scope.row.userIp"
+                placement="top-start"
+              >
                 <el-text>{{ scope.row.location }}</el-text>
               </el-tooltip>
             </template>
@@ -152,16 +233,29 @@
           </el-table-column>
           <el-table-column prop="client" label="客户端信息" align="center" min-width="180">
             <template #default="scope">
-              <el-tooltip class="box-item" effect="dark" :content="scope.row.userAgent" placement="top-start">
+              <el-tooltip
+                class="box-item"
+                effect="dark"
+                :content="scope.row.userAgent"
+                placement="top-start"
+              >
                 <el-space wrap>
-                  <el-tag type="warning" v-if="scope.row.terminalType">{{ scope.row.terminalType }}</el-tag>
+                  <el-tag type="warning" v-if="scope.row.terminalType">{{
+                    scope.row.terminalType
+                  }}</el-tag>
                   <el-tag type="info" v-if="scope.row.platform">{{ scope.row.platform }}</el-tag>
                 </el-space>
               </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column prop="auditReason" label="审核原因" align="center" min-width="150"
-            v-if="auditStatus === AuditStatus.AUDITING" />
+          <el-table-column
+            prop="auditReason"
+            label="审核原因"
+            align="center"
+            width="250"
+            show-overflow-tooltip
+            v-if="auditStatus === AuditStatus.AUDITING"
+          />
           <el-table-column prop="createTime" label="创建时间" align="center" width="150">
             <template #default="scope">
               {{ formatDateTime(scope.row.createTime) }}
@@ -175,28 +269,58 @@
           <el-table-column fixed="right" label="操作" width="180" align="center">
             <template #default="scope">
               <el-button-group v-if="deleted">
-                <el-button type="primary" text bg size="small" @click="restoreBatch([scope.row.threadId])"
-                  v-if="hasPermission('admin:thread:restore', forumId)">
+                <el-button
+                  type="primary"
+                  text
+                  bg
+                  size="small"
+                  @click="restoreBatch([scope.row.threadId])"
+                  v-if="hasPermission('admin:thread:restore', forumId)"
+                >
                   还原
                 </el-button>
               </el-button-group>
               <el-button-group v-else-if="auditStatus === AuditStatus.AUDITING">
-                <el-button type="success" text bg size="small" @click="passBatch([scope.row.threadId])"
-                  v-if="hasPermission('admin:thread:pass', forumId)">
+                <el-button
+                  type="success"
+                  text
+                  bg
+                  size="small"
+                  @click="passBatch([scope.row.threadId])"
+                  v-if="hasPermission('admin:thread:pass', forumId)"
+                >
                   通过
                 </el-button>
-                <el-button type="danger" text bg size="small" @click="rejectBatch([scope.row.threadId])"
-                  v-if="hasPermission('admin:thread:reject', forumId)">
+                <el-button
+                  type="danger"
+                  text
+                  bg
+                  size="small"
+                  @click="rejectBatch([scope.row.threadId])"
+                  v-if="hasPermission('admin:thread:reject', forumId)"
+                >
                   拒绝
                 </el-button>
               </el-button-group>
               <el-button-group v-else>
-                <el-button type="primary" text bg size="small" @click="go(`/editor/t/${scope.row.threadId}`)"
-                  v-if="hasPermission('admin:thread:edit', forumId)">
+                <el-button
+                  type="primary"
+                  text
+                  bg
+                  size="small"
+                  @click="go(`/editor/t/${scope.row.threadId}`)"
+                  v-if="hasPermission('admin:thread:edit', forumId)"
+                >
                   编辑
                 </el-button>
-                <el-button type="danger" text bg size="small" @click="deleteBatch([scope.row.threadId])"
-                  v-if="hasPermission('admin:thread:delete', forumId)">
+                <el-button
+                  type="danger"
+                  text
+                  bg
+                  size="small"
+                  @click="deleteBatch([scope.row.threadId])"
+                  v-if="hasPermission('admin:thread:delete', forumId)"
+                >
                   删除
                 </el-button>
               </el-button-group>
@@ -205,9 +329,16 @@
         </el-table>
       </div>
       <div class="pager-wrapper">
-        <el-pagination background :layout="paginationData.layout" :page-sizes="paginationData.pageSizes"
-          :total="paginationData.total" :page-size="paginationData.pageSize" :currentPage="paginationData.currentPage"
-          @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        <el-pagination
+          background
+          :layout="paginationData.layout"
+          :page-sizes="paginationData.pageSizes"
+          :total="paginationData.total"
+          :page-size="paginationData.pageSize"
+          :currentPage="paginationData.currentPage"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
       </div>
     </el-card>
     <!-- 消息框 -->
@@ -371,7 +502,13 @@ const rejectBatch = (threadIds?: number[]) => {
     customClass: 'full-width-message',
     confirmButtonText: '确定'
   }).then(() => {
-    handleOperation(OperationConstant.REJECT, ids, reason.value, notice.value, Number(searchData.forumId) || 0)
+    handleOperation(
+      OperationConstant.REJECT,
+      ids,
+      reason.value,
+      notice.value,
+      Number(searchData.forumId) || 0
+    )
   })
 }
 
@@ -436,7 +573,13 @@ const passBatch = (threadIds?: number[]) => {
     customClass: 'full-width-message',
     confirmButtonText: '确定'
   }).then(() => {
-    handleOperation(OperationConstant.PASS, ids, null, notice.value, Number(searchData.forumId) || 0)
+    handleOperation(
+      OperationConstant.PASS,
+      ids,
+      null,
+      notice.value,
+      Number(searchData.forumId) || 0
+    )
   })
 }
 
@@ -471,7 +614,13 @@ const deleteBatch = (threadIds?: number[]) => {
     customClass: 'full-width-message',
     confirmButtonText: '确定'
   }).then(() => {
-    handleOperation(OperationConstant.DELETE, ids, reason.value, notice.value, Number(searchData.forumId) || 0)
+    handleOperation(
+      OperationConstant.DELETE,
+      ids,
+      reason.value,
+      notice.value,
+      Number(searchData.forumId) || 0
+    )
   })
 }
 const restoreBatch = (threadIds?: number[]) => {
@@ -499,7 +648,13 @@ const restoreBatch = (threadIds?: number[]) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消'
   }).then(() => {
-    handleOperation(OperationConstant.RESTORE, ids, null, notice.value, Number(searchData.forumId) || 0)
+    handleOperation(
+      OperationConstant.RESTORE,
+      ids,
+      null,
+      notice.value,
+      Number(searchData.forumId) || 0
+    )
   })
 }
 
@@ -580,7 +735,7 @@ const transferBatch = () => {
       }
       handleOperation(OperationConstant.TRANSFER, ids, null, true, Number(targetForumId.value))
     })
-    .catch(() => { })
+    .catch(() => {})
 }
 
 const archiveBatch = () => {
@@ -599,7 +754,7 @@ const archiveBatch = () => {
       // 归档就是转移到归档版块（id=6）
       handleOperation(OperationConstant.TRANSFER, ids, null, false, 6)
     })
-    .catch(() => { })
+    .catch(() => {})
 }
 </script>
 

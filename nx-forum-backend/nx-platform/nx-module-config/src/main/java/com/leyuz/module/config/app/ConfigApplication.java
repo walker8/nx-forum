@@ -18,10 +18,14 @@ import java.util.Map;
 public class ConfigApplication {
     private final IConfigService configService;
     private final GenericCache<String, List<ConfigPO>> configCache;
+    private final ConfigSecretHandler configSecretHandler;
 
+    /**
+     * 读取配置值（敏感配置自动解密）
+     */
     public String getConfigValueByKey(String configKey) {
-        Map<String, String> configMap = getConfigMap();
-        return configMap.get(configKey);
+        String configValue = getRawConfigValueByKey(configKey);
+        return configSecretHandler.decryptConfigValue(configKey, configValue);
     }
 
     public <T> T getConfigValueByKey(String configKey, Class<T> clazz) {
@@ -30,6 +34,14 @@ public class ConfigApplication {
             return null;
         }
         return JSON.parseObject(defaultValue, clazz);
+    }
+
+    /**
+     * 读取库中原始配置值（不做解密，仅用于迁移等内部场景）
+     */
+    public String getRawConfigValueByKey(String configKey) {
+        Map<String, String> configMap = getConfigMap();
+        return configMap.get(configKey);
     }
 
     private Map<String, String> getConfigMap() {
@@ -43,9 +55,13 @@ public class ConfigApplication {
         return configMap;
     }
 
+    /**
+     * 更新配置值（敏感配置自动加密后落库）
+     */
     public boolean updateConfig(String configKey, String configValue) {
+        String encryptedValue = configSecretHandler.encryptConfigValue(configKey, configValue);
         configCache.remove("all");
-        return configService.updateConfig(configKey, configValue);
+        return configService.updateConfig(configKey, encryptedValue);
     }
 
 }

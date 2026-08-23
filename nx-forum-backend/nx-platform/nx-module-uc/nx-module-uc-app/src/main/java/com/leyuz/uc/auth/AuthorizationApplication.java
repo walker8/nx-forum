@@ -106,11 +106,13 @@ public class AuthorizationApplication {
 
         // 获取用户最高优先级的角色列表
         List<String> roleKeys = userRoleApplication.getHighestPriorityRoles(userId, roleScope, defaultRoleKey);
+        System.out.println("[DEBUG-AUDIT-LOG] queryPermissions userId=" + userId + ", roleScope=" + roleScope + ", defaultRoleKey=" + defaultRoleKey + ", roleKeys=" + roleKeys);
 
         // 遍历每个角色，获取并合并权限列表
         for (String roleKey : roleKeys) {
             // 根据角色键获取权限列表
             List<String> permsList = permissionApplication.listPermsByRoleKey(roleKey);
+            System.out.println("[DEBUG-AUDIT-LOG] roleKey=" + roleKey + ", permsCount=" + permsList.size() + ", first 5: " + permsList.subList(0, Math.min(5, permsList.size())));
             // 将当前角色的权限添加到总的权限集合中
             permissions.addAll(permsList);
         }

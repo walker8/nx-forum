@@ -1,13 +1,15 @@
 package com.leyuz.bbs.content.thread;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Table;
 import com.leyuz.bbs.auth.ForumPermissionResolver;
 import com.leyuz.bbs.common.constant.OperationConstant;
+import com.leyuz.bbs.common.dataobject.AuditStageV;
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
+import com.leyuz.bbs.common.dataobject.AuditTriggerSourceV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
+import com.leyuz.bbs.common.dataobject.OperatorTypeV;
 import com.leyuz.bbs.common.utils.HtmlUtils;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyV;
 import com.leyuz.bbs.content.thread.dto.*;
@@ -23,7 +25,11 @@ import com.leyuz.bbs.interaction.like.LikeApplication;
 import com.leyuz.bbs.interaction.like.dto.LikeTargetType;
 import com.leyuz.bbs.system.attach.AttachApplication;
 import com.leyuz.bbs.system.audit.AuditApplication;
+import com.leyuz.bbs.system.audit.AuditLogApplication;
+import com.leyuz.bbs.system.audit.domain.AuditLogE;
+import com.leyuz.bbs.system.audit.dto.AuditContentType;
 import com.leyuz.bbs.system.audit.dto.AuditDTO;
+import com.leyuz.bbs.system.audit.dto.AuditResult;
 import com.leyuz.bbs.system.config.ForumConfigApplication;
 import com.leyuz.bbs.user.ForumUserApplication;
 import com.leyuz.common.exception.AuditException;
@@ -60,6 +66,7 @@ public class ThreadApplication {
     private final ForumConfigApplication forumConfigApplication;
     private final ForumUserApplication forumUserApplication;
     private final AuditApplication auditApplication;
+    private final AuditLogApplication auditLogApplication;
     private final AttachApplication attachApplication;
     private final LikeApplication likeApplication;
     private final FavoriteApplication favoriteApplication;
@@ -90,24 +97,36 @@ public class ThreadApplication {
         threadE.setContent(downloadImages(threadE.getContent()));
 
         // 审核主题
-        auditThread(threadE);
+        AuditResult auditResult = auditThread(threadE, true);
         // 执行用户自定义的插件方法
         threadPluginManager.executeBeforeSave(threadE);
 
         // 保存到数据库
         threadDomainService.save(threadE);
+        // 内容入库后回填同步阶段审核记录的 contentId（黑/白名单、敏感词、规则引擎）
+        auditLogApplication.updateContentIdBySessionId(auditResult.getSessionId(), threadE.getThreadId());
+        // 触发异步 AI 复审
+        if (auditResult.isAiPending()) {
+            auditApplication.scheduleAiReview(AuditContentType.THREAD, threadE.getThreadId(), threadE.getForumId(), true);
+        }
         if (AuditStatusV.AUDITING.equals(threadE.getAuditStatus())) {
             throw new AuditException("主题审核中，请耐心等待审核通过！");
         }
     }
 
-    private void auditThread(ThreadE threadE) {
+    private AuditResult auditThread(ThreadE threadE, boolean isNew) {
         AuditDTO auditDTO = AuditDTO.builder()
                 .userId(HeaderUtils.getUserId())
                 .message(MessageFormat.format("{0} {1}", threadE.getSubject(), HtmlUtils.convertHtmlToText(threadE.getContent())))
+                .subject(threadE.getSubject())
+                .content(threadE.getContent())
+                .contentType(AuditContentType.THREAD)
+                .forumId(threadE.getForumId())
+                .isNew(isNew)
                 .build();
-        Pair<AuditStatusV, String> result = auditApplication.check(auditDTO);
-        threadE.setAuditResult(result.getKey(), result.getValue());
+        AuditResult result = auditApplication.check(auditDTO);
+        threadE.setAuditResult(result.getStatus(), result.getReason());
+        return result;
     }
 
     public void updateThread(Long threadId, ThreadCmd threadCmd) {
@@ -136,11 +155,17 @@ public class ThreadApplication {
         threadE.setContent(downloadImages(threadE.getContent()));
 
         // 审核主题
-        auditThread(threadE);
+        AuditResult auditResult = auditThread(threadE, false);
         // 执行用户自定义的插件方法
         threadPluginManager.executeBeforeUpdate(threadE);
 
         threadDomainService.update(threadE);
+        // 内容入库后回填同步阶段审核记录的 contentId（黑/白名单、敏感词、规则引擎）
+        auditLogApplication.updateContentIdBySessionId(auditResult.getSessionId(), threadE.getThreadId());
+        // 触发异步 AI 复审
+        if (auditResult.isAiPending()) {
+            auditApplication.scheduleAiReview(AuditContentType.THREAD, threadE.getThreadId(), threadE.getForumId(), false);
+        }
         if (AuditStatusV.AUDITING.equals(threadE.getAuditStatus())) {
             throw new AuditException("主题审核中，请耐心等待审核通过！");
         }
@@ -315,21 +340,25 @@ public class ThreadApplication {
         return switch (operation) {
             case OperationConstant.PASS -> {
                 forumPermissionResolver.checkPermission(forumId, "admin:thread:pass");
+                recordManualLog(threadIds, operation, null, AuditStatusV.PASSED, reason);
                 threadDomainService.passThreads(forumId, threadIds, notice);
                 yield "通过成功";
             }
             case OperationConstant.REJECT -> {
                 forumPermissionResolver.checkPermission(forumId, "admin:thread:reject");
+                recordManualLog(threadIds, operation, null, AuditStatusV.REJECTED, reason);
                 threadDomainService.rejectThreads(forumId, threadIds, reason, notice);
                 yield "拒绝成功";
             }
             case OperationConstant.RESTORE -> {
                 forumPermissionResolver.checkPermission(forumId, "admin:thread:restore");
+                recordManualLog(threadIds, operation, AuditStatusV.REJECTED, AuditStatusV.PASSED, reason);
                 threadDomainService.restoreThreads(forumId, threadIds, notice);
                 yield "恢复成功";
             }
             case OperationConstant.DELETE -> {
                 forumPermissionResolver.checkPermission(forumId, "admin:thread:delete");
+                recordManualLog(threadIds, operation, null, AuditStatusV.REJECTED, reason);
                 threadDomainService.deleteThreads(forumId, threadIds, reason, notice);
                 yield "删除成功";
             }
@@ -385,6 +414,42 @@ public class ThreadApplication {
             }
             default -> throw new ValidationException("操作类型不正确");
         };
+    }
+
+    /**
+     * 记录管理员人工操作的审核日志（仅写与审核状态相关的：PASS/REJECT/RESTORE/DELETE）
+     */
+    private void recordManualLog(List<Long> threadIds, String action, AuditStatusV before, AuditStatusV after, String reason) {
+        if (threadIds == null || threadIds.isEmpty()) {
+            return;
+        }
+        Long operatorId = HeaderUtils.getUserId();
+        for (Long threadId : threadIds) {
+            try {
+                ThreadE threadE = threadGateway.getThread(threadId);
+                if (threadE == null) {
+                    continue;
+                }
+                AuditStatusV statusBefore = before != null ? before : threadE.getAuditStatus();
+                auditLogApplication.record(AuditLogE.builder()
+                        .contentType(AuditContentType.THREAD.ordinal() + 1)
+                        .contentId(threadId)
+                        .forumId(threadE.getForumId())
+                        .userId(threadE.getCreateBy())
+                        .userIp(HeaderUtils.getIp())
+                        .triggerSource(AuditTriggerSourceV.MANUAL)
+                        .auditStage(AuditStageV.MANUAL)
+                        .auditStatusBefore(statusBefore)
+                        .auditStatusAfter(after)
+                        .hitDetail(com.alibaba.fastjson2.JSON.toJSONString(java.util.Map.of("action", action)))
+                        .operatorId(operatorId)
+                        .operatorType(OperatorTypeV.ADMIN)
+                        .reason(reason)
+                        .build());
+            } catch (Exception e) {
+                log.error("写入人工审核日志失败，threadId={}", threadId, e);
+            }
+        }
     }
 
     public void deleteThread(Long threadId, String reason, boolean notice) {

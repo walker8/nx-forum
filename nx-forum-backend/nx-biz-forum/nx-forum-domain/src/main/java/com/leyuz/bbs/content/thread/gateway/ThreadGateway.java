@@ -1,10 +1,12 @@
 package com.leyuz.bbs.content.thread.gateway;
 
+import com.leyuz.bbs.common.dataobject.ThreadHistoryItemV;
 import com.leyuz.bbs.content.thread.ThreadE;
 import com.leyuz.bbs.content.thread.ThreadPropertyE;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyV;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ThreadGateway {
     void save(ThreadE threadE);
@@ -47,6 +49,15 @@ public interface ThreadGateway {
 
     boolean rejectThread(Long threadId, String reason);
 
+    /**
+     * 仅更新审核原因（保持审核中状态）
+     *
+     * @param threadId 帖子 ID
+     * @param reason   审核原因
+     * @return 是否成功
+     */
+    boolean updateAuditReason(Long threadId, String reason);
+
     boolean restoreThread(Long threadId);
 
     /**
@@ -85,4 +96,13 @@ public interface ThreadGateway {
      */
     Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
                                     String terminalType, String platform);
+
+    /**
+     * 获取用户最近的主题帖（按发帖时间倒序，取 limit 条；包含已通过审核的帖子）
+     *
+     * @param userId 用户 ID
+     * @param limit  最大条数；<=0 返回空列表
+     * @return 历史主题帖条目列表
+     */
+    List<ThreadHistoryItemV> listRecentThreads(Long userId, int limit);
 }

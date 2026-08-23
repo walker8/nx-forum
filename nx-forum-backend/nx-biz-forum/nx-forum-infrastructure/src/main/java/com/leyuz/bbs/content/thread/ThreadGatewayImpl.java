@@ -2,30 +2,24 @@ package com.leyuz.bbs.content.thread;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
 import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
-import com.leyuz.bbs.content.thread.ThreadE;
-import com.leyuz.bbs.content.thread.ThreadPropertyE;
+import com.leyuz.bbs.common.dataobject.ThreadHistoryItemV;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyAttribute;
 import com.leyuz.bbs.content.thread.dataobject.ThreadPropertyV;
 import com.leyuz.bbs.content.thread.gateway.ThreadGateway;
-import com.leyuz.bbs.content.thread.ThreadMapper;
-import com.leyuz.bbs.content.thread.ThreadContentMapper;
-import com.leyuz.bbs.content.thread.ThreadPropertyMapper;
 import com.leyuz.common.utils.BaseEntityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.leyuz.bbs.common.constant.CommonConst.IMAGE_STRING_SEPARATOR;
 
@@ -47,6 +41,8 @@ public class ThreadGatewayImpl implements ThreadGateway {
             BaseEntityUtils.setCreateBaseEntity(threadPO);
             threadPO.setImages(String.join(IMAGE_STRING_SEPARATOR, Optional.ofNullable(threadE.getImages()).orElse(new ArrayList<>())));
             threadMapper.insert(threadPO);
+            threadE.setThreadId(threadPO.getThreadId());
+            threadE.setCreateBy(threadPO.getCreateBy());
             threadContentPO.setThreadId(threadPO.getThreadId());
             threadContentPO.setContent(Optional.ofNullable(threadE.getContent()).orElse(""));
             BaseEntityUtils.setCreateBaseEntity(threadContentPO);
@@ -253,6 +249,13 @@ public class ThreadGatewayImpl implements ThreadGateway {
     }
 
     @Override
+    public boolean updateAuditReason(Long threadId, String reason) {
+        UpdateWrapper<ThreadPO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("thread_id", threadId).set("audit_reason", reason);
+        return threadMapper.update(null, updateWrapper) > 0;
+    }
+
+    @Override
     public boolean restoreThread(Long threadId) {
         UpdateWrapper<ThreadPO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("thread_id", threadId)
@@ -316,7 +319,7 @@ public class ThreadGatewayImpl implements ThreadGateway {
 
     @Override
     public Long countThreadsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
-                                          String terminalType, String platform) {
+                                           String terminalType, String platform) {
         QueryWrapper<ThreadPO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("is_deleted", false);
         queryWrapper.eq("audit_status", AuditStatusV.PASSED.getValue());
@@ -331,5 +334,24 @@ public class ThreadGatewayImpl implements ThreadGateway {
         }
 
         return threadMapper.selectCount(queryWrapper);
+    }
+
+    @Override
+    public List<ThreadHistoryItemV> listRecentThreads(Long userId, int limit) {
+        if (userId == null || limit <= 0) {
+            return new ArrayList<>();
+        }
+        List<ThreadPO> records = threadMapper.selectList(new LambdaQueryWrapper<ThreadPO>()
+                .eq(ThreadPO::getCreateBy, userId)
+                .eq(ThreadPO::getIsDeleted, false)
+                .eq(ThreadPO::getAuditStatus, AuditStatusV.PASSED.getValue())
+                .orderByDesc(ThreadPO::getCreateTime)
+                .last("LIMIT " + limit)
+                .select(ThreadPO::getSubject, ThreadPO::getBrief, ThreadPO::getCreateTime));
+        List<ThreadHistoryItemV> result = new ArrayList<>(records.size());
+        for (ThreadPO po : records) {
+            result.add(new ThreadHistoryItemV(po.getSubject(), po.getBrief(), po.getCreateTime()));
+        }
+        return result;
     }
 }

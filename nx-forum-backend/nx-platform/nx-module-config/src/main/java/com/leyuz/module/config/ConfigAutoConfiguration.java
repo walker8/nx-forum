@@ -2,6 +2,8 @@ package com.leyuz.module.config;
 
 import com.leyuz.module.config.app.CacheConfig;
 import com.leyuz.module.config.app.ConfigApplication;
+import com.leyuz.module.config.app.ConfigSecretHandler;
+import com.leyuz.module.config.app.SensitiveConfigEncryptRunner;
 import com.leyuz.module.config.infrastructure.mybatis.ConfigServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,8 @@ import org.springframework.context.annotation.Import;
 @Import({
         CacheConfig.class,
         ConfigApplication.class,
+        ConfigSecretHandler.class,
+        SensitiveConfigEncryptRunner.class,
         ConfigServiceImpl.class
 })
 @MapperScan("com.leyuz.module.config.infrastructure.mybatis.mapper")

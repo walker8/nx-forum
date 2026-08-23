@@ -33,9 +33,11 @@ public class ThreadEventListener {
     @EventListener
     public void handleThreadUpdateEvent(ThreadUpdateEvent event) {
         ThreadE threadE = event.getEventData();
-        if (AuditStatusV.AUDITING.equals(threadE.getAuditStatus())) {
+        AuditStatusV status = threadE.getAuditStatus();
+        // AUDITING（编辑后转审核）或 REJECTED（规则引擎将已通过的帖子判为违规）都需扣减用户帖子计数
+        if (AuditStatusV.AUDITING.equals(status) || AuditStatusV.REJECTED.equals(status)) {
             forumUserPropertyMapper.decrementThreads(threadE.getCreateBy());
-        } else if (AuditStatusV.PASSED.equals(threadE.getAuditStatus())) {
+        } else if (AuditStatusV.PASSED.equals(status)) {
             notificationApplication.sendMentionNotification(threadE);
         }
     }
@@ -73,7 +75,7 @@ public class ThreadEventListener {
     public void handleThreadRejectedEvent(ThreadRejectedEvent event) {
         ThreadE threadE = event.getEventData();
         if (event.isNotice()) {
-            String subject = getSubjectOrBrief(threadE.getSubject(), threadE.getBrief());
+            String subject = getShortTitle(threadE.getSubject(), threadE.getBrief());
             String message = MessageFormat.format("您的帖子《<a href=\"/t/{0}\">{1}</a>》已被审核拒绝", threadE.getThreadId(), subject);
             String reason = event.getReason();
             if (StringUtils.isNotEmpty(reason)) {
@@ -81,6 +83,22 @@ public class ThreadEventListener {
             }
             notificationApplication.sendSystemNotification(threadE.getCreateBy(), "帖子审核通知", message);
         }
+    }
+
+    /**
+     * 截取短标题（AI 拒绝通知专用，限 30 字 + 省略号）
+     */
+    private String getShortTitle(String subject, String brief) {
+        String title;
+        if (StringUtils.isBlank(subject)) {
+            title = StringUtils.defaultIfBlank(brief, "无文字内容");
+        } else {
+            title = subject;
+        }
+        if (title.length() > 30) {
+            return title.substring(0, 30) + "...";
+        }
+        return title;
     }
 
     @EventListener

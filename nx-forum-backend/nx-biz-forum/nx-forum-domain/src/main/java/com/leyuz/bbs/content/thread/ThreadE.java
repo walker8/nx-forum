@@ -210,6 +210,14 @@ public class ThreadE {
         this.auditReason = auditReason;
     }
 
+    public void setThreadId(Long threadId) {
+        this.threadId = threadId;
+    }
+
+    public void setCreateBy(Long createBy) {
+        this.createBy = createBy;
+    }
+
     public void setContent(String content) {
         setContent(content, null);
     }

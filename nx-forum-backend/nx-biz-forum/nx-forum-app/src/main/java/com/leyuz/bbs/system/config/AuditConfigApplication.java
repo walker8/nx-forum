@@ -1,7 +1,9 @@
 package com.leyuz.bbs.system.config;
 
 import com.alibaba.fastjson2.JSON;
+import com.leyuz.bbs.system.config.dto.AuditConfigAiDTO;
 import com.leyuz.bbs.system.config.dto.AuditConfigBlackWhiteUsersDTO;
+import com.leyuz.bbs.system.config.dto.AuditConfigRulesDTO;
 import com.leyuz.bbs.system.config.dto.AuditConfigSensitiveWordsDTO;
 import com.leyuz.bbs.system.config.dto.ConfigConst;
 import com.leyuz.common.exception.ValidationException;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 @Service
@@ -77,5 +80,60 @@ public class AuditConfigApplication {
             config.setWhiteListUsers(new HashSet<>());
         }
         configApplication.updateConfig(ConfigConst.AUDIT_CONFIG_BLACK_WHITE_USERS, JSON.toJSONString(config));
+    }
+
+    /**
+     * 获取审核规则引擎配置
+     *
+     * @return 规则引擎配置
+     */
+    public AuditConfigRulesDTO getAuditConfigRules() {
+        AuditConfigRulesDTO config = configApplication.getConfigValueByKey(ConfigConst.AUDIT_CONFIG_RULES, AuditConfigRulesDTO.class);
+        if (config == null) {
+            config = new AuditConfigRulesDTO();
+            updateAuditConfigRules(config);
+        }
+        return config;
+    }
+
+    /**
+     * 更新审核规则引擎配置
+     *
+     * @param config 规则引擎配置
+     */
+    public void updateAuditConfigRules(AuditConfigRulesDTO config) {
+        if (config == null) {
+            throw new ValidationException("审核规则配置不能为空");
+        }
+        if (config.getRules() == null) {
+            config.setRules(new ArrayList<>());
+        }
+        configApplication.updateConfig(ConfigConst.AUDIT_CONFIG_RULES, JSON.toJSONString(config));
+    }
+
+    /**
+     * 获取 AI 审核配置
+     *
+     * @return AI 审核配置
+     */
+    public AuditConfigAiDTO getAuditConfigAi() {
+        AuditConfigAiDTO config = configApplication.getConfigValueByKey(ConfigConst.AUDIT_CONFIG_AI, AuditConfigAiDTO.class);
+        if (config == null) {
+            config = new AuditConfigAiDTO();
+            updateAuditConfigAi(config);
+        }
+        return config;
+    }
+
+    /**
+     * 更新 AI 审核配置
+     *
+     * @param config AI 审核配置
+     */
+    public void updateAuditConfigAi(AuditConfigAiDTO config) {
+        if (config == null) {
+            throw new ValidationException("AI 审核配置不能为空");
+        }
+        configApplication.updateConfig(ConfigConst.AUDIT_CONFIG_AI, JSON.toJSONString(config));
     }
 } 

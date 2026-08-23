@@ -161,8 +161,12 @@ const getTableData = () => {
 }
 
 const handleSearch = () => {
-  paginationData.currentPage = 1
-  getTableData()
+  // 与 comment.vue 一致：避免与分页 watcher 同时触发导致重复请求
+  if (paginationData.currentPage === 1) {
+    getTableData()
+  } else {
+    paginationData.currentPage = 1
+  }
 }
 
 const resetSearch = () => {

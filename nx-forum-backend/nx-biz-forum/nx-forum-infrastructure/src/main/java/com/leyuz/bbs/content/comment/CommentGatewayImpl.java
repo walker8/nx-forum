@@ -1,12 +1,14 @@
 package com.leyuz.bbs.content.comment;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyuz.bbs.common.constant.CommonConst;
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
+import com.leyuz.bbs.common.dataobject.CommentHistoryItemV;
 import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
 import com.leyuz.bbs.content.comment.gateway.CommentGateway;
@@ -143,16 +145,12 @@ public class CommentGatewayImpl implements CommentGateway {
 
     @Override
     public boolean restoreComment(Long commentId) {
-        UpdateWrapper<CommentPO> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("comment_id", commentId).set("is_deleted", false);
-        return commentMapper.update(null, updateWrapper) > 0;
+        return passComment(commentId);
     }
 
     @Override
     public boolean restoreCommentReply(Long replyId) {
-        UpdateWrapper<CommentReplyPO> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("reply_id", replyId).set("is_deleted", false);
-        return commentReplyMapper.update(null, updateWrapper) > 0;
+        return passCommentReply(replyId);
     }
 
     @Override
@@ -185,6 +183,38 @@ public class CommentGatewayImpl implements CommentGateway {
         UpdateWrapper<CommentReplyPO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("reply_id", replyId).set("is_deleted", true)
                 .set("audit_status", AuditStatusV.REJECTED.getValue())
+                .set("audit_reason", reason);
+        return commentReplyMapper.update(null, updateWrapper) > 0;
+    }
+
+    @Override
+    public boolean updateCommentAuditReason(Long commentId, String reason) {
+        UpdateWrapper<CommentPO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("comment_id", commentId).set("audit_reason", reason);
+        return commentMapper.update(null, updateWrapper) > 0;
+    }
+
+    @Override
+    public boolean updateCommentReplyAuditReason(Long replyId, String reason) {
+        UpdateWrapper<CommentReplyPO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("reply_id", replyId).set("audit_reason", reason);
+        return commentReplyMapper.update(null, updateWrapper) > 0;
+    }
+
+    @Override
+    public boolean revertCommentToAuditing(Long commentId, String reason) {
+        UpdateWrapper<CommentPO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("comment_id", commentId)
+                .set("audit_status", AuditStatusV.AUDITING.getValue())
+                .set("audit_reason", reason);
+        return commentMapper.update(null, updateWrapper) > 0;
+    }
+
+    @Override
+    public boolean revertCommentReplyToAuditing(Long replyId, String reason) {
+        UpdateWrapper<CommentReplyPO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("reply_id", replyId)
+                .set("audit_status", AuditStatusV.AUDITING.getValue())
                 .set("audit_reason", reason);
         return commentReplyMapper.update(null, updateWrapper) > 0;
     }
@@ -448,5 +478,43 @@ public class CommentGatewayImpl implements CommentGateway {
 
         // Return sum of comments and replies
         return commentCount + replyCount;
+    }
+
+    @Override
+    public List<CommentHistoryItemV> listRecentComments(Long userId, int limit) {
+        if (userId == null || limit <= 0) {
+            return new ArrayList<>();
+        }
+        List<CommentPO> records = commentMapper.selectList(new LambdaQueryWrapper<CommentPO>()
+                .eq(CommentPO::getCreateBy, userId)
+                .eq(CommentPO::getIsDeleted, false)
+                .eq(CommentPO::getAuditStatus, AuditStatusV.PASSED.getValue())
+                .orderByDesc(CommentPO::getCreateTime)
+                .last("LIMIT " + limit)
+                .select(CommentPO::getMessage, CommentPO::getCreateTime));
+        List<CommentHistoryItemV> result = new ArrayList<>(records.size());
+        for (CommentPO po : records) {
+            result.add(new CommentHistoryItemV(po.getMessage(), po.getCreateTime()));
+        }
+        return result;
+    }
+
+    @Override
+    public List<CommentHistoryItemV> listRecentReplies(Long userId, int limit) {
+        if (userId == null || limit <= 0) {
+            return new ArrayList<>();
+        }
+        List<CommentReplyPO> records = commentReplyMapper.selectList(new LambdaQueryWrapper<CommentReplyPO>()
+                .eq(CommentReplyPO::getCreateBy, userId)
+                .eq(CommentReplyPO::getIsDeleted, false)
+                .eq(CommentReplyPO::getAuditStatus, AuditStatusV.PASSED.getValue())
+                .orderByDesc(CommentReplyPO::getCreateTime)
+                .last("LIMIT " + limit)
+                .select(CommentReplyPO::getMessage, CommentReplyPO::getCreateTime));
+        List<CommentHistoryItemV> result = new ArrayList<>(records.size());
+        for (CommentReplyPO po : records) {
+            result.add(new CommentHistoryItemV(po.getMessage(), po.getCreateTime()));
+        }
+        return result;
     }
 }

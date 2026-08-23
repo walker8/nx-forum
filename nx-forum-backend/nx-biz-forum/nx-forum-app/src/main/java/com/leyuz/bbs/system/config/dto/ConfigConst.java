@@ -14,6 +14,12 @@ public class ConfigConst {
 
     public static final String AUDIT_CONFIG_BLACK_WHITE_USERS = "audit_config_black_white_users";
 
+    public static final String AUDIT_CONFIG_RULES = "audit_config_rules";
+
+    public static final String AUDIT_CONFIG_AI = "audit_config_ai";
+
+    public static final String AI_MODELS = "ai_models";
+
     public static final String ANALYTICS_CONFIG = "analytics_config";
 
 }

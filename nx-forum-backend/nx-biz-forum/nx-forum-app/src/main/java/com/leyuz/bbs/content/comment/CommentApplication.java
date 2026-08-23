@@ -1,13 +1,15 @@
 package com.leyuz.bbs.content.comment;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyuz.bbs.auth.ForumPermissionResolver;
 import com.leyuz.bbs.common.constant.OperationConstant;
+import com.leyuz.bbs.common.dataobject.AuditStageV;
 import com.leyuz.bbs.common.dataobject.AuditStatusV;
+import com.leyuz.bbs.common.dataobject.AuditTriggerSourceV;
 import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.common.dataobject.DocTypeV;
+import com.leyuz.bbs.common.dataobject.OperatorTypeV;
 import com.leyuz.bbs.common.utils.HtmlUtils;
 import com.leyuz.bbs.content.comment.convert.CommentConvert;
 import com.leyuz.bbs.content.comment.dto.*;
@@ -18,7 +20,11 @@ import com.leyuz.bbs.content.thread.gateway.ThreadGateway;
 import com.leyuz.bbs.forum.ForumApplication;
 import com.leyuz.bbs.forum.ForumPO;
 import com.leyuz.bbs.system.audit.AuditApplication;
+import com.leyuz.bbs.system.audit.AuditLogApplication;
+import com.leyuz.bbs.system.audit.domain.AuditLogE;
+import com.leyuz.bbs.system.audit.dto.AuditContentType;
 import com.leyuz.bbs.system.audit.dto.AuditDTO;
+import com.leyuz.bbs.system.audit.dto.AuditResult;
 import com.leyuz.common.dto.UserClientInfo;
 import com.leyuz.common.exception.AuditException;
 import com.leyuz.common.exception.ValidationException;
@@ -31,6 +37,7 @@ import com.leyuz.common.utils.UserAgentUtils;
 import com.leyuz.uc.user.UserApplication;
 import com.leyuz.uc.user.UserE;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -41,6 +48,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentApplication {
     private final CommentDomainService commentDomainService;
     private final CommentGateway commentGateway;
@@ -51,6 +59,7 @@ public class CommentApplication {
     private final CommentReplyMapper commentReplyMapper;
     private final ForumApplication forumApplication;
     private final AuditApplication auditApplication;
+    private final AuditLogApplication auditLogApplication;
     private final ForumPermissionResolver forumPermissionResolver;
 
 
@@ -70,12 +79,20 @@ public class CommentApplication {
         AuditDTO auditDTO = AuditDTO.builder()
                 .userId(HeaderUtils.getUserId())
                 .message(HtmlUtils.convertHtmlToText(commentCmd.getMessage()))
+                .contentType(AuditContentType.COMMENT)
+                .forumId(forumId)
+                .isNew(true)
                 .build();
-        Pair<AuditStatusV, String> result = auditApplication.check(auditDTO);
-        commentE.setAuditResult(result.getKey(), result.getValue());
+        AuditResult result = auditApplication.check(auditDTO);
+        commentE.setAuditResult(result.getStatus(), result.getReason());
 
         // 保存评论
         commentDomainService.saveComment(commentE);
+        // 内容入库后回填同步阶段审核记录的 contentId（黑/白名单、敏感词、规则引擎）
+        auditLogApplication.updateContentIdBySessionId(result.getSessionId(), commentE.getCommentId());
+        if (result.isAiPending()) {
+            auditApplication.scheduleAiReview(AuditContentType.COMMENT, commentE.getCommentId(), forumId, true);
+        }
         if (AuditStatusV.AUDITING.equals(commentE.getAuditStatus())) {
             throw new AuditException("评论审核中，请耐心等待审核通过！");
         }
@@ -116,12 +133,20 @@ public class CommentApplication {
         AuditDTO auditDTO = AuditDTO.builder()
                 .userId(HeaderUtils.getUserId())
                 .message(HtmlUtils.convertHtmlToText(commentReplyCmd.getMessage()))
+                .contentType(AuditContentType.REPLY)
+                .forumId(forumId)
+                .isNew(true)
                 .build();
-        Pair<AuditStatusV, String> result = auditApplication.check(auditDTO);
-        commentReplyE.setAuditResult(result.getKey(), result.getValue());
+        AuditResult result = auditApplication.check(auditDTO);
+        commentReplyE.setAuditResult(result.getStatus(), result.getReason());
 
         // 保存评论的回复
         commentDomainService.saveCommentReply(commentReplyE);
+        // 内容入库后回填同步阶段审核记录的 contentId（黑/白名单、敏感词、规则引擎）
+        auditLogApplication.updateContentIdBySessionId(result.getSessionId(), commentReplyE.getReplyId());
+        if (result.isAiPending()) {
+            auditApplication.scheduleAiReview(AuditContentType.REPLY, commentReplyE.getReplyId(), forumId, true);
+        }
         if (AuditStatusV.AUDITING.equals(commentReplyE.getAuditStatus())) {
             throw new AuditException("回复审核中，请耐心等待审核通过！");
         }
@@ -289,21 +314,32 @@ public class CommentApplication {
     }
 
     public void operateCommentsByAdmin(Integer forumId, List<Long> commentIds, String operation, String reason, Boolean notice) {
+        AuditStatusV targetStatus = null;
+        AuditStatusV beforeStatus = null;
         switch (operation) {
             case OperationConstant.PASS:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:pass");
+                targetStatus = AuditStatusV.PASSED;
+                recordCommentManualLog(commentIds, AuditContentType.COMMENT.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.passComments(forumId, commentIds, notice);
                 break;
             case OperationConstant.REJECT:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:reject");
+                targetStatus = AuditStatusV.REJECTED;
+                recordCommentManualLog(commentIds, AuditContentType.COMMENT.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.rejectComments(forumId, commentIds, reason, notice);
                 break;
             case OperationConstant.RESTORE:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:restore");
+                targetStatus = AuditStatusV.PASSED;
+                beforeStatus = AuditStatusV.REJECTED;
+                recordCommentManualLog(commentIds, AuditContentType.COMMENT.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.restoreComments(forumId, commentIds, notice);
                 break;
             case OperationConstant.DELETE:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:delete");
+                targetStatus = AuditStatusV.REJECTED;
+                recordCommentManualLog(commentIds, AuditContentType.COMMENT.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.deleteComments(forumId, commentIds, reason, notice);
                 break;
             default:
@@ -316,21 +352,32 @@ public class CommentApplication {
     }
 
     public void operateCommentRepliesByAdmin(Integer forumId, List<Long> replyIds, String operation, String reason, Boolean notice) {
+        AuditStatusV targetStatus = null;
+        AuditStatusV beforeStatus = null;
         switch (operation) {
             case OperationConstant.PASS:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:pass");
+                targetStatus = AuditStatusV.PASSED;
+                recordCommentManualLog(replyIds, AuditContentType.REPLY.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.passCommentReplies(forumId, replyIds, notice);
                 break;
             case OperationConstant.REJECT:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:reject");
+                targetStatus = AuditStatusV.REJECTED;
+                recordCommentManualLog(replyIds, AuditContentType.REPLY.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.rejectCommentReplies(forumId, replyIds, reason, notice);
                 break;
             case OperationConstant.RESTORE:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:restore");
+                targetStatus = AuditStatusV.PASSED;
+                beforeStatus = AuditStatusV.REJECTED;
+                recordCommentManualLog(replyIds, AuditContentType.REPLY.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.restoreCommentReplies(forumId, replyIds, notice);
                 break;
             case OperationConstant.DELETE:
                 forumPermissionResolver.checkPermission(forumId, "admin:comment:delete");
+                targetStatus = AuditStatusV.REJECTED;
+                recordCommentManualLog(replyIds, AuditContentType.REPLY.ordinal() + 1, operation, beforeStatus, targetStatus, reason);
                 commentDomainService.deleteCommentReplies(forumId, replyIds, reason, notice);
                 break;
             default:
@@ -340,5 +387,61 @@ public class CommentApplication {
 
     public void deleteCommentReply(Long replyId, String reason, Boolean notice) {
         commentDomainService.deleteCommentReplies(0, Collections.singletonList(replyId), reason, notice);
+    }
+
+    /**
+     * 记录管理员人工操作的审核日志（评论/楼中楼）
+     */
+    private void recordCommentManualLog(List<Long> ids, Integer contentType, String action,
+                                        AuditStatusV before, AuditStatusV after, String reason) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        Long operatorId = HeaderUtils.getUserId();
+        for (Long id : ids) {
+            try {
+                AuditStatusV statusBefore = before;
+                Integer forumIdVal = null;
+                Long userId = null;
+                if (contentType == AuditContentType.COMMENT.ordinal() + 1) {
+                    CommentE commentE = commentGateway.getComment(id);
+                    if (commentE == null) {
+                        continue;
+                    }
+                    if (statusBefore == null) {
+                        statusBefore = commentE.getAuditStatus();
+                    }
+                    forumIdVal = commentE.getForumId();
+                    userId = commentE.getCreateBy();
+                } else if (contentType == AuditContentType.REPLY.ordinal() + 1) {
+                    CommentReplyE replyE = commentGateway.getCommentReply(id);
+                    if (replyE == null) {
+                        continue;
+                    }
+                    if (statusBefore == null) {
+                        statusBefore = replyE.getAuditStatus();
+                    }
+                    forumIdVal = replyE.getForumId();
+                    userId = replyE.getCreateBy();
+                }
+                auditLogApplication.record(AuditLogE.builder()
+                        .contentType(contentType)
+                        .contentId(id)
+                        .forumId(forumIdVal)
+                        .userId(userId)
+                        .userIp(HeaderUtils.getIp())
+                        .triggerSource(AuditTriggerSourceV.MANUAL)
+                        .auditStage(AuditStageV.MANUAL)
+                        .auditStatusBefore(statusBefore)
+                        .auditStatusAfter(after)
+                        .hitDetail(com.alibaba.fastjson2.JSON.toJSONString(Map.of("action", action)))
+                        .operatorId(operatorId)
+                        .operatorType(OperatorTypeV.ADMIN)
+                        .reason(reason)
+                        .build());
+            } catch (Exception e) {
+                log.error("写入评论/楼中楼人工审核日志失败，id={}", id, e);
+            }
+        }
     }
 }

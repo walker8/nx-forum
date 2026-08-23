@@ -1,11 +1,13 @@
 package com.leyuz.bbs.content.comment.gateway;
 
+import com.leyuz.bbs.common.dataobject.CommentHistoryItemV;
 import com.leyuz.bbs.common.dataobject.CommentOrderV;
 import com.leyuz.bbs.content.comment.CommentE;
 import com.leyuz.bbs.content.comment.CommentReplyE;
 import com.leyuz.common.mybatis.CustomPage;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface CommentGateway {
 
@@ -73,6 +75,26 @@ public interface CommentGateway {
 
     boolean rejectCommentReply(Long replyId, String reason);
 
+    /**
+     * 仅更新评论审核原因（保持审核中状态）
+     */
+    boolean updateCommentAuditReason(Long commentId, String reason);
+
+    /**
+     * 仅更新楼中楼审核原因（保持审核中状态）
+     */
+    boolean updateCommentReplyAuditReason(Long replyId, String reason);
+
+    /**
+     * 将评论从 PASSED 退回审核中（AI 存疑时使用），更新状态和原因
+     */
+    boolean revertCommentToAuditing(Long commentId, String reason);
+
+    /**
+     * 将楼中楼回复从 PASSED 退回审核中（AI 存疑时使用），更新状态和原因
+     */
+    boolean revertCommentReplyToAuditing(Long replyId, String reason);
+
     void updateForumId(Long threadId, Integer targetForumId);
 
     void incrementLikeCount(Long targetId, int delta);
@@ -100,4 +122,22 @@ public interface CommentGateway {
      */
     Long countCommentsCreatedBetween(LocalDateTime startDate, LocalDateTime endDate,
                                      String terminalType, String platform);
+
+    /**
+     * 获取用户最近的顶层评论（按评论时间倒序，取 limit 条）
+     *
+     * @param userId 用户 ID
+     * @param limit  最大条数；<=0 返回空列表
+     * @return 历史评论条目列表
+     */
+    List<CommentHistoryItemV> listRecentComments(Long userId, int limit);
+
+    /**
+     * 获取用户最近的楼中楼回复（按回复时间倒序，取 limit 条）
+     *
+     * @param userId 用户 ID
+     * @param limit  最大条数；<=0 返回空列表
+     * @return 历史楼中楼条目列表
+     */
+    List<CommentHistoryItemV> listRecentReplies(Long userId, int limit);
 }

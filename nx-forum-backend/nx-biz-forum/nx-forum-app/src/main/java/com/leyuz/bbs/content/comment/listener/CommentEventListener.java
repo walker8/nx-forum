@@ -73,7 +73,16 @@ public class CommentEventListener {
 
     @EventListener
     public void handleCommentRejectedEvent(CommentRejectedEvent event) {
-        sendCommentSystemNotification(EventType.REJECTED, event.getEventData(), event.getReason(), event.isNotice());
+        CommentE commentE = event.getEventData();
+        // AI 异步复审路径：PASSED -> REJECTED，需要扣减评论数；手动拒绝路径：AUDITING -> REJECTED，无需扣减
+        if (AuditStatusV.PASSED.equals(commentE.getAuditStatus())) {
+            threadGateway.decreaseComments(commentE.getThreadId(), commentE.getReplyCount() + 1);
+            // 该顶层评论被拒后，其下挂载的楼中楼回复也随之不可见，需同步清零 reply_count
+            // 防止嵌套回复计数在 DB 与 thread.comments 之间漂移（decreaseReplies 内部已对 number<=0 短路）
+            commentGateway.decreaseReplies(commentE.getCommentId(), commentE.getReplyCount());
+            forumUserPropertyService.decrementComments(commentE.getCreateBy());
+        }
+        sendCommentSystemNotification(EventType.REJECTED, commentE, event.getReason(), event.isNotice());
     }
 
     @EventListener
@@ -102,7 +111,51 @@ public class CommentEventListener {
 
     @EventListener
     public void handleCommentReplyRejectedEvent(CommentReplyRejectedEvent event) {
-        sendCommentReplySystemNotification(EventType.REJECTED, event.getEventData(), event.getReason(), event.isNotice());
+        CommentReplyE commentReplyE = event.getEventData();
+        // AI 异步复审路径：PASSED -> REJECTED，需要扣减评论数；手动拒绝路径：AUDITING -> REJECTED，无需扣减
+        if (AuditStatusV.PASSED.equals(commentReplyE.getAuditStatus())) {
+            threadGateway.decreaseComments(commentReplyE.getThreadId(), 1);
+            // 同步扣减父评论的 reply_count，避免嵌套回复计数漂移
+            commentGateway.decreaseReplies(commentReplyE.getCommentId(), 1);
+        }
+        sendCommentReplySystemNotification(EventType.REJECTED, commentReplyE, event.getReason(), event.isNotice());
+    }
+
+    @EventListener
+    public void handleCommentAiReviewEvent(CommentAiReviewEvent event) {
+        CommentE commentE = event.getEventData();
+        // AI 复审路径：PASSED -> AUDITING，需要扣减评论数
+        threadGateway.decreaseComments(commentE.getThreadId(), commentE.getReplyCount() + 1);
+        forumUserPropertyService.decrementComments(commentE.getCreateBy());
+        if (event.isNotice()) {
+            String brief = getShortBrief(commentE.getMessage());
+            String message = MessageFormat.format(
+                    "您的评论《<a href=\"/c/{0}\">{1}</a>》已被系统转交人工审核",
+                    commentE.getCommentId(), brief);
+            String reason = event.getReason();
+            if (StringUtils.isNotEmpty(reason)) {
+                message = message + "，原因：" + reason;
+            }
+            notificationApplication.sendSystemNotification(commentE.getCreateBy(), "评论审核通知", message);
+        }
+    }
+
+    @EventListener
+    public void handleCommentReplyAiReviewEvent(CommentReplyAiReviewEvent event) {
+        CommentReplyE replyE = event.getEventData();
+        // AI 复审路径：PASSED -> AUDITING，需要扣减评论数
+        threadGateway.decreaseComments(replyE.getThreadId(), 1);
+        if (event.isNotice()) {
+            String brief = getShortBrief(replyE.getMessage());
+            String message = MessageFormat.format(
+                    "您的回复《<a href=\"/c/{0}?replyId={1}\">{2}</a>》已被系统转交人工审核",
+                    replyE.getCommentId(), replyE.getReplyId(), brief);
+            String reason = event.getReason();
+            if (StringUtils.isNotEmpty(reason)) {
+                message = message + "，原因：" + reason;
+            }
+            notificationApplication.sendSystemNotification(replyE.getCreateBy(), "回复审核通知", message);
+        }
     }
 
     @EventListener
@@ -140,7 +193,10 @@ public class CommentEventListener {
 
     private void sendCommentSystemNotification(EventType eventType, CommentE commentE, String reason, boolean notice) {
         if (notice) {
-            String brief = getBrief(commentE.getMessage());
+            // 拒绝/删除通知使用 30 字短摘要，其他通知保持 80 字
+            String brief = (eventType == EventType.REJECTED)
+                    ? getShortBrief(commentE.getMessage())
+                    : getBrief(commentE.getMessage());
             String pattern = "您的评论《<a href=\"/c/{0}\">{1}</a>》";
             String subject = "";
             switch (eventType) {
@@ -171,7 +227,10 @@ public class CommentEventListener {
 
     private void sendCommentReplySystemNotification(EventType eventType, CommentReplyE commentReplyE, String reason, boolean notice) {
         if (notice) {
-            String brief = getBrief(commentReplyE.getMessage());
+            // 拒绝/删除通知使用 30 字短摘要，其他通知保持 80 字
+            String brief = (eventType == EventType.REJECTED)
+                    ? getShortBrief(commentReplyE.getMessage())
+                    : getBrief(commentReplyE.getMessage());
             String pattern = "您的回复《<a href=\"/c/{0}?replyId={1}\">{2}</a>》";
             String subject = "";
             switch (eventType) {
@@ -201,11 +260,21 @@ public class CommentEventListener {
     }
 
     private String getBrief(String message) {
-        // 取出摘要的前80个字符
+        return truncateBrief(message, 80);
+    }
+
+    /**
+     * 截取短摘要（AI 拒绝/转人工通知专用，限 30 字 + 省略号）
+     */
+    private String getShortBrief(String message) {
+        return truncateBrief(message, 30);
+    }
+
+    private String truncateBrief(String message, int maxLen) {
         if (StringUtils.isBlank(message)) {
             return "无文字内容";
-        } else if (message.length() > 80) {
-            return message.substring(0, 80) + "...";
+        } else if (message.length() > maxLen) {
+            return message.substring(0, maxLen) + "...";
         } else {
             return message;
         }

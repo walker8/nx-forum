@@ -47,4 +47,23 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    /**
+     * AI 审核异步执行器
+     *
+     * <p>采用 AbortPolicy：队列满后直接抛 RejectedExecutionException，由 {@code ContentAiAuditListener}
+     * 的 try/catch 兜底记日志并跳过本次复审（AI 厂商限流/宕机时，宁可漏审也不能把请求线程
+     * 阻塞在事务提交线程上阻塞用户发主题/评论）。</p>
+     */
+    @Bean("aiAuditExecutor")
+    public Executor aiAuditExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(200);
+        executor.setThreadNamePrefix("ai-audit-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+        executor.initialize();
+        return executor;
+    }
 }

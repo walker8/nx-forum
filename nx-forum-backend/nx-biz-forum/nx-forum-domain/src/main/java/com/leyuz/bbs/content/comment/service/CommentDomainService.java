@@ -67,8 +67,9 @@ public class CommentDomainService {
 
     public void rejectComments(Integer forumId, List<Long> commentIds, String reason, Boolean notice) {
         operate(forumId, commentIds, commentGateway::getComment, commentE -> {
-            if (AuditStatusV.AUDITING.equals(commentE.getAuditStatus())) {
-                // 待审核的回复才能被拒绝
+            // 待审核或已通过的评论才能被拒绝（AI异步复审后可能已是 PASSED）
+            if (AuditStatusV.AUDITING.equals(commentE.getAuditStatus())
+                    || AuditStatusV.PASSED.equals(commentE.getAuditStatus())) {
                 boolean rejected = commentGateway.rejectComment(commentE.getCommentId(), reason);
                 if (rejected) {
                     eventPublisher.publishEvent(new CommentRejectedEvent(this, commentE, reason, notice));
@@ -128,11 +129,40 @@ public class CommentDomainService {
 
     public void rejectCommentReplies(Integer forumId, List<Long> replyIds, String reason, Boolean notice) {
         operate(forumId, replyIds, commentGateway::getCommentReply, commentReplyE -> {
-            if (AuditStatusV.AUDITING.equals(commentReplyE.getAuditStatus())) {
-                // 待审核的评论才能被拒绝
+            // 待审核或已通过的楼中楼才能被拒绝（AI异步复审后可能已是 PASSED）
+            if (AuditStatusV.AUDITING.equals(commentReplyE.getAuditStatus())
+                    || AuditStatusV.PASSED.equals(commentReplyE.getAuditStatus())) {
                 boolean rejected = commentGateway.rejectCommentReply(commentReplyE.getReplyId(), reason);
                 if (rejected) {
                     eventPublisher.publishEvent(new CommentReplyRejectedEvent(this, commentReplyE, reason, notice));
+                }
+            }
+        });
+    }
+
+    /**
+     * AI 复审存疑：将评论从 PASSED 退回审核中（仅作用于默认通过的评论）
+     */
+    public void aiReviewComments(Integer forumId, List<Long> commentIds, String reason, Boolean notice) {
+        operate(forumId, commentIds, commentGateway::getComment, commentE -> {
+            if (AuditStatusV.PASSED.equals(commentE.getAuditStatus())) {
+                boolean reverted = commentGateway.revertCommentToAuditing(commentE.getCommentId(), reason);
+                if (reverted) {
+                    eventPublisher.publishEvent(new CommentAiReviewEvent(this, commentE, reason, notice));
+                }
+            }
+        });
+    }
+
+    /**
+     * AI 复审存疑：将楼中楼从 PASSED 退回审核中（仅作用于默认通过的楼中楼）
+     */
+    public void aiReviewCommentReplies(Integer forumId, List<Long> replyIds, String reason, Boolean notice) {
+        operate(forumId, replyIds, commentGateway::getCommentReply, commentReplyE -> {
+            if (AuditStatusV.PASSED.equals(commentReplyE.getAuditStatus())) {
+                boolean reverted = commentGateway.revertCommentReplyToAuditing(commentReplyE.getReplyId(), reason);
+                if (reverted) {
+                    eventPublisher.publishEvent(new CommentReplyAiReviewEvent(this, commentReplyE, reason, notice));
                 }
             }
         });

@@ -49,6 +49,22 @@
               <span>审核设置</span>
             </template>
           </el-menu-item>
+          <el-menu-item index="2-7" @click="handleMenuClick('/admin/ai-models')" v-if="hasPermission('admin:system:audit')">
+            <template #title>
+              <el-icon size="16px">
+                <Icon name="tabler:robot" />
+              </el-icon>
+              <span>模型管理</span>
+            </template>
+          </el-menu-item>
+          <el-menu-item index="2-8" @click="handleMenuClick('/admin/audit-log')" v-if="hasPermission('admin:system:audit')">
+            <template #title>
+              <el-icon size="16px">
+                <Icon name="tabler:history" />
+              </el-icon>
+              <span>审核日志</span>
+            </template>
+          </el-menu-item>
           <el-menu-item index="2-6" @click="handleMenuClick('/admin/image')" v-if="hasPermission('admin:system:image')">
             <template #title>
               <el-icon size="16px">
@@ -201,6 +217,8 @@ const routeIndexMap: Record<string, string> = {
   '/admin/analytics': '2-1',
   '/admin/forum': '2-3',
   '/admin/audit': '2-4',
+  '/admin/ai-models': '2-7',
+  '/admin/audit-log': '2-8',
   '/admin/image': '2-6',
   '/admin/custom-page': '2-5',
   '/admin/thread': '3-0',

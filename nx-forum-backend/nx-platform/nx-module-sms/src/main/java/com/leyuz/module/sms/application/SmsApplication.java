@@ -2,10 +2,12 @@ package com.leyuz.module.sms.application;
 
 import com.alibaba.fastjson2.JSON;
 import com.leyuz.common.exception.ValidationException;
+import com.leyuz.common.security.SecretCrypto;
 import com.leyuz.module.config.app.ConfigApplication;
 import com.leyuz.module.sms.dto.SmsConfigDTO;
 import com.leyuz.module.sms.infrastructure.AliyunSmsClient;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,6 +48,16 @@ public class SmsApplication {
     }
 
     public void updateSmsConfig(SmsConfigDTO config) {
+        if (config == null) {
+            return;
+        }
+        // accessKeySecret 留空或为脱敏展示值时沿用原值，避免误覆盖
+        SmsConfigDTO stored = configApplication.getConfigValueByKey(SMS_CONFIG_KEY, SmsConfigDTO.class);
+        if (stored != null && stored.getAccessKeySecret() != null
+                && (StringUtils.isBlank(config.getAccessKeySecret())
+                || SecretCrypto.isMaskedForm(config.getAccessKeySecret(), stored.getAccessKeySecret()))) {
+            config.setAccessKeySecret(stored.getAccessKeySecret());
+        }
         configApplication.updateConfig(SMS_CONFIG_KEY, JSON.toJSONString(config));
     }
 

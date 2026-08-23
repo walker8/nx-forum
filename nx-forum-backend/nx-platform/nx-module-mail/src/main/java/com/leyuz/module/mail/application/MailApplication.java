@@ -2,6 +2,7 @@ package com.leyuz.module.mail.application;
 
 import com.alibaba.fastjson2.JSON;
 import com.leyuz.common.exception.ValidationException;
+import com.leyuz.common.security.SecretCrypto;
 import com.leyuz.module.config.app.ConfigApplication;
 import com.leyuz.module.mail.config.MailConfiguration;
 import com.leyuz.module.mail.dto.EmailListConfigDTO;
@@ -271,14 +272,29 @@ public class MailApplication implements ApplicationRunner {
     }
 
     public void updateSmtpConfig(MailConfigDTO config) {
-        if (config != null) {
-            configApplication.updateConfig(MAIL_SMTP_CONFIG_KEY, JSON.toJSONString(config));
-            mailConfiguration.updateMailProperties(config);
+        if (config == null) {
+            return;
         }
+        // 密码留空或为脱敏展示值时沿用原密码，避免误覆盖
+        MailConfigDTO stored = configApplication.getConfigValueByKey(MAIL_SMTP_CONFIG_KEY, MailConfigDTO.class);
+        if (stored != null && stored.getPassword() != null
+                && (!StringUtils.hasText(config.getPassword())
+                || SecretCrypto.isMaskedForm(config.getPassword(), stored.getPassword()))) {
+            config.setPassword(stored.getPassword());
+        }
+        configApplication.updateConfig(MAIL_SMTP_CONFIG_KEY, JSON.toJSONString(config));
+        mailConfiguration.updateMailProperties(config);
     }
 
+    /**
+     * 获取 SMTP 配置（管理端视图，密码脱敏回显）
+     */
     public MailConfigDTO getSmtpConfig() {
-        return configApplication.getConfigValueByKey(MAIL_SMTP_CONFIG_KEY, MailConfigDTO.class);
+        MailConfigDTO config = configApplication.getConfigValueByKey(MAIL_SMTP_CONFIG_KEY, MailConfigDTO.class);
+        if (config != null) {
+            config.setPassword(SecretCrypto.mask(config.getPassword()));
+        }
+        return config;
     }
 
     /**
